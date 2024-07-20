@@ -88,7 +88,7 @@ impl Lexer {
   fn read_string(&mut self) -> Token {
     self.consume_expect("\"");
     let string = self.read_while(|c| c != '"');
-    self.consume_expect("\"");
+    self.consume_expect_with_custom_error("\"", "undetermined string");
     let location = self.create_location();
     Token::new_string(location, string)
   }
@@ -118,6 +118,15 @@ impl Lexer {
     } else {
       let location = self.create_location();
       panic!("Expected '{}' at {:?}", text, location);
+    }
+  }
+
+  fn consume_expect_with_custom_error(&mut self, text: &str, error_message: &str) {
+    if &self.peek_many(text.len()) == text {
+      self.advance_many(text.len());
+    } else {
+      let location = self.create_location();
+      panic!("{} at {:?}", error_message, location);
     }
   }
 
