@@ -27,14 +27,17 @@ impl Lexer {
     if self.peeked_token.is_none() {
       self.peeked_token = Some(self.read_next_token());
     }
-    self.peeked_token.take().unwrap()
+    let token = self.peeked_token.clone().unwrap();
+    return token;
   }
 
   pub fn next_token(&mut self) -> Token {
     if self.peeked_token.is_none() {
       return self.read_next_token();
     }
-    return self.peeked_token.clone().unwrap();
+    let token = self.peeked_token.clone().unwrap();
+    self.peeked_token = None;
+    return token;
   }
   fn read_next_token(&mut self) -> Token {
     self.skip_whitespace();

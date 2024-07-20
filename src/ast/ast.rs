@@ -286,7 +286,7 @@ pub enum Type {
   Void,
   Number,
   String,
-  Bool,
+  Boolean,
   Identifier(String),
 }
 
@@ -300,7 +300,7 @@ impl Type {
       "void" => Type::Void,
       "number" => Type::Number,
       "string" => Type::String,
-      "bool" => Type::Bool,
+      "boolean" => Type::Boolean,
       _ => Type::Identifier(text),
     }
   }

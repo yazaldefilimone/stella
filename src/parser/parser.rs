@@ -17,7 +17,7 @@ impl Parser {
     Parser { lexer }
   }
 
-  fn parse_program(&mut self) -> ast::Program {
+  pub fn parse_program(&mut self) -> ast::Program {
     let mut program = ast::Program::new();
     while !self.is_end() {
       let statement = self.parse_statement();
@@ -45,15 +45,16 @@ impl Parser {
   fn parse_expression_statement(&mut self) -> ast::ExpressionStatement {
     let token = self.lexer.peek_token();
     match token.kind {
-      TokenKind::Number(_) => self.parse_literal_expression(token),
-      TokenKind::String(_) => self.parse_literal_expression(token),
-      TokenKind::True => self.parse_literal_expression(token),
-      TokenKind::False => self.parse_literal_expression(token),
+      TokenKind::Number(_) => self.parse_literal_expression(),
+      TokenKind::String(_) => self.parse_literal_expression(),
+      TokenKind::True => self.parse_literal_expression(),
+      TokenKind::False => self.parse_literal_expression(),
       _ => panic!("Invalid expression statement"),
     }
   }
 
-  fn parse_literal_expression(&mut self, token: Token) -> ast::ExpressionStatement {
+  fn parse_literal_expression(&mut self) -> ast::ExpressionStatement {
+    let token = self.lexer.next_token();
     match token.kind {
       TokenKind::Number(number) => ast::ExpressionStatement::new_number_literal(number, token.location),
       TokenKind::String(string) => ast::ExpressionStatement::new_string_literal(string, token.location),
@@ -109,17 +110,23 @@ impl Parser {
   }
 
   fn parse_local_statement(&mut self) -> ast::Statement {
+    self.consume_expect_token(TokenKind::Local);
     let name = self.consume_token();
     let mut type_ = None;
+
     if self.match_token(&TokenKind::Colon) {
       self.consume_expect_token(TokenKind::Colon);
       type_ = Some(self.parse_type());
     }
+
     self.consume_expect_token(TokenKind::Equal);
 
     let init = self.parse_expression_statement();
+
     let location = name.location.clone();
+
     let local = ast::LocalStatement::new(name, type_, init, location);
+
     ast::Statement::LocalStatement(local)
   }
 
@@ -179,9 +186,10 @@ impl Parser {
   }
 
   fn is_end(&mut self) -> bool {
-    match self.lexer.next_token().kind {
+    let next_token = self.lexer.peek_token();
+    return match next_token.kind {
       TokenKind::EOF => true,
       _ => false,
-    }
+    };
   }
 }

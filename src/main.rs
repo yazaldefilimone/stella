@@ -9,6 +9,7 @@ mod utils;
 
 use ast::tokens::TokenKind;
 use lexer::Lexer;
+use parser::parser::Parser;
 
 fn main() {
   let matches = cli::command_line();
@@ -28,6 +29,12 @@ fn main() {
 
 fn run_check(path_name: &str) {
   let raw = std::fs::read_to_string(path_name).unwrap();
+  let mut parser = Parser::new(&raw);
+  let program = parser.parse_program();
+  println!("{:#?}", program);
+}
+fn run_compile(path_name: &str) {
+  let raw = std::fs::read_to_string(path_name).unwrap();
   println!("raw: {}", raw);
   let mut lexer = Lexer::new(raw);
   loop {
@@ -37,8 +44,4 @@ fn run_check(path_name: &str) {
       break;
     }
   }
-}
-fn run_compile(path_name: &str) {
-  println!("compile {:?}", path_name);
-  println!("Oops, compile don't work yet. Coming soon. Stay tuned.");
 }
