@@ -23,7 +23,7 @@ impl Token {
     Token::new(TokenKind::Identifier(identifier), location)
   }
 
-  pub fn new_number(location: Location, number: f64) -> Token {
+  pub fn new_number(location: Location, number: String) -> Token {
     Token::new(TokenKind::Number(number), location)
   }
 
@@ -53,6 +53,7 @@ impl Token {
       "nil" => Token::new(TokenKind::Nil, location),
       "type" => Token::new(TokenKind::Type, location),
       "enum" => Token::new(TokenKind::Enum, location),
+      "continue" => Token::new(TokenKind::Continue, location),
       _ => Token::new(TokenKind::Identifier(keyword), location),
     }
   }
@@ -81,6 +82,7 @@ pub enum TokenKind {
   Nil,
   Type,
   Enum,
+  Continue,
 
   // Operators and Delimiters
   Tilde,        // ~
@@ -120,7 +122,7 @@ pub enum TokenKind {
 
   // Literals
   Identifier(String),
-  Number(f64),
+  Number(String),
   String(String),
 
   // Outros

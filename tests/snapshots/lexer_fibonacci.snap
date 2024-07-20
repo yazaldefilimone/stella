@@ -20,7 +20,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 9,
+        column: 8,
       ),
       end: Position(
         line: 1,
@@ -72,7 +72,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 22,
+        column: 21,
       ),
       end: Position(
         line: 1,
@@ -111,7 +111,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 31,
+        column: 30,
       ),
       end: Position(
         line: 1,
@@ -120,11 +120,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("f"),
+    kind: If,
     location: Location(
       start: Position(
-        line: 2,
-        column: 5,
+        line: 1,
+        column: 37,
       ),
       end: Position(
         line: 2,
@@ -137,7 +137,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 7,
+        column: 6,
       ),
       end: Position(
         line: 2,
@@ -150,7 +150,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 9,
+        column: 8,
       ),
       end: Position(
         line: 2,
@@ -172,11 +172,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Number(1.0),
+    kind: Number("1"),
     location: Location(
       start: Position(
         line: 2,
-        column: 12,
+        column: 11,
       ),
       end: Position(
         line: 2,
@@ -189,7 +189,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 14,
+        column: 13,
       ),
       end: Position(
         line: 2,
@@ -198,11 +198,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("eturn"),
+    kind: Return,
     location: Location(
       start: Position(
-        line: 3,
-        column: 9,
+        line: 2,
+        column: 18,
       ),
       end: Position(
         line: 3,
@@ -215,7 +215,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 3,
-        column: 15,
+        column: 14,
       ),
       end: Position(
         line: 3,
@@ -224,11 +224,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("nd"),
+    kind: End,
     location: Location(
       start: Position(
-        line: 4,
-        column: 5,
+        line: 3,
+        column: 16,
       ),
       end: Position(
         line: 4,
@@ -237,11 +237,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("eturn"),
+    kind: Return,
     location: Location(
       start: Position(
-        line: 5,
-        column: 5,
+        line: 4,
+        column: 7,
       ),
       end: Position(
         line: 5,
@@ -254,7 +254,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 5,
-        column: 11,
+        column: 10,
       ),
       end: Position(
         line: 5,
@@ -293,7 +293,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 5,
-        column: 23,
+        column: 22,
       ),
       end: Position(
         line: 5,
@@ -302,11 +302,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Number(1.0),
+    kind: Number("1"),
     location: Location(
       start: Position(
         line: 5,
-        column: 25,
+        column: 24,
       ),
       end: Position(
         line: 5,
@@ -332,7 +332,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 5,
-        column: 28,
+        column: 27,
       ),
       end: Position(
         line: 5,
@@ -345,7 +345,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 5,
-        column: 30,
+        column: 29,
       ),
       end: Position(
         line: 5,
@@ -384,7 +384,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 5,
-        column: 42,
+        column: 41,
       ),
       end: Position(
         line: 5,
@@ -393,11 +393,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Number(2.0),
+    kind: Number("2"),
     location: Location(
       start: Position(
         line: 5,
-        column: 44,
+        column: 43,
       ),
       end: Position(
         line: 5,
@@ -419,11 +419,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("nd"),
+    kind: End,
     location: Location(
       start: Position(
-        line: 6,
-        column: 1,
+        line: 5,
+        column: 46,
       ),
       end: Position(
         line: 6,
@@ -435,12 +435,12 @@ source: tests/snapshot_tests.rs
     kind: EOF,
     location: Location(
       start: Position(
-        line: 7,
-        column: 1,
+        line: 6,
+        column: 3,
       ),
       end: Position(
         line: 7,
-        column: 1,
+        column: 0,
       ),
     ),
   ),

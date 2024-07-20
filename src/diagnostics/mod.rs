@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 use std::collections::HashMap;
 
+use crate::utils::location::Location;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DiagnosticLevel {
   Info,
@@ -91,4 +93,11 @@ impl From<TypeError> for Diagnostic {
     };
     Diagnostic { message, level }
   }
+}
+
+pub fn report_error(message: &str, location: &mut Location, raw: &str) -> ! {
+  println!("Error: {} at ", message);
+  let range = location.cursor_range(raw).expect("Failed to get range");
+  println!("{}", highlight_error::highlight_error(range.start, range.end, raw));
+  std::process::exit(1);
 }

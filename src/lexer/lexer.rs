@@ -1,6 +1,10 @@
 use crate::{
   ast::tokens::{Token, TokenKind},
-  utils::location::{Location, Position},
+  diagnostics::report_error,
+  utils::{
+    location::{Location, Position},
+    match_number,
+  },
 };
 
 pub struct Lexer {
@@ -8,15 +12,31 @@ pub struct Lexer {
   column: usize, // column of the current character
   line: usize,   // line of the current character
   cursor: usize, // current character
-  current_position: Position,
+  pub current_position: Position,
+  peeked_token: Option<Token>,
 }
 
 impl Lexer {
   pub fn new(raw: String) -> Lexer {
     let current_position = Position { line: 1, column: 0 };
-    Lexer { raw, column: 0, line: 1, cursor: 0, current_position }
+    let peeked_token = None;
+    Lexer { raw, column: 0, line: 1, cursor: 0, current_position, peeked_token }
   }
+
+  pub fn peek_token(&mut self) -> Token {
+    if self.peeked_token.is_none() {
+      self.peeked_token = Some(self.read_next_token());
+    }
+    self.peeked_token.take().unwrap()
+  }
+
   pub fn next_token(&mut self) -> Token {
+    if self.peeked_token.is_none() {
+      return self.read_next_token();
+    }
+    return self.peeked_token.clone().unwrap();
+  }
+  fn read_next_token(&mut self) -> Token {
     self.skip_whitespace();
     if self.is_end() {
       return Token::new(TokenKind::EOF, self.create_location());
@@ -44,11 +64,12 @@ impl Lexer {
       '[' => self.read_simple_token(TokenKind::LeftBracket),
       ']' => self.read_simple_token(TokenKind::RightBracket),
       '"' => self.read_string(),
-      '1'..='9' => self.read_number(),
+      '0'..='9' => self.read_number(),
       'a'..='z' | 'A'..='Z' | '_' => self.read_keyword_or_identifier(),
       _ => {
-        let location = self.create_location();
-        panic!("Invalid character '{}' at {:?}", current_char, location);
+        let mut location = self.create_location();
+        let message = format!("Invalid character '{}'", current_char);
+        report_error(&message, &mut location, &self.raw);
       }
     };
 
@@ -80,9 +101,9 @@ impl Lexer {
   }
 
   fn read_number(&mut self) -> Token {
-    let number = self.read_while(|c| c.is_digit(10) || c == '.');
+    let number = self.read_while(|character| match_number(character));
     let location = self.create_location();
-    Token::new_number(location, number.parse::<f64>().unwrap())
+    Token::new_number(location, number)
   }
 
   fn read_string(&mut self) -> Token {
@@ -135,10 +156,16 @@ impl Lexer {
   }
 
   fn peek_one(&self) -> char {
+    if self.is_end() {
+      return '\0';
+    }
     self.raw[self.cursor..].chars().next().unwrap()
   }
 
   fn peek_many(&self, count: usize) -> String {
+    if self.is_end() {
+      return "".to_string();
+    }
     self.raw[self.cursor..].chars().take(count).collect()
   }
 
@@ -158,18 +185,17 @@ impl Lexer {
   }
 
   fn skip_whitespace(&mut self) {
-    if self.is_end() {
-      self.current_position = Position { line: self.line, column: self.column };
+    let current_char = self.peek_one();
+    if self.is_end() || !current_char.is_whitespace() {
       return;
     }
-    let current_char = self.peek_one();
     if current_char == '\n' {
       self.advance_new_line();
-      self.skip_whitespace();
+      return self.skip_whitespace();
     }
     if current_char.is_whitespace() {
       self.advance_one();
-      self.skip_whitespace();
+      return self.skip_whitespace();
     }
     self.current_position = Position { line: self.line, column: self.column };
   }
