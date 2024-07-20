@@ -2,23 +2,22 @@
 
 use glob::glob;
 use insta::assert_ron_snapshot;
+use std::ffi::OsString;
 use std::fs;
 use std::path::Path;
 use stella::ast::tokens::{Token, TokenKind};
 use stella::lexer::Lexer;
 
-fn read_test_files(pattern: &str) -> Vec<String> {
-  let mut files = Vec::new();
-  for entry in glob(pattern).expect("Failed to read glob pattern") {
-    match entry {
-      Ok(path) => {
-        let content = fs::read_to_string(path).expect("Failed to read file");
-        files.push(content);
-      }
-      Err(e) => println!("{:?}", e),
-    }
+fn read_test_files_with_pattern(pattern: &str) -> Vec<(String, String)> {
+  let mut patterns = Vec::new();
+  let glob_pattern = glob(pattern).expect("Failed to read glob pattern");
+  for entry in glob_pattern {
+    let path = entry.expect("Failed to read file");
+    let file_name = path.file_name().unwrap().to_string_lossy().to_string();
+    let content = fs::read_to_string(path).expect("Failed to read file");
+    patterns.push((file_name.to_owned(), content));
   }
-  files
+  patterns
 }
 
 fn create_tokens(source_code: &str) -> Vec<Token> {
@@ -34,15 +33,40 @@ fn create_tokens(source_code: &str) -> Vec<Token> {
   }
   return tokens;
 }
+fn format_file_name_with_module(file_name: &str, module: &str) -> String {
+  let file_name = format!("{}_{}", module, file_name).replace(".lua", "");
+  return file_name;
+}
+fn setings_snapshot() -> insta::Settings {
+  let mut settings = insta::Settings::clone_current();
+  settings.set_prepend_module_to_snapshot(false);
+  settings.set_omit_expression(true);
+  settings
+}
 
 #[test]
 fn test_lexer_snapshot() {
-  let test_files = read_test_files("tests/golden_tests/lexer/*.lua");
-  println!("test_lexer_snapshot: {:?}", test_files);
-  for source_code in test_files.iter() {
-    let tokens = create_tokens(source_code);
-    assert_ron_snapshot!("lexer_tokens", tokens);
-  }
+  let test_files = read_test_files_with_pattern("tests/golden_tests/lexer/*.lua");
+  let settings = setings_snapshot();
+  settings.bind(|| {
+    for (file_name, source_code) in test_files.iter() {
+      let tokens = create_tokens(source_code);
+      let file_name = format_file_name_with_module(file_name, "lexer");
+      assert_ron_snapshot!(file_name.clone(), tokens);
+    }
+  });
 }
 
-// Funções para o parser e o type checker seguirão a mesma estrutura
+#[test]
+fn test_parser_snapshot() {
+  let test_files = read_test_files_with_pattern("tests/golden_tests/parser/*.lua");
+  println!("test_parser_snapshot: {:?}", test_files);
+  // hei, please :) implement me
+}
+
+#[test]
+fn test_type_checker_snapshot() {
+  let test_files = read_test_files_with_pattern("tests/golden_tests/type_checker/*.lua");
+  println!("test_type_checker_snapshot: {:?}", test_files);
+  // hei, please :) implement me
+}
