@@ -1,0 +1,512 @@
+---
+source: tests/snapshot_tests.rs
+---
+[
+  Token(
+    kind: Function,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 0,
+      ),
+      end: Position(
+        line: 1,
+        column: 8,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("outer"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 9,
+      ),
+      end: Position(
+        line: 1,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 14,
+      ),
+      end: Position(
+        line: 1,
+        column: 15,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("x"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 15,
+      ),
+      end: Position(
+        line: 1,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 16,
+      ),
+      end: Position(
+        line: 1,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 18,
+      ),
+      end: Position(
+        line: 1,
+        column: 24,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 24,
+      ),
+      end: Position(
+        line: 1,
+        column: 25,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 25,
+      ),
+      end: Position(
+        line: 1,
+        column: 26,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 27,
+      ),
+      end: Position(
+        line: 1,
+        column: 33,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("unction"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 5,
+      ),
+      end: Position(
+        line: 2,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("inner"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 13,
+      ),
+      end: Position(
+        line: 2,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 18,
+      ),
+      end: Position(
+        line: 2,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("y"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 19,
+      ),
+      end: Position(
+        line: 2,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 20,
+      ),
+      end: Position(
+        line: 2,
+        column: 21,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 22,
+      ),
+      end: Position(
+        line: 2,
+        column: 28,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 28,
+      ),
+      end: Position(
+        line: 2,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 29,
+      ),
+      end: Position(
+        line: 2,
+        column: 30,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 31,
+      ),
+      end: Position(
+        line: 2,
+        column: 37,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("eturn"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 9,
+      ),
+      end: Position(
+        line: 3,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("x"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 15,
+      ),
+      end: Position(
+        line: 3,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: Plus,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 17,
+      ),
+      end: Position(
+        line: 3,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("y"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 19,
+      ),
+      end: Position(
+        line: 3,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("nd"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 5,
+      ),
+      end: Position(
+        line: 4,
+        column: 7,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("eturn"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 5,
+      ),
+      end: Position(
+        line: 5,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("inner"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 11,
+      ),
+      end: Position(
+        line: 5,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 16,
+      ),
+      end: Position(
+        line: 5,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("x"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 17,
+      ),
+      end: Position(
+        line: 5,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: Star,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 19,
+      ),
+      end: Position(
+        line: 5,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(2.0),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 21,
+      ),
+      end: Position(
+        line: 5,
+        column: 22,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 22,
+      ),
+      end: Position(
+        line: 5,
+        column: 23,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("nd"),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 1,
+      ),
+      end: Position(
+        line: 6,
+        column: 3,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("int"),
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 2,
+      ),
+      end: Position(
+        line: 8,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 5,
+      ),
+      end: Position(
+        line: 8,
+        column: 6,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("outer"),
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 6,
+      ),
+      end: Position(
+        line: 8,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 11,
+      ),
+      end: Position(
+        line: 8,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(10.0),
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 12,
+      ),
+      end: Position(
+        line: 8,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 14,
+      ),
+      end: Position(
+        line: 8,
+        column: 15,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 15,
+      ),
+      end: Position(
+        line: 8,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: EOF,
+    location: Location(
+      start: Position(
+        line: 9,
+        column: 1,
+      ),
+      end: Position(
+        line: 9,
+        column: 1,
+      ),
+    ),
+  ),
+]

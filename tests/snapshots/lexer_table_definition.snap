@@ -1,0 +1,317 @@
+---
+source: tests/snapshot_tests.rs
+---
+[
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 0,
+      ),
+      end: Position(
+        line: 1,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("person"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 6,
+      ),
+      end: Position(
+        line: 1,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 12,
+      ),
+      end: Position(
+        line: 1,
+        column: 13,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("table"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 14,
+      ),
+      end: Position(
+        line: 1,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 20,
+      ),
+      end: Position(
+        line: 1,
+        column: 21,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftBrace,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 22,
+      ),
+      end: Position(
+        line: 1,
+        column: 23,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("ame"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 5,
+      ),
+      end: Position(
+        line: 2,
+        column: 8,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 9,
+      ),
+      end: Position(
+        line: 2,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: String("Stella"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 11,
+      ),
+      end: Position(
+        line: 2,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Comma,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 19,
+      ),
+      end: Position(
+        line: 2,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("ge"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 5,
+      ),
+      end: Position(
+        line: 3,
+        column: 7,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 8,
+      ),
+      end: Position(
+        line: 3,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(25.0),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 10,
+      ),
+      end: Position(
+        line: 3,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Comma,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 12,
+      ),
+      end: Position(
+        line: 3,
+        column: 13,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("s_student"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 5,
+      ),
+      end: Position(
+        line: 4,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 15,
+      ),
+      end: Position(
+        line: 4,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: True,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 17,
+      ),
+      end: Position(
+        line: 4,
+        column: 21,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("int"),
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 2,
+      ),
+      end: Position(
+        line: 7,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 5,
+      ),
+      end: Position(
+        line: 7,
+        column: 6,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("person"),
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 6,
+      ),
+      end: Position(
+        line: 7,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: DoubleDot,
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 12,
+      ),
+      end: Position(
+        line: 7,
+        column: 13,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 13,
+      ),
+      end: Position(
+        line: 7,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 17,
+      ),
+      end: Position(
+        line: 7,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: EOF,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 1,
+      ),
+      end: Position(
+        line: 8,
+        column: 1,
+      ),
+    ),
+  ),
+]

@@ -46,7 +46,7 @@ fn setings_snapshot() -> insta::Settings {
 
 #[test]
 fn test_lexer_snapshot() {
-  let test_files = read_test_files_with_pattern("tests/golden_tests/lexer/*.lua");
+  let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
   let settings = setings_snapshot();
   settings.bind(|| {
     for (file_name, source_code) in test_files.iter() {
@@ -59,14 +59,14 @@ fn test_lexer_snapshot() {
 
 #[test]
 fn test_parser_snapshot() {
-  let test_files = read_test_files_with_pattern("tests/golden_tests/parser/*.lua");
+  let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
   println!("test_parser_snapshot: {:?}", test_files);
   // hei, please :) implement me
 }
 
 #[test]
 fn test_type_checker_snapshot() {
-  let test_files = read_test_files_with_pattern("tests/golden_tests/type_checker/*.lua");
+  let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
   println!("test_type_checker_snapshot: {:?}", test_files);
   // hei, please :) implement me
 }

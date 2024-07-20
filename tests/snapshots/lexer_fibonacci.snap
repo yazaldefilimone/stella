@@ -1,0 +1,447 @@
+---
+source: tests/snapshot_tests.rs
+---
+[
+  Token(
+    kind: Function,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 0,
+      ),
+      end: Position(
+        line: 1,
+        column: 8,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("fibonacci"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 9,
+      ),
+      end: Position(
+        line: 1,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 18,
+      ),
+      end: Position(
+        line: 1,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("n"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 19,
+      ),
+      end: Position(
+        line: 1,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 20,
+      ),
+      end: Position(
+        line: 1,
+        column: 21,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 22,
+      ),
+      end: Position(
+        line: 1,
+        column: 28,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 28,
+      ),
+      end: Position(
+        line: 1,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 29,
+      ),
+      end: Position(
+        line: 1,
+        column: 30,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 31,
+      ),
+      end: Position(
+        line: 1,
+        column: 37,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("f"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 5,
+      ),
+      end: Position(
+        line: 2,
+        column: 6,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("n"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 7,
+      ),
+      end: Position(
+        line: 2,
+        column: 8,
+      ),
+    ),
+  ),
+  Token(
+    kind: Less,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 9,
+      ),
+      end: Position(
+        line: 2,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 10,
+      ),
+      end: Position(
+        line: 2,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(1.0),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 12,
+      ),
+      end: Position(
+        line: 2,
+        column: 13,
+      ),
+    ),
+  ),
+  Token(
+    kind: Then,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 14,
+      ),
+      end: Position(
+        line: 2,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("eturn"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 9,
+      ),
+      end: Position(
+        line: 3,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("n"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 15,
+      ),
+      end: Position(
+        line: 3,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("nd"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 5,
+      ),
+      end: Position(
+        line: 4,
+        column: 7,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("eturn"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 5,
+      ),
+      end: Position(
+        line: 5,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("fibonacci"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 11,
+      ),
+      end: Position(
+        line: 5,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 20,
+      ),
+      end: Position(
+        line: 5,
+        column: 21,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("n"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 21,
+      ),
+      end: Position(
+        line: 5,
+        column: 22,
+      ),
+    ),
+  ),
+  Token(
+    kind: Minus,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 23,
+      ),
+      end: Position(
+        line: 5,
+        column: 24,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(1.0),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 25,
+      ),
+      end: Position(
+        line: 5,
+        column: 26,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 26,
+      ),
+      end: Position(
+        line: 5,
+        column: 27,
+      ),
+    ),
+  ),
+  Token(
+    kind: Plus,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 28,
+      ),
+      end: Position(
+        line: 5,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("fibonacci"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 30,
+      ),
+      end: Position(
+        line: 5,
+        column: 39,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 39,
+      ),
+      end: Position(
+        line: 5,
+        column: 40,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("n"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 40,
+      ),
+      end: Position(
+        line: 5,
+        column: 41,
+      ),
+    ),
+  ),
+  Token(
+    kind: Minus,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 42,
+      ),
+      end: Position(
+        line: 5,
+        column: 43,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(2.0),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 44,
+      ),
+      end: Position(
+        line: 5,
+        column: 45,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 45,
+      ),
+      end: Position(
+        line: 5,
+        column: 46,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("nd"),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 1,
+      ),
+      end: Position(
+        line: 6,
+        column: 3,
+      ),
+    ),
+  ),
+  Token(
+    kind: EOF,
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 1,
+      ),
+      end: Position(
+        line: 7,
+        column: 1,
+      ),
+    ),
+  ),
+]

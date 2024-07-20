@@ -1,0 +1,291 @@
+---
+source: tests/snapshot_tests.rs
+---
+[
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 0,
+      ),
+      end: Position(
+        line: 1,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("age"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 6,
+      ),
+      end: Position(
+        line: 1,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 9,
+      ),
+      end: Position(
+        line: 1,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 11,
+      ),
+      end: Position(
+        line: 1,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 18,
+      ),
+      end: Position(
+        line: 1,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(25.0),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 20,
+      ),
+      end: Position(
+        line: 1,
+        column: 22,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("age"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 3,
+      ),
+      end: Position(
+        line: 3,
+        column: 6,
+      ),
+    ),
+  ),
+  Token(
+    kind: Greater,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 7,
+      ),
+      end: Position(
+        line: 3,
+        column: 8,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 8,
+      ),
+      end: Position(
+        line: 3,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number(18.0),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 10,
+      ),
+      end: Position(
+        line: 3,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Then,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 13,
+      ),
+      end: Position(
+        line: 3,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("rint"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 5,
+      ),
+      end: Position(
+        line: 4,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 9,
+      ),
+      end: Position(
+        line: 4,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: String("You are an adult."),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 10,
+      ),
+      end: Position(
+        line: 4,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 29,
+      ),
+      end: Position(
+        line: 4,
+        column: 30,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("lse"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 1,
+      ),
+      end: Position(
+        line: 5,
+        column: 4,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("rint"),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 5,
+      ),
+      end: Position(
+        line: 6,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: LeftParen,
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 9,
+      ),
+      end: Position(
+        line: 6,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: String("You are a minor."),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 10,
+      ),
+      end: Position(
+        line: 6,
+        column: 28,
+      ),
+    ),
+  ),
+  Token(
+    kind: RightParen,
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 28,
+      ),
+      end: Position(
+        line: 6,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("nd"),
+    location: Location(
+      start: Position(
+        line: 7,
+        column: 1,
+      ),
+      end: Position(
+        line: 7,
+        column: 3,
+      ),
+    ),
+  ),
+  Token(
+    kind: EOF,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 1,
+      ),
+      end: Position(
+        line: 8,
+        column: 1,
+      ),
+    ),
+  ),
+]
