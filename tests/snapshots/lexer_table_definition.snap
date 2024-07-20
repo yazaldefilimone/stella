@@ -20,7 +20,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 6,
+        column: 5,
       ),
       end: Position(
         line: 1,
@@ -46,7 +46,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 14,
+        column: 13,
       ),
       end: Position(
         line: 1,
@@ -59,7 +59,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 20,
+        column: 19,
       ),
       end: Position(
         line: 1,
@@ -72,7 +72,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 22,
+        column: 21,
       ),
       end: Position(
         line: 1,
@@ -81,11 +81,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("ame"),
+    kind: Identifier("name"),
     location: Location(
       start: Position(
-        line: 2,
-        column: 5,
+        line: 1,
+        column: 23,
       ),
       end: Position(
         line: 2,
@@ -98,7 +98,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 9,
+        column: 8,
       ),
       end: Position(
         line: 2,
@@ -111,7 +111,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 11,
+        column: 10,
       ),
       end: Position(
         line: 2,
@@ -133,11 +133,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("ge"),
+    kind: Identifier("age"),
     location: Location(
       start: Position(
-        line: 3,
-        column: 5,
+        line: 2,
+        column: 20,
       ),
       end: Position(
         line: 3,
@@ -150,7 +150,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 3,
-        column: 8,
+        column: 7,
       ),
       end: Position(
         line: 3,
@@ -159,11 +159,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Number(25.0),
+    kind: Number("25"),
     location: Location(
       start: Position(
         line: 3,
-        column: 10,
+        column: 9,
       ),
       end: Position(
         line: 3,
@@ -185,11 +185,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("s_student"),
+    kind: Identifier("is_student"),
     location: Location(
       start: Position(
-        line: 4,
-        column: 5,
+        line: 3,
+        column: 13,
       ),
       end: Position(
         line: 4,
@@ -202,7 +202,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 4,
-        column: 15,
+        column: 14,
       ),
       end: Position(
         line: 4,
@@ -215,7 +215,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 4,
-        column: 17,
+        column: 16,
       ),
       end: Position(
         line: 4,
@@ -224,11 +224,24 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("int"),
+    kind: RightBrace,
     location: Location(
       start: Position(
-        line: 7,
-        column: 2,
+        line: 4,
+        column: 21,
+      ),
+      end: Position(
+        line: 5,
+        column: 1,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("print"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 1,
       ),
       end: Position(
         line: 7,
@@ -305,12 +318,12 @@ source: tests/snapshot_tests.rs
     kind: EOF,
     location: Location(
       start: Position(
-        line: 8,
-        column: 1,
+        line: 7,
+        column: 18,
       ),
       end: Position(
         line: 8,
-        column: 1,
+        column: 0,
       ),
     ),
   ),

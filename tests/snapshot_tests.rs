@@ -7,6 +7,7 @@ use std::fs;
 use std::path::Path;
 use stella::ast::tokens::{Token, TokenKind};
 use stella::lexer::Lexer;
+use stella::parser::parser::Parser;
 
 fn read_test_files_with_pattern(pattern: &str) -> Vec<(String, String)> {
   let mut patterns = Vec::new();
@@ -32,6 +33,11 @@ fn create_tokens(source_code: &str) -> Vec<Token> {
     tokens.push(token);
   }
   return tokens;
+}
+
+fn create_parser(source_code: &str) -> Parser {
+  let parser = Parser::new(source_code);
+  return parser;
 }
 fn format_file_name_with_module(file_name: &str, module: &str) -> String {
   let file_name = format!("{}_{}", module, file_name).replace(".lua", "");
@@ -60,8 +66,15 @@ fn test_lexer_snapshot() {
 #[test]
 fn test_parser_snapshot() {
   let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
-  println!("test_parser_snapshot: {:?}", test_files);
-  // hei, please :) implement me
+  let settings = setings_snapshot();
+  settings.bind(|| {
+    for (file_name, source_code) in test_files.iter() {
+      let mut parser = create_parser(source_code);
+      let file_name = format_file_name_with_module(file_name, "parser");
+      let program = parser.parse_program();
+      assert_ron_snapshot!(file_name.clone(), program);
+    }
+  });
 }
 
 #[test]

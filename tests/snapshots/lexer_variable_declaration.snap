@@ -20,7 +20,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 6,
+        column: 5,
       ),
       end: Position(
         line: 1,
@@ -46,7 +46,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 12,
+        column: 11,
       ),
       end: Position(
         line: 1,
@@ -59,7 +59,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 19,
+        column: 18,
       ),
       end: Position(
         line: 1,
@@ -72,7 +72,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 21,
+        column: 20,
       ),
       end: Position(
         line: 1,
@@ -81,11 +81,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("ocal"),
+    kind: Local,
     location: Location(
       start: Position(
-        line: 2,
-        column: 1,
+        line: 1,
+        column: 29,
       ),
       end: Position(
         line: 2,
@@ -98,7 +98,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 6,
+        column: 5,
       ),
       end: Position(
         line: 2,
@@ -124,7 +124,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 11,
+        column: 10,
       ),
       end: Position(
         line: 2,
@@ -137,7 +137,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 18,
+        column: 17,
       ),
       end: Position(
         line: 2,
@@ -146,11 +146,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Number(25.0),
+    kind: Number("25"),
     location: Location(
       start: Position(
         line: 2,
-        column: 20,
+        column: 19,
       ),
       end: Position(
         line: 2,
@@ -159,11 +159,11 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("ocal"),
+    kind: Local,
     location: Location(
       start: Position(
-        line: 3,
-        column: 1,
+        line: 2,
+        column: 22,
       ),
       end: Position(
         line: 3,
@@ -176,7 +176,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 3,
-        column: 6,
+        column: 5,
       ),
       end: Position(
         line: 3,
@@ -202,7 +202,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 3,
-        column: 18,
+        column: 17,
       ),
       end: Position(
         line: 3,
@@ -215,7 +215,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 3,
-        column: 26,
+        column: 25,
       ),
       end: Position(
         line: 3,
@@ -228,7 +228,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 3,
-        column: 28,
+        column: 27,
       ),
       end: Position(
         line: 3,
@@ -240,12 +240,12 @@ source: tests/snapshot_tests.rs
     kind: EOF,
     location: Location(
       start: Position(
-        line: 4,
-        column: 1,
+        line: 3,
+        column: 32,
       ),
       end: Position(
         line: 4,
-        column: 1,
+        column: 0,
       ),
     ),
   ),

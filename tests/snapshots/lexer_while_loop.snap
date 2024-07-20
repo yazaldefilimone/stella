@@ -16,7 +16,7 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("person"),
+    kind: Identifier("count"),
     location: Location(
       start: Position(
         line: 1,
@@ -24,12 +24,25 @@ source: tests/snapshot_tests.rs
       ),
       end: Position(
         line: 1,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 11,
+      ),
+      end: Position(
+        line: 1,
         column: 12,
       ),
     ),
   ),
   Token(
-    kind: Equal,
+    kind: Identifier("number"),
     location: Location(
       start: Position(
         line: 1,
@@ -37,120 +50,68 @@ source: tests/snapshot_tests.rs
       ),
       end: Position(
         line: 1,
-        column: 14,
-      ),
-    ),
-  ),
-  Token(
-    kind: LeftBrace,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 14,
-      ),
-      end: Position(
-        line: 1,
-        column: 16,
-      ),
-    ),
-  ),
-  Token(
-    kind: Identifier("name"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 16,
-      ),
-      end: Position(
-        line: 2,
-        column: 8,
-      ),
-    ),
-  ),
-  Token(
-    kind: Equal,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 8,
-      ),
-      end: Position(
-        line: 2,
-        column: 10,
-      ),
-    ),
-  ),
-  Token(
-    kind: String("Stella"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 10,
-      ),
-      end: Position(
-        line: 2,
         column: 19,
       ),
     ),
   ),
   Token(
-    kind: Comma,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 19,
-      ),
-      end: Position(
-        line: 2,
-        column: 20,
-      ),
-    ),
-  ),
-  Token(
-    kind: Identifier("age"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 20,
-      ),
-      end: Position(
-        line: 3,
-        column: 7,
-      ),
-    ),
-  ),
-  Token(
     kind: Equal,
     location: Location(
       start: Position(
-        line: 3,
-        column: 7,
+        line: 1,
+        column: 19,
       ),
       end: Position(
-        line: 3,
-        column: 9,
+        line: 1,
+        column: 21,
       ),
     ),
   ),
   Token(
-    kind: Number("25"),
+    kind: Number("0"),
     location: Location(
       start: Position(
-        line: 3,
-        column: 9,
+        line: 1,
+        column: 21,
       ),
       end: Position(
-        line: 3,
-        column: 12,
+        line: 1,
+        column: 23,
       ),
     ),
   ),
   Token(
-    kind: Comma,
+    kind: While,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 23,
+      ),
+      end: Position(
+        line: 3,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("count"),
     location: Location(
       start: Position(
         line: 3,
-        column: 12,
+        column: 5,
+      ),
+      end: Position(
+        line: 3,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: Less,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 11,
       ),
       end: Position(
         line: 3,
@@ -159,54 +120,28 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("is_student"),
+    kind: Number("10"),
     location: Location(
       start: Position(
         line: 3,
         column: 13,
       ),
       end: Position(
-        line: 4,
-        column: 14,
-      ),
-    ),
-  ),
-  Token(
-    kind: Equal,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 14,
-      ),
-      end: Position(
-        line: 4,
+        line: 3,
         column: 16,
       ),
     ),
   ),
   Token(
-    kind: True,
+    kind: Do,
     location: Location(
       start: Position(
-        line: 4,
+        line: 3,
         column: 16,
       ),
       end: Position(
-        line: 4,
-        column: 21,
-      ),
-    ),
-  ),
-  Token(
-    kind: RightBrace,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 21,
-      ),
-      end: Position(
-        line: 5,
-        column: 1,
+        line: 3,
+        column: 19,
       ),
     ),
   ),
@@ -214,12 +149,12 @@ source: tests/snapshot_tests.rs
     kind: Identifier("print"),
     location: Location(
       start: Position(
-        line: 5,
-        column: 1,
+        line: 3,
+        column: 19,
       ),
       end: Position(
-        line: 7,
-        column: 5,
+        line: 4,
+        column: 9,
       ),
     ),
   ),
@@ -227,51 +162,25 @@ source: tests/snapshot_tests.rs
     kind: LeftParen,
     location: Location(
       start: Position(
-        line: 7,
-        column: 5,
+        line: 4,
+        column: 9,
       ),
       end: Position(
-        line: 7,
-        column: 6,
+        line: 4,
+        column: 10,
       ),
     ),
   ),
   Token(
-    kind: Identifier("person"),
+    kind: Identifier("count"),
     location: Location(
       start: Position(
-        line: 7,
-        column: 6,
+        line: 4,
+        column: 10,
       ),
       end: Position(
-        line: 7,
-        column: 12,
-      ),
-    ),
-  ),
-  Token(
-    kind: DoubleDot,
-    location: Location(
-      start: Position(
-        line: 7,
-        column: 12,
-      ),
-      end: Position(
-        line: 7,
-        column: 13,
-      ),
-    ),
-  ),
-  Token(
-    kind: Identifier("name"),
-    location: Location(
-      start: Position(
-        line: 7,
-        column: 13,
-      ),
-      end: Position(
-        line: 7,
-        column: 17,
+        line: 4,
+        column: 15,
       ),
     ),
   ),
@@ -279,12 +188,90 @@ source: tests/snapshot_tests.rs
     kind: RightParen,
     location: Location(
       start: Position(
-        line: 7,
+        line: 4,
+        column: 15,
+      ),
+      end: Position(
+        line: 4,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("count"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 16,
+      ),
+      end: Position(
+        line: 5,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 9,
+      ),
+      end: Position(
+        line: 5,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("count"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 11,
+      ),
+      end: Position(
+        line: 5,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Plus,
+    location: Location(
+      start: Position(
+        line: 5,
         column: 17,
       ),
       end: Position(
-        line: 7,
-        column: 18,
+        line: 5,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number("1"),
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 19,
+      ),
+      end: Position(
+        line: 5,
+        column: 21,
+      ),
+    ),
+  ),
+  Token(
+    kind: End,
+    location: Location(
+      start: Position(
+        line: 5,
+        column: 21,
+      ),
+      end: Position(
+        line: 6,
+        column: 3,
       ),
     ),
   ),
@@ -292,11 +279,11 @@ source: tests/snapshot_tests.rs
     kind: EOF,
     location: Location(
       start: Position(
-        line: 7,
-        column: 18,
+        line: 6,
+        column: 3,
       ),
       end: Position(
-        line: 8,
+        line: 7,
         column: 0,
       ),
     ),
