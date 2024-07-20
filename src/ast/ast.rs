@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-
+#![allow(dead_code)]
 use crate::utils::location::Location;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Ast {

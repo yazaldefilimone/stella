@@ -1,109 +1,128 @@
-use std::process::exit;
-
 use crate::{
   ast::tokens::{Token, TokenKind},
-  diagnostics::diagnostics::Diagnostic,
   utils::location::{Location, Position},
 };
 
 pub struct Lexer {
-  pub raw: String,   // raw lua code
-  pub column: usize, // column of the current character
-  pub line: usize,   // line of the current character
-  pub cursor: usize, // current character
-  pub diagnostics: Diagnostic,
-  pub current_position: Position,
+  raw: String,   // lua code
+  column: usize, // column of the current character
+  line: usize,   // line of the current character
+  cursor: usize, // current character
+  current_position: Position,
 }
 
 impl Lexer {
   pub fn new(raw: String) -> Lexer {
-    let diagnostics = Diagnostic::new();
     let current_position = Position { line: 1, column: 0 };
-    Lexer { raw, column: 0, line: 1, cursor: 0, diagnostics, current_position }
+    Lexer { raw, column: 0, line: 1, cursor: 0, current_position }
   }
-
   pub fn next_token(&mut self) -> Token {
-    self.skip_trivial();
+    self.skip_whitespace();
     if self.is_end() {
-      let end_position = self.create_position();
-      return Token::create(TokenKind::EOF, self.create_location(end_position));
+      return Token::new(TokenKind::EOF, self.create_location());
     }
-    let current_token = match self.peek_one() {
-      '+' => self.lex_operator(TokenKind::Plus, "+"),
-      '-' => self.lex_operator(TokenKind::Minus, "-"),
-      '*' => self.lex_operator(TokenKind::Asterisk, "*"),
-      '/' => self.lex_operator(TokenKind::Slash, "/"),
-      '%' => self.lex_operator(TokenKind::Percent, "%"),
-      '=' => self.lex_operator(TokenKind::Equal, "="),
-      '<' => self.lex_operator(TokenKind::Less, "<"),
-      '0'..='9' => self.lex_number(),
-      '"' => self.lex_string(),
-      _ => self.lex_identifier(),
+    let current_char = self.peek_one();
+    let current_token = match current_char {
+      '+' => self.read_check_ahead("+=", TokenKind::Plus, TokenKind::PlusAssign),
+      '-' => self.read_check_ahead("-=", TokenKind::Minus, TokenKind::MinusAssign),
+      '*' => self.read_check_ahead("*=", TokenKind::Star, TokenKind::StarAssign),
+      '/' => self.read_check_ahead("/=", TokenKind::Slash, TokenKind::SlashAssign),
+      '=' => self.read_check_ahead("=", TokenKind::Assign, TokenKind::Equal),
+      '~' => self.read_check_ahead("~=", TokenKind::Tilde, TokenKind::NotEqual),
+      '<' => self.read_check_ahead("=", TokenKind::Less, TokenKind::LessEqual),
+      '>' => self.read_check_ahead("=", TokenKind::Greater, TokenKind::GreaterEqual),
+      '(' => self.read_simple_token(TokenKind::LeftParen),
+      ')' => self.read_simple_token(TokenKind::RightParen),
+      '%' => self.read_simple_token(TokenKind::Percent),
+      '#' => self.read_simple_token(TokenKind::Hash),
+      '.' => self.read_check_ahead(".", TokenKind::Dot, TokenKind::DoubleDot),
+      ',' => self.read_simple_token(TokenKind::Comma),
+      ':' => self.read_simple_token(TokenKind::Colon),
+      ';' => self.read_simple_token(TokenKind::Semicolon),
+      '{' => self.read_simple_token(TokenKind::LeftBrace),
+      '}' => self.read_simple_token(TokenKind::RightBrace),
+      '[' => self.read_simple_token(TokenKind::LeftBracket),
+      ']' => self.read_simple_token(TokenKind::RightBracket),
+      '"' => self.read_string(),
+      '1'..='9' => self.read_number(),
+      'a'..='z' | 'A'..='Z' | '_' => self.read_keyword_or_identifier(),
+      _ => {
+        let location = self.create_location();
+        panic!("Invalid character '{}' at {:?}", current_char, location);
+      }
     };
+
     return current_token;
   }
 
-  fn lex_operator(&mut self, kind: TokenKind, text: &str) -> Token {
-    self.consume_expect(text);
-    let end_position = self.create_position();
-    let location = self.create_location(end_position);
-    return Token::create(kind, location);
+  fn read_simple_token(&mut self, kind: TokenKind) -> Token {
+    self.advance_one();
+    let location = self.create_location();
+    Token::new(kind, location)
   }
 
-  fn lex_number(&mut self) -> Token {
-    let number = self.consume_while(|c| c.is_digit(10));
-    let end_position = self.create_position();
-    let location = self.create_location(end_position);
-    return Token::create_number(location, number.parse::<f64>().unwrap());
-  }
-
-  fn lex_string(&mut self) -> Token {
-    self.consume_expect("\"");
-    // let string = self.consume_while(|c| c != '"');
-    self.consume_expect("allets");
-    self.consume_expect("\"");
-    let end_position = self.create_position();
-    let location = self.create_location(end_position);
-    return Token::create_string(location, "allets".to_string());
-  }
-
-  fn lex_identifier(&mut self) -> Token {
-    let identifier = self.consume_while(|c| c.is_alphanumeric() || c == '_');
-    let end_position = self.create_position();
-    let location = self.create_location(end_position);
-    return Token::create_identifier(location, identifier);
-  }
-
-  fn lex_keyword_or_identifier(&mut self) -> Token {
-    let keyword = self.consume_while(|c| c.is_alphabetic() || c == '_');
-    let end_position = self.create_position();
-    let location = self.create_location(end_position);
-    return Token::create_keyword_or_identifier(location, keyword);
-  }
-
-  // helpers
-
-  fn skip_trivial(&mut self) {
-    if self.is_end() {
-      return;
-    }
-    /*
-    1. if is whitespace, and increase column and cursor
-    2. if is newline, increase line and reset column
-    */
-    let current_char = self.peek_one();
-    if current_char == '\n' {
-      self.line += 1;
-      self.column = 0;
+  fn read_check_ahead(&mut self, next: &str, single_kind: TokenKind, double_kind: TokenKind) -> Token {
+    if self.starts_with(next) {
+      self.advance_many(next.len());
+      let location = self.create_location();
+      Token::new(double_kind, location)
+    } else {
       self.advance_one();
-      self.skip_trivial();
+      let location = self.create_location();
+      Token::new(single_kind, location)
     }
-    if current_char.is_whitespace() {
-      self.column += 1;
+  }
+
+  fn read_keyword_or_identifier(&mut self) -> Token {
+    let text = self.read_while(|c| c.is_alphabetic() || c == '_');
+    let location = self.create_location();
+    Token::new_keyword_or_identifier(location, text)
+  }
+
+  fn read_number(&mut self) -> Token {
+    let number = self.read_while(|c| c.is_digit(10) || c == '.');
+    let location = self.create_location();
+    Token::new_number(location, number.parse::<f64>().unwrap())
+  }
+
+  fn read_string(&mut self) -> Token {
+    self.consume_expect("\"");
+    let string = self.read_while(|c| c != '"');
+    self.consume_expect("\"");
+    let location = self.create_location();
+    Token::new_string(location, string)
+  }
+
+  fn read_while(&mut self, mut test: impl FnMut(char) -> bool) -> String {
+    let start_cursor = self.cursor;
+    while !self.is_end() && test(self.peek_one()) {
       self.advance_one();
-      self.skip_trivial();
     }
-    return;
+    self.raw[start_cursor..self.cursor].to_string()
+  }
+
+  fn advance_one(&mut self) {
+    self.cursor += 1;
+    self.column += 1;
+  }
+
+  fn create_location(&mut self) -> Location {
+    let start = self.current_position.clone();
+    self.current_position = Position { line: self.line, column: self.column };
+    Location { start, end: self.current_position.clone() }
+  }
+
+  fn consume_expect(&mut self, text: &str) {
+    if &self.peek_many(text.len()) == text {
+      self.advance_many(text.len());
+    } else {
+      let location = self.create_location();
+      panic!("Expected '{}' at {:?}", text, location);
+    }
+  }
+
+  fn is_end(&self) -> bool {
+    self.cursor >= self.raw.len()
   }
 
   fn peek_one(&self) -> char {
@@ -114,59 +133,35 @@ impl Lexer {
     self.raw[self.cursor..].chars().take(count).collect()
   }
 
-  fn starts_with(&self, s: &str) -> bool {
-    self.raw[self.cursor..].starts_with(s)
-  }
-
-  fn is_end(&self) -> bool {
-    self.cursor >= self.raw.len()
-  }
-
-  fn advance_one(&mut self) {
-    self.cursor += 1;
-    self.column += 1;
-  }
-
   fn advance_many(&mut self, count: usize) {
     self.cursor += count;
     self.column += count;
   }
 
-  fn consume(&mut self) -> char {
-    let mut iter = self.raw[self.cursor..].char_indices();
-    let (_, cur_char) = iter.next().unwrap();
-    let (next_cursor, _) = iter.next().unwrap_or((1, ' '));
-    self.cursor += next_cursor;
-    cur_char
+  fn starts_with(&self, s: &str) -> bool {
+    self.raw[self.cursor..].starts_with(s)
   }
 
-  fn consume_expect(&mut self, text: &str) {
-    if &self.peek_many(text.len()) == text {
-      self.advance_many(text.len());
-    } else {
-      let message = format!("Expected '{}' but got '{}'", text, &self.peek_many(text.len()));
-      self.advance_many(text.len());
-      let end_position = self.create_position();
-      let location = self.create_location(end_position);
-      self.diagnostics.add_error(&message, location);
-      self.diagnostics.display(&self.raw);
-      std::process::exit(1);
+  fn advance_new_line(&mut self) {
+    self.line += 1;
+    self.column = 0;
+    self.cursor += 1;
+  }
+
+  fn skip_whitespace(&mut self) {
+    if self.is_end() {
+      self.current_position = Position { line: self.line, column: self.column };
+      return;
     }
-  }
-
-  fn consume_while(&mut self, mut test: impl FnMut(char) -> bool) -> String {
-    let start_cursor = self.cursor;
-    while !self.is_end() && test(self.peek_one()) {
+    let current_char = self.peek_one();
+    if current_char == '\n' {
+      self.advance_new_line();
+      self.skip_whitespace();
+    }
+    if current_char.is_whitespace() {
       self.advance_one();
+      self.skip_whitespace();
     }
-    self.raw[start_cursor..self.cursor].to_string()
-  }
-  fn create_location(&mut self, end_position: Position) -> Location {
-    let previous_position = self.current_position.clone();
-    self.current_position = end_position.clone();
-    Location { start: previous_position, end: end_position }
-  }
-  fn create_position(&self) -> Position {
-    Position { line: self.line, column: self.column }
+    self.current_position = Position { line: self.line, column: self.column };
   }
 }

@@ -28,10 +28,11 @@ fn main() {
 
 fn run_check(path_name: &str) {
   let raw = std::fs::read_to_string(path_name).unwrap();
+  println!("raw: {}", raw);
   let mut lexer = Lexer::new(raw);
   loop {
     let token = lexer.next_token();
-    // println!("{:?}", token);
+    println!("{:?}", token);
     if token.kind == TokenKind::EOF {
       break;
     }

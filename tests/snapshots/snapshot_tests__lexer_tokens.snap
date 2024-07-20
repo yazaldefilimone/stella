@@ -1,0 +1,97 @@
+---
+source: tests/snapshot_tests.rs
+expression: tokens
+---
+[
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 0,
+      ),
+      end: Position(
+        line: 1,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 6,
+      ),
+      end: Position(
+        line: 1,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 10,
+      ),
+      end: Position(
+        line: 1,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("string"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 12,
+      ),
+      end: Position(
+        line: 1,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 19,
+      ),
+      end: Position(
+        line: 1,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: String("Stella"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 21,
+      ),
+      end: Position(
+        line: 1,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: EOF,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 1,
+      ),
+      end: Position(
+        line: 2,
+        column: 1,
+      ),
+    ),
+  ),
+]

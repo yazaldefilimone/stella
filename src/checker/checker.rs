@@ -1,4 +1,6 @@
-use crate::diagnostics::diagnostics::Diagnostic;
+#![allow(dead_code)]
+
+use crate::diagnostics::Diagnostic;
 
 pub struct Checker {}
 
