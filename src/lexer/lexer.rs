@@ -1,6 +1,6 @@
 use crate::{
   ast::tokens::{Token, TokenKind},
-  diagnostics::report_error,
+  diagnostics::report_and_exit,
   utils::{
     location::{Location, Position},
     match_number,
@@ -72,7 +72,7 @@ impl Lexer {
       _ => {
         let mut location = self.create_location();
         let message = format!("Invalid character '{}'", current_char);
-        report_error(&message, &mut location, &self.raw);
+        report_and_exit(&message, &mut location, &self.raw);
       }
     };
 

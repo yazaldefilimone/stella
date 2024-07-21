@@ -8,6 +8,7 @@ mod parser;
 mod utils;
 
 use ast::tokens::TokenKind;
+use checker::checker::Checker;
 use lexer::Lexer;
 use parser::parser::Parser;
 
@@ -31,7 +32,14 @@ fn run_check(path_name: &str) {
   let raw = std::fs::read_to_string(path_name).unwrap();
   let mut parser = Parser::new(&raw);
   let program = parser.parse_program();
-  println!("{:#?}", program);
+  let mut checker = Checker::new();
+  let type_result = checker.check(&program);
+  if type_result.is_err() || checker.diagnostics.error_count > 0 {
+    checker.diagnostics.emit_all(&raw, path_name);
+    return;
+  }
+  let type_ = type_result.unwrap();
+  println!("Result: {}", type_.to_string());
 }
 fn run_compile(path_name: &str) {
   let raw = std::fs::read_to_string(path_name).unwrap();
