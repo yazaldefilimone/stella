@@ -33,9 +33,15 @@ pub enum Statement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AssignStatement {
-  pub name: String,
+  pub name: Token,
   pub value: ExpressionStatement,
   pub location: Location,
+}
+
+impl AssignStatement {
+  pub fn new(name: Token, value: ExpressionStatement, location: Location) -> Self {
+    AssignStatement { name, value, location }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -127,12 +133,12 @@ pub struct EmptyStatement {
 pub struct LocalStatement {
   pub name: Token,
   pub type_: Option<Type>,
-  pub init: ExpressionStatement,
+  pub init: Option<ExpressionStatement>,
   pub location: Location,
 }
 
 impl LocalStatement {
-  pub fn new(name: Token, type_: Option<Type>, init: ExpressionStatement, location: Location) -> Self {
+  pub fn new(name: Token, type_: Option<Type>, init: Option<ExpressionStatement>, location: Location) -> Self {
     LocalStatement { name, type_, init, location }
   }
 }
@@ -140,16 +146,34 @@ impl LocalStatement {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ExpressionStatement {
   LiteralExpression(LiteralExpression),
+  IdentifierExpression(IdentifierExpression),
   CallExpression(CallExpression),
   UnaryExpression(UnaryExpression),
   BinaryExpression(BinaryExpression),
   DeclarationExpression(DeclarationExpression),
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct IdentifierExpression {
+  pub name: String,
+  pub location: Location,
+}
+
+impl IdentifierExpression {
+  pub fn new(name: String, location: Location) -> Self {
+    IdentifierExpression { name, location }
+  }
+}
+
 impl ExpressionStatement {
   pub fn new_number_literal(value: String, location: Location) -> Self {
     let literal = LiteralExpression::new_number_literal(value, location);
     return ExpressionStatement::LiteralExpression(literal);
+  }
+
+  pub fn new_identifier(name: String, location: Location) -> Self {
+    let literal = IdentifierExpression::new(name, location);
+    return ExpressionStatement::IdentifierExpression(literal);
   }
 
   pub fn new_string_literal(value: String, location: Location) -> Self {
@@ -288,11 +312,23 @@ pub enum Type {
   String,
   Boolean,
   Identifier(String),
+  Any,
 }
 
 impl Type {
   pub fn identifier(name: String) -> Self {
     Type::Identifier(name)
+  }
+
+  pub fn to_string(&self) -> String {
+    match self {
+      Type::Void => "void".to_string(),
+      Type::Number => "number".to_string(),
+      Type::String => "string".to_string(),
+      Type::Boolean => "boolean".to_string(),
+      Type::Identifier(name) => name.to_string(),
+      Type::Any => "any".to_string(),
+    }
   }
 
   pub fn new_type(text: String) -> Self {
@@ -301,6 +337,7 @@ impl Type {
       "number" => Type::Number,
       "string" => Type::String,
       "boolean" => Type::Boolean,
+      "any" => Type::Any,
       _ => Type::Identifier(text),
     }
   }

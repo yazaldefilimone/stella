@@ -128,3 +128,14 @@ pub enum TokenKind {
   // Outros
   EOF, // End of file
 }
+
+impl Token {
+  pub fn lexeme(&self) -> String {
+    match &self.kind {
+      TokenKind::Identifier(name) => name.clone(),
+      TokenKind::Number(number) => number.clone(),
+      TokenKind::String(string) => string.clone(),
+      _ => panic!("Invalid token"),
+    }
+  }
+}

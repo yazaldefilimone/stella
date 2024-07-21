@@ -4,17 +4,19 @@ use crate::{
     ast,
     tokens::{Token, TokenKind},
   },
+  diagnostics::report_and_exit,
   lexer::Lexer,
 };
 
 pub struct Parser {
   lexer: Lexer,
+  pub raw: String,
 }
 
 impl Parser {
   pub fn new(raw: &str) -> Parser {
     let lexer = Lexer::new(raw.to_string());
-    Parser { lexer }
+    Parser { lexer, raw: raw.to_string() }
   }
 
   pub fn parse_program(&mut self) -> ast::Program {
@@ -28,8 +30,7 @@ impl Parser {
 
   fn parse_statement(&mut self) -> ast::Statement {
     let token = self.lexer.peek_token();
-    match token.kind {
-      TokenKind::Function => self.parse_function_statement(),
+    let statement = match token.kind {
       TokenKind::Local => self.parse_local_statement(),
       TokenKind::If => self.parse_if_statement(),
       TokenKind::While => self.parse_while_statement(),
@@ -39,7 +40,10 @@ impl Parser {
       TokenKind::Continue => self.parse_continue_statement(),
       TokenKind::Return => self.parse_return_statement(),
       _ => self.parse_assign_statement(),
-    }
+    };
+    // end ;
+    self.match_token_and_consume(&TokenKind::Semicolon);
+    return statement;
   }
 
   fn parse_expression_statement(&mut self) -> ast::ExpressionStatement {
@@ -49,7 +53,14 @@ impl Parser {
       TokenKind::String(_) => self.parse_literal_expression(),
       TokenKind::True => self.parse_literal_expression(),
       TokenKind::False => self.parse_literal_expression(),
-      _ => panic!("Invalid expression statement"),
+      TokenKind::Identifier(_) => {
+        let identifier = self.consume_token();
+        ast::ExpressionStatement::new_identifier(identifier.lexeme(), identifier.location)
+      }
+      _ => {
+        let mut location = token.location.clone();
+        report_and_exit("Invalid expression statement", &mut location, &self.raw.as_str());
+      }
     }
   }
 
@@ -60,12 +71,19 @@ impl Parser {
       TokenKind::String(string) => ast::ExpressionStatement::new_string_literal(string, token.location),
       TokenKind::True => ast::ExpressionStatement::new_bool_literal(true, token.location),
       TokenKind::False => ast::ExpressionStatement::new_bool_literal(false, token.location),
-      _ => panic!("Invalid literal expression"),
+      _ => {
+        let mut location = token.location.clone();
+        report_and_exit("Invalid literal expression", &mut location, &self.raw.as_str());
+      }
     }
   }
 
   fn parse_assign_statement(&mut self) -> ast::Statement {
-    todo!("hei, please :) implement me");
+    let name = self.consume_token();
+    self.consume_expect_token(TokenKind::Equal);
+    let value = self.parse_expression_statement();
+    let location = name.location.clone();
+    ast::Statement::AssignStatement(ast::AssignStatement::new(name, value, location))
   }
 
   // function name(arg1: type1, arg2: type2): type
@@ -113,15 +131,13 @@ impl Parser {
     self.consume_expect_token(TokenKind::Local);
     let name = self.consume_token();
     let mut type_ = None;
-
-    if self.match_token(&TokenKind::Colon) {
-      self.consume_expect_token(TokenKind::Colon);
+    if let Some(_) = self.match_token_and_consume(&TokenKind::Colon) {
       type_ = Some(self.parse_type());
     }
-
-    self.consume_expect_token(TokenKind::Equal);
-
-    let init = self.parse_expression_statement();
+    let mut init = None;
+    if let Some(_) = self.match_token_and_consume(&TokenKind::Equal) {
+      init = Some(self.parse_expression_statement());
+    }
 
     let location = name.location.clone();
 
@@ -171,7 +187,9 @@ impl Parser {
   fn consume_expect_token(&mut self, kind: TokenKind) -> Token {
     let token = self.lexer.next_token();
     if token.kind != kind {
-      panic!("Expected '{:?}' but found '{:?}'", kind, token.kind);
+      let mut location = token.location.clone();
+      let message = format!("Expected '{:?}' but found '{:?}'", kind, token.kind);
+      report_and_exit(message.as_str(), &mut location, &self.raw.as_str());
     }
     token
   }
@@ -183,6 +201,13 @@ impl Parser {
   fn match_token(&mut self, kind: &TokenKind) -> bool {
     let next_token = self.lexer.peek_token();
     return &next_token.kind == kind;
+  }
+
+  fn match_token_and_consume(&mut self, kind: &TokenKind) -> Option<Token> {
+    if self.match_token(kind) {
+      return Some(self.consume_token());
+    }
+    return None;
   }
 
   fn is_end(&mut self) -> bool {
