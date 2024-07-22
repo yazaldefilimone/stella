@@ -9,7 +9,7 @@ mod types;
 mod utils;
 
 use ast::tokens::TokenKind;
-use checker::checker::Checker;
+use checker::Checker;
 use lexer::Lexer;
 use parser::parser::Parser;
 
