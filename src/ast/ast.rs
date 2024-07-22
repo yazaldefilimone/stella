@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use super::tokens::Token;
-use crate::utils::location::Location;
+use crate::{types::Type, utils::location::Location};
 #[allow(dead_code)]
 use serde::{Deserialize, Serialize};
 
@@ -300,46 +300,6 @@ pub struct BoolLiteral {
 impl BoolLiteral {
   pub fn new(value: bool, location: Location) -> Self {
     BoolLiteral { value, location }
-  }
-}
-
-// Definição de Tipos
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Type {
-  Void,
-  Number,
-  String,
-  Boolean,
-  Identifier(String),
-  Any,
-}
-
-impl Type {
-  pub fn identifier(name: String) -> Self {
-    Type::Identifier(name)
-  }
-
-  pub fn to_string(&self) -> String {
-    match self {
-      Type::Void => "void".to_string(),
-      Type::Number => "number".to_string(),
-      Type::String => "string".to_string(),
-      Type::Boolean => "boolean".to_string(),
-      Type::Identifier(name) => name.to_string(),
-      Type::Any => "any".to_string(),
-    }
-  }
-
-  pub fn new_type(text: String) -> Self {
-    match text.as_str() {
-      "void" => Type::Void,
-      "number" => Type::Number,
-      "string" => Type::String,
-      "boolean" => Type::Boolean,
-      "any" => Type::Any,
-      _ => Type::Identifier(text),
-    }
   }
 }
 

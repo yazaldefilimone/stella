@@ -5,6 +5,7 @@ mod context;
 mod diagnostics;
 mod lexer;
 mod parser;
+mod types;
 mod utils;
 
 use ast::tokens::TokenKind;

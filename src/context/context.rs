@@ -1,5 +1,6 @@
 #![allow(dead_code)]
-use crate::{ast::ast::Type, utils::location::Location};
+use crate::types::Type;
+use crate::utils::location::Location;
 use std::collections::{HashMap, HashSet};
 
 pub struct Context {

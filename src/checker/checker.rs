@@ -1,8 +1,9 @@
 #![allow(dead_code, unused_variables)]
 
-use crate::ast::ast::{self, Type};
+use crate::ast::ast;
 use crate::context::context::Context;
 use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError, TypeWarning};
+use crate::types::Type;
 
 pub struct Checker {
   ctx: Context,
@@ -71,7 +72,7 @@ impl Checker {
   fn check_t(&mut self, t: &Option<Type>) -> Type {
     match t {
       Some(t) => t.clone(),
-      None => Type::Any,
+      None => Type::Unknown,
     }
   }
 
@@ -82,11 +83,11 @@ impl Checker {
     let left_t = if let Some(init) = &local.init {
       self.check_expression_statement(init).unwrap()
     } else {
-      Type::Any
+      Type::Unknown
     };
 
     let location = local.location.clone();
-    if !self.check_match_type(&left_t, &right_t) {
+    if !right_t.check_is_can_replace(&left_t) {
       let diagnostic = TypeError::MismatchedTypes(right_t.to_string(), left_t.to_string(), Some(location));
       return Err(self.create_diagnostic(diagnostic));
     }
@@ -153,12 +154,12 @@ impl Checker {
       )));
     }
     let left_t = self.ctx.get_variable(lexema.as_str()).unwrap().clone();
-    if !self.check_match_type(&left_t, &right_t) {
+    if left_t.check_match(&right_t) {
       let location = Some(assign.location.clone());
       let diagnostic = TypeError::TypeMismatchAssignment(left_t.to_string(), right_t.to_string(), location);
       return Err(self.create_diagnostic(diagnostic));
     }
-    if self.check_can_replace_type(&left_t, &right_t) {
+    if right_t.check_is_can_replace(&left_t) {
       self.ctx.declare_variable(lexema.as_str(), right_t.clone());
       return Ok(right_t);
     }
@@ -183,27 +184,6 @@ impl Checker {
 
   fn check_repeat_statement(&mut self, repeat: &ast::RepeatStatement) {
     // Implement repeat statement checks
-  }
-
-  fn check_match_type(&self, left: &Type, right: &Type) -> bool {
-    match (left, right) {
-      (Type::Number, Type::Number) => true,
-      (Type::String, Type::String) => true,
-      (Type::Boolean, Type::Boolean) => true,
-      (Type::Identifier(left), Type::Identifier(right)) => left == right,
-      (Type::Any, _) => true,
-      (_, Type::Any) => true,
-      _ => false,
-    }
-  }
-
-  fn check_can_replace_type(&self, left: &Type, right: &Type) -> bool {
-    // if left is any, then it can replace any type with right
-    match (left, right) {
-      (Type::Any, Type::Any) => false,
-      (Type::Any, _) => true,
-      _ => false,
-    }
   }
 
   fn create_diagnostic(&self, error: TypeError) -> Diagnostic {
