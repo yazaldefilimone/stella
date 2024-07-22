@@ -120,7 +120,7 @@ pub enum TokenKind {
   LeftBracket,  // [
   RightBracket, // ]
 
-  // Literals
+  // Literals, inclue types
   Identifier(String),
   Number(String),
   String(String),

@@ -87,7 +87,13 @@ impl Type {
 
   // helper functions to create types
   pub fn new_type(name: String) -> Self {
-    Type::Identifier(name)
+    match name.as_str() {
+      "number" => Type::Number,
+      "string" => Type::String,
+      "boolean" => Type::Boolean,
+      "unknown" => Type::Unknown,
+      _ => Type::Identifier(name),
+    }
   }
   pub fn new_number() -> Self {
     Type::Number

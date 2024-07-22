@@ -1,0 +1,434 @@
+---
+source: tests/snapshot_tests.rs
+---
+[
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 0,
+      ),
+      end: Position(
+        line: 1,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 5,
+      ),
+      end: Position(
+        line: 1,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 10,
+      ),
+      end: Position(
+        line: 1,
+        column: 11,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("string"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 11,
+      ),
+      end: Position(
+        line: 1,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 18,
+      ),
+      end: Position(
+        line: 1,
+        column: 20,
+      ),
+    ),
+  ),
+  Token(
+    kind: String("Stella"),
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 20,
+      ),
+      end: Position(
+        line: 1,
+        column: 29,
+      ),
+    ),
+  ),
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 1,
+        column: 29,
+      ),
+      end: Position(
+        line: 2,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("age"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 5,
+      ),
+      end: Position(
+        line: 2,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 9,
+      ),
+      end: Position(
+        line: 2,
+        column: 10,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 10,
+      ),
+      end: Position(
+        line: 2,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 17,
+      ),
+      end: Position(
+        line: 2,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 19,
+      ),
+      end: Position(
+        line: 2,
+        column: 24,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    location: Location(
+      start: Position(
+        line: 2,
+        column: 24,
+      ),
+      end: Position(
+        line: 3,
+        column: 4,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 4,
+      ),
+      end: Position(
+        line: 3,
+        column: 6,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number("10"),
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 6,
+      ),
+      end: Position(
+        line: 3,
+        column: 9,
+      ),
+    ),
+  ),
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 3,
+        column: 9,
+      ),
+      end: Position(
+        line: 4,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("is_student"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 5,
+      ),
+      end: Position(
+        line: 4,
+        column: 16,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 16,
+      ),
+      end: Position(
+        line: 4,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("boolean"),
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 17,
+      ),
+      end: Position(
+        line: 4,
+        column: 25,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 25,
+      ),
+      end: Position(
+        line: 4,
+        column: 27,
+      ),
+    ),
+  ),
+  Token(
+    kind: True,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 27,
+      ),
+      end: Position(
+        line: 4,
+        column: 32,
+      ),
+    ),
+  ),
+  Token(
+    kind: Local,
+    location: Location(
+      start: Position(
+        line: 4,
+        column: 32,
+      ),
+      end: Position(
+        line: 6,
+        column: 5,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("what_is_that"),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 5,
+      ),
+      end: Position(
+        line: 6,
+        column: 18,
+      ),
+    ),
+  ),
+  Token(
+    kind: Colon,
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 18,
+      ),
+      end: Position(
+        line: 6,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("unknown"),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 19,
+      ),
+      end: Position(
+        line: 6,
+        column: 27,
+      ),
+    ),
+  ),
+  Token(
+    kind: Semicolon,
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 27,
+      ),
+      end: Position(
+        line: 6,
+        column: 28,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("what_is_that"),
+    location: Location(
+      start: Position(
+        line: 6,
+        column: 28,
+      ),
+      end: Position(
+        line: 8,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 12,
+      ),
+      end: Position(
+        line: 8,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: Number("10"),
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 14,
+      ),
+      end: Position(
+        line: 8,
+        column: 17,
+      ),
+    ),
+  ),
+  Token(
+    kind: Identifier("what_is_that"),
+    location: Location(
+      start: Position(
+        line: 8,
+        column: 17,
+      ),
+      end: Position(
+        line: 11,
+        column: 12,
+      ),
+    ),
+  ),
+  Token(
+    kind: Equal,
+    location: Location(
+      start: Position(
+        line: 11,
+        column: 12,
+      ),
+      end: Position(
+        line: 11,
+        column: 14,
+      ),
+    ),
+  ),
+  Token(
+    kind: True,
+    location: Location(
+      start: Position(
+        line: 11,
+        column: 14,
+      ),
+      end: Position(
+        line: 11,
+        column: 19,
+      ),
+    ),
+  ),
+  Token(
+    kind: EOF,
+    location: Location(
+      start: Position(
+        line: 11,
+        column: 19,
+      ),
+      end: Position(
+        line: 12,
+        column: 0,
+      ),
+    ),
+  ),
+]
