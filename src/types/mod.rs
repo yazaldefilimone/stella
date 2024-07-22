@@ -14,7 +14,7 @@ pub enum Type {
   Optional(OptionalType),
   Unknown,
   Identifier(String),
-  Void,
+  Nil,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -52,7 +52,7 @@ impl Type {
       (Type::String, Type::String) => true,
       (Type::Boolean, Type::Boolean) => true,
       (Type::Unknown, Type::Unknown) => true,
-      (Type::Void, Type::Void) => true,
+      (Type::Nil, Type::Nil) => true,
       (Type::Optional(left), Type::Optional(right)) => left.type_.check_match(&right.type_),
       (Type::Union(left), Type::Union(right)) => check_match_union(&left.types, &right.types),
       (Type::Table(left), Type::Table(right)) => check_match_table(&left, &right),
@@ -71,7 +71,7 @@ impl Type {
   // to string
   pub fn to_string(&self) -> String {
     match self {
-      Type::Void => "void".to_string(),
+      Type::Nil => "nil".to_string(),
       Type::Number => "number".to_string(),
       Type::String => "string".to_string(),
       Type::Boolean => "boolean".to_string(),
@@ -91,6 +91,7 @@ impl Type {
       "number" => Type::Number,
       "string" => Type::String,
       "boolean" => Type::Boolean,
+      "nil" => Type::Nil,
       "unknown" => Type::Unknown,
       _ => Type::Identifier(name),
     }

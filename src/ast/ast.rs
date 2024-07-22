@@ -251,6 +251,7 @@ pub enum LiteralExpression {
   NumberLiteral(NumberLiteral),
   StringLiteral(StringLiteral),
   BoolLiteral(BoolLiteral),
+  NilLiteral,
 }
 
 impl LiteralExpression {

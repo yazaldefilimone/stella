@@ -16,7 +16,7 @@ impl Checker {
   }
 
   pub fn check(&mut self, program: &ast::Program) -> Result<Type, Diagnostic> {
-    let mut last_t = Type::Void;
+    let mut last_t = Type::Nil;
     for statement in &program.statements {
       match self.check_statement(statement) {
         Ok(ty) => last_t = ty,
@@ -41,29 +41,29 @@ impl Checker {
       ast::Statement::LocalStatement(local) => self.check_local_statement(local),
       ast::Statement::EmptyStatement(empty) => {
         self.check_empty_statement(empty);
-        Ok(Type::Void)
+        Ok(Type::Nil)
       }
       ast::Statement::BlockStatement(block) => self.check_block_statement(block),
       ast::Statement::AssignStatement(assign) => self.check_assign_statement(assign),
       ast::Statement::FunctionStatement(function) => {
         self.check_function_statement(function);
-        Ok(Type::Void)
+        Ok(Type::Nil)
       }
       ast::Statement::ReturnStatement(return_) => {
         self.check_return_statement(return_);
-        Ok(Type::Void)
+        Ok(Type::Nil)
       }
       ast::Statement::IfStatement(if_) => {
         self.check_if_statement(if_);
-        Ok(Type::Void)
+        Ok(Type::Nil)
       }
       ast::Statement::WhileStatement(while_) => {
         self.check_while_statement(while_);
-        Ok(Type::Void)
+        Ok(Type::Nil)
       }
       ast::Statement::RepeatStatement(repeat) => {
         self.check_repeat_statement(repeat);
-        Ok(Type::Void)
+        Ok(Type::Nil)
       }
       _ => todo!("Implement more statement checks"),
     }
@@ -81,7 +81,7 @@ impl Checker {
     let right_t = self.check_t(&local.type_);
 
     let left_t = if let Some(init) = &local.init {
-      self.check_expression_statement(init).unwrap()
+      self.check_expression_statement(init).unwrap_or(Type::Unknown)
     } else {
       Type::Unknown
     };
@@ -103,7 +103,7 @@ impl Checker {
   }
 
   fn check_block_statement(&mut self, block: &ast::BlockStatement) -> Result<Type, Diagnostic> {
-    let mut last_t = Type::Void;
+    let mut last_t = Type::Nil;
     for statement in &block.body {
       match self.check_statement(statement) {
         Ok(ty) => last_t = ty,
@@ -140,6 +140,7 @@ impl Checker {
       ast::LiteralExpression::NumberLiteral(_) => Ok(Type::Number),
       ast::LiteralExpression::StringLiteral(_) => Ok(Type::String),
       ast::LiteralExpression::BoolLiteral(_) => Ok(Type::Boolean),
+      ast::LiteralExpression::NilLiteral => Ok(Type::Nil),
     }
   }
 
