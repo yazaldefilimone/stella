@@ -15,15 +15,15 @@ impl Checker {
   }
 
   pub fn check(&mut self, program: &ast::Program) -> Result<Type, Diagnostic> {
-    let mut last_type = Type::Void;
+    let mut last_t = Type::Void;
     for statement in &program.statements {
       match self.check_statement(statement) {
-        Ok(ty) => last_type = ty,
+        Ok(ty) => last_t = ty,
         Err(diag) => self.diagnostics.add(diag),
       }
     }
-    let unused_variables = self.ctx.check_unused_variables();
-    for unused_variable in unused_variables {
+
+    for unused_variable in self.ctx.check_unused_variables() {
       let unused_variable_location = self.ctx.get_variable_location(&unused_variable);
       if unused_variable_location.is_none() {
         continue;
@@ -32,7 +32,7 @@ impl Checker {
       self.diagnostics.add(report.into());
     }
 
-    return Ok(last_type);
+    return Ok(last_t);
   }
 
   fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, Diagnostic> {
@@ -77,24 +77,24 @@ impl Checker {
 
   fn check_local_statement(&mut self, local: &ast::LocalStatement) -> Result<Type, Diagnostic> {
     let text_name = local.name.lexeme();
-    let right_type = self.check_t(&local.type_);
+    let right_t = self.check_t(&local.type_);
 
-    let left_type = if let Some(init) = &local.init {
+    let left_t = if let Some(init) = &local.init {
       self.check_expression_statement(init).unwrap()
     } else {
       Type::Any
     };
 
     let location = local.location.clone();
-    if !self.check_match_type(&left_type, &right_type) {
-      let diagnostic = TypeError::MismatchedTypes(right_type.to_string(), left_type.to_string(), Some(location));
+    if !self.check_match_type(&left_t, &right_t) {
+      let diagnostic = TypeError::MismatchedTypes(right_t.to_string(), left_t.to_string(), Some(location));
       return Err(self.create_diagnostic(diagnostic));
     }
 
     self.ctx.set_variable_location(text_name.as_str(), location);
 
-    self.ctx.declare_variable(text_name.as_str(), right_type.clone());
-    Ok(right_type)
+    self.ctx.declare_variable(text_name.as_str(), right_t.clone());
+    Ok(right_t)
   }
 
   fn check_empty_statement(&mut self, _empty: &ast::EmptyStatement) {
@@ -102,14 +102,14 @@ impl Checker {
   }
 
   fn check_block_statement(&mut self, block: &ast::BlockStatement) -> Result<Type, Diagnostic> {
-    let mut last_type = Type::Void;
+    let mut last_t = Type::Void;
     for statement in &block.body {
       match self.check_statement(statement) {
-        Ok(ty) => last_type = ty,
+        Ok(ty) => last_t = ty,
         Err(diag) => self.diagnostics.add(diag),
       }
     }
-    Ok(last_type)
+    Ok(last_t)
   }
 
   fn check_expression_statement(&mut self, expression: &ast::ExpressionStatement) -> Result<Type, Diagnostic> {
@@ -143,7 +143,7 @@ impl Checker {
   }
 
   fn check_assign_statement(&mut self, assign: &ast::AssignStatement) -> Result<Type, Diagnostic> {
-    let right_type = self.check_expression_statement(&assign.value)?;
+    let right_t = self.check_expression_statement(&assign.value)?;
     let lexema = assign.name.lexeme();
     if !self.ctx.is_variable_defined(lexema.as_str()) {
       return Err(self.create_diagnostic(TypeError::UndeclaredVariable(
@@ -152,17 +152,17 @@ impl Checker {
         Some(assign.name.location.clone()),
       )));
     }
-    let left_type = self.ctx.get_variable(lexema.as_str()).unwrap().clone();
-    if !self.check_match_type(&left_type, &right_type) {
+    let left_t = self.ctx.get_variable(lexema.as_str()).unwrap().clone();
+    if !self.check_match_type(&left_t, &right_t) {
       let location = Some(assign.location.clone());
-      let diagnostic = TypeError::TypeMismatchAssignment(left_type.to_string(), right_type.to_string(), location);
+      let diagnostic = TypeError::TypeMismatchAssignment(left_t.to_string(), right_t.to_string(), location);
       return Err(self.create_diagnostic(diagnostic));
     }
-    if self.check_can_replace_type(&left_type, &right_type) {
-      self.ctx.declare_variable(lexema.as_str(), right_type.clone());
-      return Ok(right_type);
+    if self.check_can_replace_type(&left_t, &right_t) {
+      self.ctx.declare_variable(lexema.as_str(), right_t.clone());
+      return Ok(right_t);
     }
-    Ok(left_type)
+    Ok(left_t)
   }
 
   fn check_function_statement(&mut self, function: &ast::FunctionStatement) {
