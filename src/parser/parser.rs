@@ -6,6 +6,7 @@ use crate::{
   },
   diagnostics::report_and_exit,
   lexer::Lexer,
+  types::Type,
 };
 
 pub struct Parser {
@@ -108,15 +109,15 @@ impl Parser {
     ))
   }
 
-  fn parse_type(&mut self) -> ast::Type {
+  fn parse_type(&mut self) -> Type {
     let token = self.lexer.next_token();
     match token.kind {
-      TokenKind::Identifier(name) => ast::Type::new_type(name),
+      TokenKind::Identifier(name) => Type::new_type(name),
       _ => todo!("hei, please :) implement me"),
     }
   }
 
-  fn parse_arguments(&mut self) -> Vec<(Token, ast::Type)> {
+  fn parse_arguments(&mut self) -> Vec<(Token, Type)> {
     let mut arguments = vec![];
     while !self.match_token(&TokenKind::RightParen) {
       let name = self.consume_token();
