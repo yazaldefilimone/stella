@@ -58,14 +58,14 @@ impl Context {
     None
   }
 
-  pub fn is_variable_defined(&self, name: &str) -> bool {
+  pub fn is_defined(&self, name: &str) -> bool {
     if let Some(scope) = self.scopes.get(self.scope_pointer) {
       return scope.variables.contains_key(name);
     }
     false
   }
 
-  pub fn is_variable_defined_in_any_scope(&self, name: &str) -> bool {
+  pub fn is_defined_in_any_scope(&self, name: &str) -> bool {
     for i in (0..=self.scope_pointer).rev() {
       if let Some(scope) = self.scopes.get(i) {
         if scope.variables.contains_key(name) {

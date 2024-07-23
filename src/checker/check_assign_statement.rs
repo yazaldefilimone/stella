@@ -5,9 +5,9 @@ use crate::types::Type;
 
 impl Checker {
   pub fn check_assign_statement(&mut self, assign: &ast::AssignStatement) -> Result<Type, Diagnostic> {
-    let right_t = self.check_expression_statement(&assign.value)?;
+    let right_t = self.check_expression_statement(&assign.value).unwrap();
     let lexema = assign.name.lexeme();
-    if !self.ctx.is_variable_defined(lexema.as_str()) {
+    if !self.ctx.is_defined(lexema.as_str()) {
       return Err(self.create_diagnostic(TypeError::UndeclaredVariable(
         lexema.to_string(),
         // TODO: hei :), use name location or a value location?

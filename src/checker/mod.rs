@@ -2,6 +2,7 @@
 
 pub mod check_assign_statement;
 pub mod check_block_statement;
+pub mod check_declaration_statement;
 pub mod check_empty_statement;
 pub mod check_expression_statement;
 pub mod check_for_statement;
@@ -14,6 +15,7 @@ pub mod check_repeat_statement;
 pub mod check_return_statement;
 pub mod check_statement;
 pub mod check_type;
+pub mod check_type_statement;
 pub mod check_while_statement;
 
 use crate::ast::ast;
