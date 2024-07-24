@@ -54,32 +54,32 @@ fn setings_snapshot() -> insta::Settings {
 fn test_lexer_snapshot() {
   let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
   let settings = setings_snapshot();
-  settings.bind(|| {
-    for (file_name, source_code) in test_files.iter() {
+  for (file_name, source_code) in test_files.iter() {
+    settings.bind(|| {
       let tokens = create_tokens(source_code);
       let file_name = format_file_name_with_module(file_name, "lexer");
       assert_ron_snapshot!(file_name.clone(), tokens);
-    }
-  });
+    });
+  }
 }
 
 #[test]
 fn test_parser_snapshot() {
   let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
   let settings = setings_snapshot();
-  settings.bind(|| {
-    for (file_name, source_code) in test_files.iter() {
+  for (file_name, source_code) in test_files.iter() {
+    settings.bind(|| {
       let mut parser = create_parser(source_code);
       let file_name = format_file_name_with_module(file_name, "parser");
       let program = parser.parse_program();
       assert_ron_snapshot!(file_name.clone(), program);
-    }
-  });
+    });
+  }
 }
 
-#[test]
-fn test_type_checker_snapshot() {
-  let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
-  println!("test_type_checker_snapshot: {:?}", test_files);
-  // hei, please :) implement me
-}
+// #[test]
+// fn test_type_checker_snapshot() {
+//   let test_files = read_test_files_with_pattern("tests/golden_tests/*.lua");
+//   println!("test_type_checker_snapshot: {:?}", test_files);
+//   // hei, please :) implement me
+// }

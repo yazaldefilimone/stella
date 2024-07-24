@@ -55,7 +55,7 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Equal,
+    kind: Assign,
     location: Location(
       start: Position(
         line: 1,
@@ -107,20 +107,7 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Greater,
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 6,
-      ),
-      end: Position(
-        line: 3,
-        column: 8,
-      ),
-    ),
-  ),
-  Token(
-    kind: Equal,
+    kind: GreaterEqual,
     location: Location(
       start: Position(
         line: 3,

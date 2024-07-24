@@ -1,0 +1,298 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    FunctionStatement(FunctionStatement(
+      name: Token(
+        kind: Identifier("fibonacci"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 8,
+          ),
+          end: Position(
+            line: 1,
+            column: 18,
+          ),
+        ),
+      ),
+      arguments: [
+        (Token(
+          kind: Identifier("n"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 19,
+            ),
+            end: Position(
+              line: 1,
+              column: 20,
+            ),
+          ),
+        ), Some(Number)),
+      ],
+      return_t: Some(Number),
+      body: BlockStatement(BlockStatement(
+        body: [
+          IfStatement(IfStatement(
+            condition: BinaryExpression(BinaryExpression(
+              operator: LessThanOrEqual,
+              left: Identifier(Identifier(
+                name: "n",
+                location: Location(
+                  start: Position(
+                    line: 2,
+                    column: 6,
+                  ),
+                  end: Position(
+                    line: 2,
+                    column: 8,
+                  ),
+                ),
+              )),
+              right: LiteralExpression(NumberLiteral(NumberLiteral(
+                value: "1",
+                location: Location(
+                  start: Position(
+                    line: 2,
+                    column: 11,
+                  ),
+                  end: Position(
+                    line: 2,
+                    column: 13,
+                  ),
+                ),
+              ))),
+            )),
+            body: BlockStatement(BlockStatement(
+              body: [
+                ReturnStatement(ReturnStatement(
+                  value: [
+                    Identifier(Identifier(
+                      name: "n",
+                      location: Location(
+                        start: Position(
+                          line: 3,
+                          column: 14,
+                        ),
+                        end: Position(
+                          line: 3,
+                          column: 16,
+                        ),
+                      ),
+                    )),
+                  ],
+                  location: Location(
+                    start: Position(
+                      line: 2,
+                      column: 18,
+                    ),
+                    end: Position(
+                      line: 3,
+                      column: 14,
+                    ),
+                  ),
+                )),
+              ],
+              location: Location(
+                start: Position(
+                  line: 2,
+                  column: 18,
+                ),
+                end: Position(
+                  line: 3,
+                  column: 14,
+                ),
+              ),
+            )),
+            else_body: None,
+            location: Location(
+              start: Position(
+                line: 1,
+                column: 37,
+              ),
+              end: Position(
+                line: 2,
+                column: 6,
+              ),
+            ),
+          )),
+          ReturnStatement(ReturnStatement(
+            value: [
+              CallExpression(CallExpression(
+                name: Token(
+                  kind: Identifier("fibonacci"),
+                  location: Location(
+                    start: Position(
+                      line: 5,
+                      column: 10,
+                    ),
+                    end: Position(
+                      line: 5,
+                      column: 20,
+                    ),
+                  ),
+                ),
+                args: BinaryExpression(BinaryExpression(
+                  operator: Add,
+                  left: GroupedExpression(GroupedExpression(
+                    expression: [
+                      BinaryExpression(BinaryExpression(
+                        operator: Subtract,
+                        left: Identifier(Identifier(
+                          name: "n",
+                          location: Location(
+                            start: Position(
+                              line: 5,
+                              column: 21,
+                            ),
+                            end: Position(
+                              line: 5,
+                              column: 22,
+                            ),
+                          ),
+                        )),
+                        right: LiteralExpression(NumberLiteral(NumberLiteral(
+                          value: "1",
+                          location: Location(
+                            start: Position(
+                              line: 5,
+                              column: 24,
+                            ),
+                            end: Position(
+                              line: 5,
+                              column: 26,
+                            ),
+                          ),
+                        ))),
+                      )),
+                    ],
+                    location: Location(
+                      start: Position(
+                        line: 5,
+                        column: 20,
+                      ),
+                      end: Position(
+                        line: 5,
+                        column: 21,
+                      ),
+                    ),
+                  )),
+                  right: CallExpression(CallExpression(
+                    name: Token(
+                      kind: Identifier("fibonacci"),
+                      location: Location(
+                        start: Position(
+                          line: 5,
+                          column: 29,
+                        ),
+                        end: Position(
+                          line: 5,
+                          column: 39,
+                        ),
+                      ),
+                    ),
+                    args: GroupedExpression(GroupedExpression(
+                      expression: [
+                        BinaryExpression(BinaryExpression(
+                          operator: Subtract,
+                          left: Identifier(Identifier(
+                            name: "n",
+                            location: Location(
+                              start: Position(
+                                line: 5,
+                                column: 40,
+                              ),
+                              end: Position(
+                                line: 5,
+                                column: 41,
+                              ),
+                            ),
+                          )),
+                          right: LiteralExpression(NumberLiteral(NumberLiteral(
+                            value: "2",
+                            location: Location(
+                              start: Position(
+                                line: 5,
+                                column: 43,
+                              ),
+                              end: Position(
+                                line: 5,
+                                column: 45,
+                              ),
+                            ),
+                          ))),
+                        )),
+                      ],
+                      location: Location(
+                        start: Position(
+                          line: 5,
+                          column: 39,
+                        ),
+                        end: Position(
+                          line: 5,
+                          column: 40,
+                        ),
+                      ),
+                    )),
+                    location: Location(
+                      start: Position(
+                        line: 5,
+                        column: 29,
+                      ),
+                      end: Position(
+                        line: 5,
+                        column: 39,
+                      ),
+                    ),
+                  )),
+                )),
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 10,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 20,
+                  ),
+                ),
+              )),
+            ],
+            location: Location(
+              start: Position(
+                line: 4,
+                column: 7,
+              ),
+              end: Position(
+                line: 5,
+                column: 10,
+              ),
+            ),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 37,
+          ),
+          end: Position(
+            line: 2,
+            column: 6,
+          ),
+        ),
+      )),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 8,
+        ),
+        end: Position(
+          line: 1,
+          column: 18,
+        ),
+      ),
+    )),
+  ],
+)

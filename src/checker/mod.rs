@@ -2,20 +2,19 @@
 
 pub mod check_assign_statement;
 pub mod check_block_statement;
-pub mod check_declaration_statement;
 pub mod check_empty_statement;
 pub mod check_expression_statement;
 pub mod check_for_statement;
 pub mod check_function_statement;
-pub mod check_identifier_expression;
+pub mod check_identifier;
 pub mod check_if_statement;
 pub mod check_literal_expression;
-pub mod check_local_statement;
 pub mod check_repeat_statement;
 pub mod check_return_statement;
 pub mod check_statement;
 pub mod check_type;
 pub mod check_type_statement;
+pub mod check_variable_declaration;
 pub mod check_while_statement;
 
 use crate::ast::ast;
@@ -51,10 +50,6 @@ impl Checker {
     }
 
     return Ok(last_t);
-  }
-
-  pub fn check_continue_statement(&mut self, continue_: &ast::ContinueStatement) {
-    // Empty statements don't change the type context
   }
 
   pub fn check_break_statement(&mut self, break_: &ast::BreakStatement) {

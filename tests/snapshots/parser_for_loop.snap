@@ -1,0 +1,127 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    ForStatement(ForStatement(
+      variable: Identifier(Identifier(
+        name: "i",
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 3,
+          ),
+          end: Position(
+            line: 1,
+            column: 5,
+          ),
+        ),
+      )),
+      init: LiteralExpression(NumberLiteral(NumberLiteral(
+        value: "1",
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 6,
+          ),
+          end: Position(
+            line: 1,
+            column: 8,
+          ),
+        ),
+      ))),
+      limit: LiteralExpression(NumberLiteral(NumberLiteral(
+        value: "10",
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 9,
+          ),
+          end: Position(
+            line: 1,
+            column: 12,
+          ),
+        ),
+      ))),
+      step: None,
+      body: BlockStatement(BlockStatement(
+        body: [
+          CallStatement(CallStatement(
+            expression: CallExpression(CallExpression(
+              name: Token(
+                kind: Identifier("print"),
+                location: Location(
+                  start: Position(
+                    line: 1,
+                    column: 15,
+                  ),
+                  end: Position(
+                    line: 2,
+                    column: 9,
+                  ),
+                ),
+              ),
+              args: GroupedExpression(GroupedExpression(
+                expression: [
+                  Identifier(Identifier(
+                    name: "i",
+                    location: Location(
+                      start: Position(
+                        line: 2,
+                        column: 10,
+                      ),
+                      end: Position(
+                        line: 2,
+                        column: 11,
+                      ),
+                    ),
+                  )),
+                ],
+                location: Location(
+                  start: Position(
+                    line: 2,
+                    column: 9,
+                  ),
+                  end: Position(
+                    line: 2,
+                    column: 10,
+                  ),
+                ),
+              )),
+              location: Location(
+                start: Position(
+                  line: 1,
+                  column: 15,
+                ),
+                end: Position(
+                  line: 2,
+                  column: 9,
+                ),
+              ),
+            )),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 15,
+          ),
+          end: Position(
+            line: 2,
+            column: 9,
+          ),
+        ),
+      )),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 0,
+        ),
+        end: Position(
+          line: 1,
+          column: 3,
+        ),
+      ),
+    )),
+  ],
+)

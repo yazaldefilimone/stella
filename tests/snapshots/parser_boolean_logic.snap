@@ -1,0 +1,200 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("a"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 5,
+          ),
+          end: Position(
+            line: 1,
+            column: 7,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Boolean),
+      init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
+        value: true,
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 18,
+          ),
+          end: Position(
+            line: 1,
+            column: 23,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 5,
+        ),
+        end: Position(
+          line: 1,
+          column: 7,
+        ),
+      ),
+    )),
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("b"),
+        location: Location(
+          start: Position(
+            line: 2,
+            column: 5,
+          ),
+          end: Position(
+            line: 2,
+            column: 7,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Boolean),
+      init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
+        value: false,
+        location: Location(
+          start: Position(
+            line: 2,
+            column: 18,
+          ),
+          end: Position(
+            line: 2,
+            column: 24,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 2,
+          column: 5,
+        ),
+        end: Position(
+          line: 2,
+          column: 7,
+        ),
+      ),
+    )),
+    IfStatement(IfStatement(
+      condition: BinaryExpression(BinaryExpression(
+        operator: And,
+        left: Identifier(Identifier(
+          name: "a",
+          location: Location(
+            start: Position(
+              line: 4,
+              column: 2,
+            ),
+            end: Position(
+              line: 4,
+              column: 4,
+            ),
+          ),
+        )),
+        right: UnaryExpression(UnaryExpression(
+          operator: Not,
+          operand: Identifier(Identifier(
+            name: "b",
+            location: Location(
+              start: Position(
+                line: 4,
+                column: 12,
+              ),
+              end: Position(
+                line: 4,
+                column: 14,
+              ),
+            ),
+          )),
+        )),
+      )),
+      body: BlockStatement(BlockStatement(
+        body: [
+          CallStatement(CallStatement(
+            expression: CallExpression(CallExpression(
+              name: Token(
+                kind: Identifier("print"),
+                location: Location(
+                  start: Position(
+                    line: 4,
+                    column: 19,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 9,
+                  ),
+                ),
+              ),
+              args: GroupedExpression(GroupedExpression(
+                expression: [
+                  LiteralExpression(StringLiteral(StringLiteral(
+                    value: "a is true and b is false",
+                    location: Location(
+                      start: Position(
+                        line: 5,
+                        column: 10,
+                      ),
+                      end: Position(
+                        line: 5,
+                        column: 36,
+                      ),
+                    ),
+                  ))),
+                ],
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 9,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 10,
+                  ),
+                ),
+              )),
+              location: Location(
+                start: Position(
+                  line: 4,
+                  column: 19,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 9,
+                ),
+              ),
+            )),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 4,
+            column: 19,
+          ),
+          end: Position(
+            line: 5,
+            column: 9,
+          ),
+        ),
+      )),
+      else_body: None,
+      location: Location(
+        start: Position(
+          line: 2,
+          column: 24,
+        ),
+        end: Position(
+          line: 4,
+          column: 2,
+        ),
+      ),
+    )),
+  ],
+)

@@ -4,9 +4,9 @@ use crate::diagnostics::{Diagnostic, TypeError};
 use crate::types::Type;
 
 impl Checker {
-  pub fn check_local_statement(&mut self, local: &ast::LocalStatement) -> Result<Type, Diagnostic> {
+  pub fn check_variable_declaration(&mut self, local: &ast::VariableDeclaration) -> Result<Type, Diagnostic> {
     let text_name = local.name.lexeme();
-    let right_t = self.check_t(&local.type_);
+    let right_t = self.check_t(&local.t);
 
     let left_t = if let Some(init) = &local.init {
       self.check_expression_statement(init).unwrap_or(Type::Unknown)

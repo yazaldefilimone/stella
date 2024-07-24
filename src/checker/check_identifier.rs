@@ -5,7 +5,7 @@ use crate::diagnostics::TypeError;
 use crate::types::Type;
 
 impl Checker {
-  pub fn check_identifier_expression(&mut self, ident: &ast::IdentifierExpression) -> Result<Type, Diagnostic> {
+  pub fn check_identifier(&mut self, ident: &ast::Identifier) -> Result<Type, Diagnostic> {
     let text_name = ident.name.clone();
     if !self.ctx.is_defined(text_name.as_str()) {
       return Err(self.create_diagnostic(TypeError::UndeclaredVariable(

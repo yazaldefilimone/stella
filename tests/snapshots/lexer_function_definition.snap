@@ -150,19 +150,6 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 2,
-        column: 20,
-      ),
-      end: Position(
-        line: 2,
-        column: 22,
-      ),
-    ),
-  ),
-  Token(
-    kind: DoubleDot,
-    location: Location(
-      start: Position(
-        line: 2,
         column: 22,
       ),
       end: Position(

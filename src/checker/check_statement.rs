@@ -6,7 +6,7 @@ use crate::types::Type;
 impl Checker {
   pub fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, Diagnostic> {
     match statement {
-      ast::Statement::LocalStatement(local) => self.check_local_statement(local),
+      ast::Statement::VariableDeclaration(vaiable) => self.check_variable_declaration(vaiable),
       ast::Statement::EmptyStatement(empty) => {
         self.check_empty_statement(empty);
         Ok(Type::Nil)

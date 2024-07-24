@@ -4,7 +4,7 @@ use crate::ast::ast;
 // use crate::types::Type;
 
 impl Checker {
-  pub fn check_type_statement(&mut self, local: &ast::LocalStatement) {
+  pub fn check_type_statement(&mut self, local: &ast::VariableDeclaration) {
     // type .. = type
   }
 }

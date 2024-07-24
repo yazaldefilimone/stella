@@ -3,7 +3,7 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    LocalStatement(LocalStatement(
+    VariableDeclaration(VariableDeclaration(
       name: Token(
         kind: Identifier("name"),
         location: Location(
@@ -17,7 +17,8 @@ Program(
           ),
         ),
       ),
-      type_: Some(String),
+      local: true,
+      t: Some(String),
       init: Some(LiteralExpression(StringLiteral(StringLiteral(
         value: "Stella",
         location: Location(
@@ -42,7 +43,7 @@ Program(
         ),
       ),
     )),
-    LocalStatement(LocalStatement(
+    VariableDeclaration(VariableDeclaration(
       name: Token(
         kind: Identifier("age"),
         location: Location(
@@ -56,8 +57,9 @@ Program(
           ),
         ),
       ),
-      type_: Some(Number),
-      init: Some(IdentifierExpression(IdentifierExpression(
+      local: true,
+      t: Some(Number),
+      init: Some(Identifier(Identifier(
         name: "name",
         location: Location(
           start: Position(
@@ -119,7 +121,7 @@ Program(
         ),
       ),
     )),
-    LocalStatement(LocalStatement(
+    VariableDeclaration(VariableDeclaration(
       name: Token(
         kind: Identifier("is_student"),
         location: Location(
@@ -133,7 +135,8 @@ Program(
           ),
         ),
       ),
-      type_: Some(Boolean),
+      local: true,
+      t: Some(Boolean),
       init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
         value: true,
         location: Location(
@@ -158,7 +161,7 @@ Program(
         ),
       ),
     )),
-    LocalStatement(LocalStatement(
+    VariableDeclaration(VariableDeclaration(
       name: Token(
         kind: Identifier("what_is_that"),
         location: Location(
@@ -172,7 +175,8 @@ Program(
           ),
         ),
       ),
-      type_: Some(Unknown),
+      local: true,
+      t: Some(Unknown),
       init: None,
       location: Location(
         start: Position(

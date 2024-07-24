@@ -25,21 +25,33 @@ pub enum Statement {
   RepeatStatement(RepeatStatement),
   ForStatement(ForStatement),
   BreakStatement(BreakStatement),
-  ContinueStatement(ContinueStatement),
+  GotoStatement(GotoStatement),
   BlockStatement(BlockStatement),
   EmptyStatement(EmptyStatement),
-  LocalStatement(LocalStatement),
+  VariableDeclaration(VariableDeclaration),
+  CallStatement(CallStatement),
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CallStatement {
+  expression: Expression,
+}
+
+impl CallStatement {
+  pub fn new(expression: Expression) -> Self {
+    CallStatement { expression }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AssignStatement {
   pub name: Token,
-  pub value: ExpressionStatement,
+  pub value: Expression,
   pub location: Location,
 }
 
 impl AssignStatement {
-  pub fn new(name: Token, value: ExpressionStatement, location: Location) -> Self {
+  pub fn new(name: Token, value: Expression, location: Location) -> Self {
     AssignStatement { name, value, location }
   }
 }
@@ -47,8 +59,8 @@ impl AssignStatement {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FunctionStatement {
   pub name: Token,
-  pub arguments: Vec<(Token, Type)>,
-  pub return_type: Type,
+  pub arguments: Vec<(Token, Option<Type>)>,
+  pub return_t: Option<Type>,
   pub body: Box<Statement>,
   pub location: Location,
 }
@@ -56,59 +68,68 @@ pub struct FunctionStatement {
 impl FunctionStatement {
   pub fn new(
     name: Token,
-    arguments: Vec<(Token, Type)>,
-    return_type: Type,
+    arguments: Vec<(Token, Option<Type>)>,
+    return_t: Option<Type>,
     body: Statement,
     location: Location,
   ) -> Self {
-    FunctionStatement { name, arguments, return_type, body: Box::new(body), location }
+    FunctionStatement { name, arguments, return_t, body: Box::new(body), location }
   }
 }
 #[derive(Debug, Serialize, Deserialize)]
+// return 10 // return "Hello", 20
+// return function(a, b) return a + b end -- return a function
 pub struct ReturnStatement {
-  pub value: ExpressionStatement,
+  pub value: Vec<Expression>,
   pub location: Location,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IfStatement {
-  pub condition: ExpressionStatement,
-  pub body: Vec<Statement>,
-  pub else_body: Option<Vec<Statement>>,
+  pub condition: Expression,
+  pub body: Box<Statement>,
+  pub else_body: Option<Box<Statement>>,
   pub location: Location,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WhileStatement {
-  pub condition: ExpressionStatement,
-  pub body: Vec<Statement>,
+  pub condition: Expression,
+  pub body: Box<Statement>,
   pub location: Location,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RepeatStatement {
-  pub body: Vec<Statement>,
-  pub condition: ExpressionStatement,
+  pub body: Box<Statement>,
+  pub condition: Expression,
   pub location: Location,
 }
 
+impl RepeatStatement {
+  pub fn new(body: Statement, condition: Expression, location: Location) -> Self {
+    RepeatStatement { body: Box::new(body), condition, location }
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
+// for i = 1, 10, 2 do ... end
 pub struct ForStatement {
-  pub initializer: Option<ExpressionStatement>,
-  pub condition: Option<ExpressionStatement>,
-  pub increment: Option<ExpressionStatement>,
-  pub body: Vec<Statement>,
+  pub variable: Expression,
+  pub init: Expression,
+  pub limit: Expression,
+  pub step: Option<Expression>,
+  pub body: Box<Statement>,
   pub location: Location,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BreakStatement {
-  pub label: Option<String>,
   pub location: Location,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ContinueStatement {
+pub struct GotoStatement {
   pub label: Option<String>,
   pub location: Location,
 }
@@ -130,86 +151,90 @@ pub struct EmptyStatement {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct LocalStatement {
+pub struct VariableDeclaration {
   pub name: Token,
-  pub type_: Option<Type>,
-  pub init: Option<ExpressionStatement>,
+  pub local: bool,
+  pub t: Option<Type>,
+  pub init: Option<Expression>,
   pub location: Location,
 }
 
-impl LocalStatement {
-  pub fn new(name: Token, type_: Option<Type>, init: Option<ExpressionStatement>, location: Location) -> Self {
-    LocalStatement { name, type_, init, location }
+impl VariableDeclaration {
+  pub fn new(name: Token, local: bool, t: Option<Type>, init: Option<Expression>, location: Location) -> Self {
+    VariableDeclaration { name, local, t, init, location }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum ExpressionStatement {
+pub enum Expression {
   LiteralExpression(LiteralExpression),
-  IdentifierExpression(IdentifierExpression),
+  Identifier(Identifier),
   CallExpression(CallExpression),
   UnaryExpression(UnaryExpression),
+  GroupedExpression(GroupedExpression),
   BinaryExpression(BinaryExpression),
-  DeclarationExpression(DeclarationExpression),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct IdentifierExpression {
+pub struct GroupedExpression {
+  pub expression: Vec<Expression>,
+  pub location: Location,
+}
+
+impl GroupedExpression {
+  pub fn new(expression: Vec<Expression>, location: Location) -> Self {
+    GroupedExpression { expression, location }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Identifier {
   pub name: String,
   pub location: Location,
 }
 
-impl IdentifierExpression {
+impl Identifier {
   pub fn new(name: String, location: Location) -> Self {
-    IdentifierExpression { name, location }
+    Identifier { name, location }
   }
 }
 
-impl ExpressionStatement {
+impl Expression {
   pub fn new_number_literal(value: String, location: Location) -> Self {
     let literal = LiteralExpression::new_number_literal(value, location);
-    return ExpressionStatement::LiteralExpression(literal);
+    return Expression::LiteralExpression(literal);
   }
 
   pub fn new_identifier(name: String, location: Location) -> Self {
-    let literal = IdentifierExpression::new(name, location);
-    return ExpressionStatement::IdentifierExpression(literal);
+    let literal = Identifier::new(name, location);
+    return Expression::Identifier(literal);
   }
 
   pub fn new_string_literal(value: String, location: Location) -> Self {
     let literal = LiteralExpression::new_string_literal(value, location);
-    return ExpressionStatement::LiteralExpression(literal);
+    return Expression::LiteralExpression(literal);
   }
 
   pub fn new_bool_literal(value: bool, location: Location) -> Self {
     let literal = LiteralExpression::new_bool_literal(value, location);
-    return ExpressionStatement::LiteralExpression(literal);
+    return Expression::LiteralExpression(literal);
   }
-}
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DeclarationExpression {
-  pub name: Token,
-  pub value: Box<ExpressionStatement>,
-  pub local: bool,
-  pub location: Location,
-}
-
-impl DeclarationExpression {
-  pub fn new(name: Token, value: Box<ExpressionStatement>, local: bool, location: Location) -> Self {
-    DeclarationExpression { name, value, local, location }
+  pub fn new_call_expression(name: Token, args: Expression, location: Location) -> Self {
+    let call_expression = CallExpression::new(name, Box::new(args), location);
+    return Expression::CallExpression(call_expression);
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CallExpression {
   pub name: Token,
-  pub args: Vec<ExpressionStatement>,
+  pub args: Box<Expression>,
   pub location: Location,
 }
 
 impl CallExpression {
-  pub fn new(name: Token, args: Vec<ExpressionStatement>, location: Location) -> Self {
+  pub fn new(name: Token, args: Box<Expression>, location: Location) -> Self {
     CallExpression { name, args, location }
   }
 }
@@ -217,32 +242,25 @@ impl CallExpression {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UnaryExpression {
   pub operator: UnaryOperator,
-  pub operand: Box<ExpressionStatement>,
-  pub location: Location,
+  pub operand: Box<Expression>,
 }
 
 impl UnaryExpression {
-  pub fn new(operator: UnaryOperator, operand: Box<ExpressionStatement>, location: Location) -> Self {
-    UnaryExpression { operator, operand, location }
+  pub fn new(operator: UnaryOperator, operand: Box<Expression>) -> Self {
+    UnaryExpression { operator, operand }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BinaryExpression {
   pub operator: BinaryOperator,
-  pub left: Box<ExpressionStatement>,
-  pub right: Box<ExpressionStatement>,
-  pub location: Location,
+  pub left: Box<Expression>,
+  pub right: Box<Expression>,
 }
 
 impl BinaryExpression {
-  pub fn new(
-    operator: BinaryOperator,
-    left: Box<ExpressionStatement>,
-    right: Box<ExpressionStatement>,
-    location: Location,
-  ) -> Self {
-    BinaryExpression { operator, left, right, location }
+  pub fn new(operator: BinaryOperator, left: Box<Expression>, right: Box<Expression>) -> Self {
+    BinaryExpression { operator, left, right }
   }
 }
 
@@ -312,17 +330,18 @@ pub enum UnaryOperator {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum BinaryOperator {
-  Add,
-  Subtract,
-  Multiply,
-  Divide,
-  Modulus,
-  And,
-  Or,
-  Equal,
-  NotEqual,
-  LessThan,
-  GreaterThan,
-  LessThanOrEqual,
-  GreaterThanOrEqual,
+  Add,                // +
+  Subtract,           // -
+  Multiply,           // *
+  Divide,             // /
+  Modulus,            // %
+  And,                // and
+  Or,                 // or
+  Equal,              // ==
+  NotEqual,           // ~=
+  LessThan,           // <
+  GreaterThan,        // >
+  LessThanOrEqual,    // <=
+  GreaterThanOrEqual, // >=
+  DoubleDot,          // ..
 }

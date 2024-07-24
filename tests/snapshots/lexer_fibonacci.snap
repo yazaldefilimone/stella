@@ -146,20 +146,7 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Less,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 8,
-      ),
-      end: Position(
-        line: 2,
-        column: 10,
-      ),
-    ),
-  ),
-  Token(
-    kind: Equal,
+    kind: LessEqual,
     location: Location(
       start: Position(
         line: 2,

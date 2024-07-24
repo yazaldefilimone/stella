@@ -86,15 +86,13 @@ impl Lexer {
   }
 
   fn read_check_ahead(&mut self, next: &str, single_kind: TokenKind, double_kind: TokenKind) -> Token {
+    let simple_token = self.read_simple_token(single_kind);
     if self.starts_with(next) {
       self.advance_many(next.len());
       let location = self.create_location();
-      Token::new(double_kind, location)
-    } else {
-      self.advance_one();
-      let location = self.create_location();
-      Token::new(single_kind, location)
+      return Token::new(double_kind, location);
     }
+    return simple_token;
   }
 
   fn read_keyword_or_identifier(&mut self) -> Token {

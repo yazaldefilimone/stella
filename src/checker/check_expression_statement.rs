@@ -4,10 +4,10 @@ use crate::diagnostics::Diagnostic;
 use crate::types::Type;
 
 impl Checker {
-  pub fn check_expression_statement(&mut self, expression: &ast::ExpressionStatement) -> Result<Type, Diagnostic> {
+  pub fn check_expression_statement(&mut self, expression: &ast::Expression) -> Result<Type, Diagnostic> {
     match expression {
-      ast::ExpressionStatement::LiteralExpression(literal) => self.check_literal_expression(literal),
-      ast::ExpressionStatement::IdentifierExpression(identifier) => self.check_identifier_expression(identifier),
+      ast::Expression::LiteralExpression(literal) => self.check_literal_expression(literal),
+      ast::Expression::Identifier(ident) => self.check_identifier(ident),
       _ => todo!("Implement more expression checks"),
     }
   }

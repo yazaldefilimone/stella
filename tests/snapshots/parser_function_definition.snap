@@ -1,0 +1,198 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    FunctionStatement(FunctionStatement(
+      name: Token(
+        kind: Identifier("greet"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 8,
+          ),
+          end: Position(
+            line: 1,
+            column: 14,
+          ),
+        ),
+      ),
+      arguments: [
+        (Token(
+          kind: Identifier("name"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 15,
+            ),
+            end: Position(
+              line: 1,
+              column: 19,
+            ),
+          ),
+        ), Some(String)),
+      ],
+      return_t: Some(String),
+      body: BlockStatement(BlockStatement(
+        body: [
+          ReturnStatement(ReturnStatement(
+            value: [
+              BinaryExpression(BinaryExpression(
+                operator: DoubleDot,
+                left: LiteralExpression(StringLiteral(StringLiteral(
+                  value: "Hello, ",
+                  location: Location(
+                    start: Position(
+                      line: 2,
+                      column: 10,
+                    ),
+                    end: Position(
+                      line: 2,
+                      column: 20,
+                    ),
+                  ),
+                ))),
+                right: Identifier(Identifier(
+                  name: "name",
+                  location: Location(
+                    start: Position(
+                      line: 2,
+                      column: 23,
+                    ),
+                    end: Position(
+                      line: 2,
+                      column: 28,
+                    ),
+                  ),
+                )),
+              )),
+            ],
+            location: Location(
+              start: Position(
+                line: 1,
+                column: 36,
+              ),
+              end: Position(
+                line: 2,
+                column: 10,
+              ),
+            ),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 36,
+          ),
+          end: Position(
+            line: 2,
+            column: 10,
+          ),
+        ),
+      )),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 8,
+        ),
+        end: Position(
+          line: 1,
+          column: 14,
+        ),
+      ),
+    )),
+    CallStatement(CallStatement(
+      expression: CallExpression(CallExpression(
+        name: Token(
+          kind: Identifier("print"),
+          location: Location(
+            start: Position(
+              line: 3,
+              column: 3,
+            ),
+            end: Position(
+              line: 5,
+              column: 5,
+            ),
+          ),
+        ),
+        args: GroupedExpression(GroupedExpression(
+          expression: [
+            CallExpression(CallExpression(
+              name: Token(
+                kind: Identifier("greet"),
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 6,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 11,
+                  ),
+                ),
+              ),
+              args: GroupedExpression(GroupedExpression(
+                expression: [
+                  LiteralExpression(StringLiteral(StringLiteral(
+                    value: "Stella",
+                    location: Location(
+                      start: Position(
+                        line: 5,
+                        column: 12,
+                      ),
+                      end: Position(
+                        line: 5,
+                        column: 20,
+                      ),
+                    ),
+                  ))),
+                ],
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 11,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 12,
+                  ),
+                ),
+              )),
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 6,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 11,
+                ),
+              ),
+            )),
+          ],
+          location: Location(
+            start: Position(
+              line: 5,
+              column: 5,
+            ),
+            end: Position(
+              line: 5,
+              column: 6,
+            ),
+          ),
+        )),
+        location: Location(
+          start: Position(
+            line: 3,
+            column: 3,
+          ),
+          end: Position(
+            line: 5,
+            column: 5,
+          ),
+        ),
+      )),
+    )),
+  ],
+)

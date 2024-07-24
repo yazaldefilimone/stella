@@ -29,7 +29,7 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Colon,
+    kind: Assign,
     location: Location(
       start: Position(
         line: 1,
@@ -42,7 +42,7 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Identifier("number"),
+    kind: Number("1"),
     location: Location(
       start: Position(
         line: 1,
@@ -50,33 +50,7 @@ source: tests/snapshot_tests.rs
       ),
       end: Position(
         line: 1,
-        column: 13,
-      ),
-    ),
-  ),
-  Token(
-    kind: Equal,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 13,
-      ),
-      end: Position(
-        line: 1,
-        column: 15,
-      ),
-    ),
-  ),
-  Token(
-    kind: Number("1"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 15,
-      ),
-      end: Position(
-        line: 1,
-        column: 17,
+        column: 8,
       ),
     ),
   ),
@@ -85,11 +59,11 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 17,
+        column: 8,
       ),
       end: Position(
         line: 1,
-        column: 18,
+        column: 9,
       ),
     ),
   ),
@@ -98,11 +72,11 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 18,
+        column: 9,
       ),
       end: Position(
         line: 1,
-        column: 21,
+        column: 12,
       ),
     ),
   ),
@@ -111,11 +85,11 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 21,
+        column: 12,
       ),
       end: Position(
         line: 1,
-        column: 24,
+        column: 15,
       ),
     ),
   ),
@@ -124,7 +98,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 24,
+        column: 15,
       ),
       end: Position(
         line: 2,

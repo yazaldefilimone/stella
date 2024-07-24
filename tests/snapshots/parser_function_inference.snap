@@ -1,0 +1,223 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    FunctionStatement(FunctionStatement(
+      name: Token(
+        kind: Identifier("add"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 8,
+          ),
+          end: Position(
+            line: 1,
+            column: 12,
+          ),
+        ),
+      ),
+      arguments: [
+        (Token(
+          kind: Identifier("a"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 13,
+            ),
+            end: Position(
+              line: 1,
+              column: 14,
+            ),
+          ),
+        ), None),
+        (Token(
+          kind: Comma,
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 14,
+            ),
+            end: Position(
+              line: 1,
+              column: 15,
+            ),
+          ),
+        ), None),
+        (Token(
+          kind: Identifier("b"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 15,
+            ),
+            end: Position(
+              line: 1,
+              column: 17,
+            ),
+          ),
+        ), None),
+      ],
+      return_t: None,
+      body: BlockStatement(BlockStatement(
+        body: [
+          ReturnStatement(ReturnStatement(
+            value: [
+              BinaryExpression(BinaryExpression(
+                operator: Add,
+                left: Identifier(Identifier(
+                  name: "a",
+                  location: Location(
+                    start: Position(
+                      line: 2,
+                      column: 10,
+                    ),
+                    end: Position(
+                      line: 2,
+                      column: 12,
+                    ),
+                  ),
+                )),
+                right: Identifier(Identifier(
+                  name: "b",
+                  location: Location(
+                    start: Position(
+                      line: 2,
+                      column: 14,
+                    ),
+                    end: Position(
+                      line: 2,
+                      column: 16,
+                    ),
+                  ),
+                )),
+              )),
+            ],
+            location: Location(
+              start: Position(
+                line: 1,
+                column: 18,
+              ),
+              end: Position(
+                line: 2,
+                column: 10,
+              ),
+            ),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 18,
+          ),
+          end: Position(
+            line: 2,
+            column: 10,
+          ),
+        ),
+      )),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 8,
+        ),
+        end: Position(
+          line: 1,
+          column: 12,
+        ),
+      ),
+    )),
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("result"),
+        location: Location(
+          start: Position(
+            line: 5,
+            column: 5,
+          ),
+          end: Position(
+            line: 5,
+            column: 12,
+          ),
+        ),
+      ),
+      local: true,
+      t: None,
+      init: Some(CallExpression(CallExpression(
+        name: Token(
+          kind: Identifier("add"),
+          location: Location(
+            start: Position(
+              line: 5,
+              column: 14,
+            ),
+            end: Position(
+              line: 5,
+              column: 18,
+            ),
+          ),
+        ),
+        args: GroupedExpression(GroupedExpression(
+          expression: [
+            LiteralExpression(NumberLiteral(NumberLiteral(
+              value: "5",
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 19,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 20,
+                ),
+              ),
+            ))),
+            LiteralExpression(NumberLiteral(NumberLiteral(
+              value: "10",
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 21,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 24,
+                ),
+              ),
+            ))),
+          ],
+          location: Location(
+            start: Position(
+              line: 5,
+              column: 18,
+            ),
+            end: Position(
+              line: 5,
+              column: 19,
+            ),
+          ),
+        )),
+        location: Location(
+          start: Position(
+            line: 5,
+            column: 14,
+          ),
+          end: Position(
+            line: 5,
+            column: 18,
+          ),
+        ),
+      ))),
+      location: Location(
+        start: Position(
+          line: 5,
+          column: 5,
+        ),
+        end: Position(
+          line: 5,
+          column: 12,
+        ),
+      ),
+    )),
+  ],
+)
