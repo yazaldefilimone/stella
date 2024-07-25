@@ -41,13 +41,14 @@ impl Lexer {
   }
   fn read_next_token(&mut self) -> Token {
     self.skip_whitespace();
+    self.current_position = Position { line: self.line, column: self.column };
     if self.is_end() {
       return Token::new(TokenKind::EOF, self.create_location());
     }
     let current_char = self.peek_one();
     let current_token = match current_char {
       '+' => self.read_check_ahead("+=", TokenKind::Plus, TokenKind::PlusAssign),
-      '-' => self.read_check_ahead("-=", TokenKind::Minus, TokenKind::MinusAssign),
+      '-' => self.read_commant_or_minus("-=", TokenKind::Minus, TokenKind::MinusAssign),
       '*' => self.read_check_ahead("*=", TokenKind::Star, TokenKind::StarAssign),
       '/' => self.read_check_ahead("/=", TokenKind::Slash, TokenKind::SlashAssign),
       '=' => self.read_check_ahead("=", TokenKind::Assign, TokenKind::Equal),
@@ -95,8 +96,45 @@ impl Lexer {
     return simple_token;
   }
 
+  fn read_commant_or_minus(&mut self, text: &str, single_kind: TokenKind, double_kind: TokenKind) -> Token {
+    if self.peek_many(2) == "--" {
+      return self.read_comment();
+    }
+    return self.read_check_ahead(text, single_kind, double_kind);
+  }
+
+  fn read_comment(&mut self) -> Token {
+    if self.starts_with("--[") {
+      return self.read_block_comment();
+    }
+    return self.read_line_comment();
+  }
+  fn read_block_comment(&mut self) -> Token {
+    self.consume_expect("--[[");
+    let mut text = String::new();
+    while !self.is_end() && !self.starts_with("--]]") {
+      let character = self.peek_one();
+      if character == '\n' {
+        self.advance_new_line();
+      } else {
+        self.advance_one();
+      }
+      text.push(character);
+    }
+    self.consume_expect_with_custom_error("--]]", "unexpected end of block comment");
+    let location = self.create_location();
+    return Token::new_block_comment(location, text);
+  }
+
+  fn read_line_comment(&mut self) -> Token {
+    self.consume_expect("--");
+    let text = self.read_while(|c| c != '\n');
+    let location = self.create_location();
+    return Token::new_comment(location, text);
+  }
+
   fn read_keyword_or_identifier(&mut self) -> Token {
-    let text = self.read_while(|c| c.is_alphabetic() || c == '_');
+    let text = self.read_while(|c| c.is_ascii_alphabetic() || c == '_');
     let location = self.create_location();
     Token::new_keyword_or_identifier(location, text)
   }
@@ -131,7 +169,7 @@ impl Lexer {
   fn create_location(&mut self) -> Location {
     let start = self.current_position.clone();
     self.current_position = Position { line: self.line, column: self.column };
-    Location { start, end: self.current_position.clone() }
+    Location { start, end: Position { line: self.line, column: self.column } }
   }
 
   fn consume_expect(&mut self, text: &str) {
@@ -198,6 +236,5 @@ impl Lexer {
       self.advance_one();
       return self.skip_whitespace();
     }
-    self.current_position = Position { line: self.line, column: self.column };
   }
 }

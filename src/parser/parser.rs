@@ -5,6 +5,7 @@ use crate::ast::tokens::{Token, TokenKind};
 use crate::diagnostics::report_and_exit;
 use crate::lexer::Lexer;
 use crate::types::Type;
+use crate::utils::location::Location;
 
 pub struct Parser {
   lexer: Lexer,
@@ -27,6 +28,12 @@ impl Parser {
 
   fn parse_statement(&mut self) -> ast::Statement {
     let token = self.lexer.peek_token();
+    // skip comments
+    if token.is_comment() {
+      self.lexer.next_token();
+      return self.parse_statement();
+    };
+
     let statement = match token.kind {
       TokenKind::Local => self.parse_variable_declaration(),
       TokenKind::If => self.parse_if_statement(),
@@ -39,6 +46,7 @@ impl Parser {
       TokenKind::Function => self.parse_function_statement(),
       _ => self.parse_assign_or_call_statement(),
     };
+
     self.match_token_and_consume(TokenKind::Semicolon);
     statement
   }
@@ -49,9 +57,10 @@ impl Parser {
 
   fn parse_or_expression(&mut self) -> ast::Expression {
     let mut expression = self.parse_and_expression();
-    while let Some(operator) = self.parse_binary_operator() {
+    while let Some((operator, location)) = self.parse_binary_operator() {
       let right_expression = self.parse_and_expression();
-      let binary_expression = ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression));
+      let binary_expression =
+        ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression), location);
       expression = ast::Expression::BinaryExpression(binary_expression);
     }
     expression
@@ -59,15 +68,16 @@ impl Parser {
 
   fn parse_and_expression(&mut self) -> ast::Expression {
     let mut expression = self.parse_unary_expression();
-    while let Some(operator) = self.parse_binary_operator() {
+    while let Some((operator, location)) = self.parse_binary_operator() {
       let right_expression = self.parse_unary_expression();
-      let binary_expression = ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression));
+      let binary_expression =
+        ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression), location);
       expression = ast::Expression::BinaryExpression(binary_expression);
     }
     expression
   }
 
-  fn parse_binary_operator(&mut self) -> Option<ast::BinaryOperator> {
+  fn parse_binary_operator(&mut self) -> Option<(ast::BinaryOperator, Location)> {
     let token = self.lexer.peek_token();
     let operator_token = match token.kind {
       TokenKind::Plus => Some(ast::BinaryOperator::Add),
@@ -86,10 +96,11 @@ impl Parser {
       TokenKind::DoubleDot => Some(ast::BinaryOperator::DoubleDot),
       _ => None,
     };
-    if operator_token.is_some() {
+    if let Some(operator) = operator_token {
       self.lexer.next_token();
+      return Some((operator, token.location));
     }
-    operator_token
+    None
   }
 
   fn parse_unary_operator(&mut self) -> Option<ast::UnaryOperator> {
