@@ -12,3 +12,5 @@ cargo build --release
 ./stella compile tests/golden_tests/nested_functions.lua
 
 ```
+
+- [Stella Virtual Machine](https://github.com/yazaldefilimone/stella-compiler)
