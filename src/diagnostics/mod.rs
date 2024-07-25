@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::ast::ast::BinaryOperator;
 use crate::utils::location::Location;
 use crate::utils::{
   get_full_path, highlight_text_with_cyan, highlight_text_with_gray, highlight_text_with_red,
@@ -39,7 +40,8 @@ impl Diagnostic {
   pub fn emit(&self, raw: &str, file_name: &str) {
     match self.level {
       DiagnosticLevel::Info | DiagnosticLevel::Warning | DiagnosticLevel::Error => {
-        report_error(&self.message, &mut self.location.clone().unwrap(), raw, file_name)
+        let mut location = self.location.clone().unwrap_or(Location::new());
+        report_error(&self.message, &mut location, raw, file_name)
       }
     }
   }
@@ -107,8 +109,10 @@ pub enum TypeError {
   MismatchedTypes(String, String, Option<Location>),
   UndeclaredVariable(String, Option<Location>),
   TypeMismatchAssignment(String, String, Option<Location>),
+  RedeclaredInSameScope(String, Option<Location>),
   InvalidAssignment(String, Option<Location>),
-  FunctionArityMismatch(String, usize, usize, Option<Location>),
+  FunctionArityMismatch(usize, usize, Option<Location>),
+  UnsupportedOperator(String, String, BinaryOperator, Option<Location>),
 }
 
 impl From<TypeError> for Diagnostic {
@@ -130,18 +134,33 @@ impl From<TypeError> for Diagnostic {
         ),
         location,
       ),
-      TypeError::UndeclaredVariable(name, location) => {
-        (format!("{}: undeclared variable '{}'", red_type_error, name), location)
-      }
+      TypeError::UndeclaredVariable(name, location) => (
+        format!("{}: connot find a value '{}' in this scope", red_type_error, name),
+        location,
+      ),
       TypeError::InvalidAssignment(name, location) => (
         format!("{}: invalid assignment to '{}'", red_type_error, name),
         location,
       ),
-      TypeError::FunctionArityMismatch(name, expected, found, location) => (
+      TypeError::FunctionArityMismatch(expected, found, location) => (
         format!(
-          "{}: function '{}' expected {} arguments, but found {}",
-          red_type_error, name, expected, found
+          "{}: call expected {} arguments, but found {}",
+          red_type_error, expected, found
         ),
+        location,
+      ),
+      TypeError::UnsupportedOperator(left, right, operator, location) => (
+        format!(
+          "{}: unsupported operator '{}' for types '{}' and '{}'",
+          red_type_error,
+          operator.to_string(),
+          left,
+          right
+        ),
+        location,
+      ),
+      TypeError::RedeclaredInSameScope(name, location) => (
+        format!("{}: '{}' is already declared in this scope.", red_type_error, name),
         location,
       ),
     };
@@ -150,8 +169,14 @@ impl From<TypeError> for Diagnostic {
 }
 
 pub fn report_error(message: &str, location: &mut Location, raw: &str, file_name: &str) {
-  let range = location.cursor_range(raw).expect("Failed to get range");
-  let line_highlight = highlight_text_with_yellow(format!("{}:{}", location.start.line, location.end.line).as_str());
+  let range = location.cursor_range(raw);
+
+  if range.is_none() {
+    println!("{}", highlight_text_with_red(message));
+    return;
+  }
+  let range = range.unwrap();
+  let line_highlight = highlight_text_with_yellow(format!("{}:{}", location.start.line, location.end.column).as_str());
 
   println!();
   println!("{}", highlight_error::highlight_error(range.start, range.end, raw));

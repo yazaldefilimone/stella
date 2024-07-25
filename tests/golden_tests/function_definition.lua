@@ -1,5 +1,4 @@
-function greet(name: string): string
+function greet(name: string): number
     return "Hello, " .. name
 end
-
-print(greet("Stella"))
+local result: number = greet("Stella")

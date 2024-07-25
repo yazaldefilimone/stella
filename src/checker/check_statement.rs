@@ -13,14 +13,9 @@ impl Checker {
       }
       ast::Statement::BlockStatement(block) => self.check_block_statement(block),
       ast::Statement::AssignStatement(assign) => self.check_assign_statement(assign),
-      ast::Statement::FunctionStatement(function) => {
-        self.check_function_statement(function);
-        Ok(Type::Nil)
-      }
-      ast::Statement::ReturnStatement(return_) => {
-        self.check_return_statement(return_);
-        Ok(Type::Nil)
-      }
+      ast::Statement::FunctionStatement(function) => self.check_function_statement(function),
+      ast::Statement::ReturnStatement(return_) => self.check_return_statement(return_),
+      ast::Statement::CallStatement(call) => self.check_call_statement(call),
       ast::Statement::IfStatement(if_) => {
         self.check_if_statement(if_);
         Ok(Type::Nil)
@@ -35,5 +30,9 @@ impl Checker {
       }
       _ => todo!("Implement more statement checks"),
     }
+  }
+
+  pub fn check_call_statement(&mut self, call: &ast::CallStatement) -> Result<Type, Diagnostic> {
+    return self.check_expression(&call.expression);
   }
 }

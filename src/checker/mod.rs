@@ -1,11 +1,14 @@
 #![allow(dead_code, unused_variables)]
 
 pub mod check_assign_statement;
+pub mod check_binary_expression;
 pub mod check_block_statement;
+pub mod check_call_expression;
 pub mod check_empty_statement;
-pub mod check_expression_statement;
+pub mod check_expression;
 pub mod check_for_statement;
 pub mod check_function_statement;
+pub mod check_grouped_expression;
 pub mod check_identifier;
 pub mod check_if_statement;
 pub mod check_literal_expression;

@@ -1,4 +1,5 @@
 
 max_width = 120
 tab_spaces = 2
-struct_lit_width = 100
+struct_lit_width = 120
+chain_width = 120

@@ -1,8 +1,8 @@
 function outer(x: number): number
-    function inner(y: number): number
-        return x + y
+    function inner(y: number): string
+        return "Hello, " .. "World"
     end
     return inner(x * 2)
 end
 
-print(outer(10))
+local result: number = outer(10)

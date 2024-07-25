@@ -6,6 +6,10 @@ pub struct Location {
 }
 
 impl Location {
+  pub fn new() -> Self {
+    Location { start: Position { line: 0, column: 0 }, end: Position { line: 0, column: 0 } }
+  }
+  // remove this function
   pub fn cursor_range(&self, raw: &str) -> Option<Range> {
     let mut cursor = 0;
     let mut start_cursor = None;
@@ -17,8 +21,9 @@ impl Location {
       if line == self.start.line && column == self.start.column {
         start_cursor = Some(cursor);
       }
+
       if line == self.end.line && column == self.end.column {
-        end_cursor = Some(cursor + character.len_utf8());
+        end_cursor = Some(cursor);
         break;
       }
       if character == '\n' {
@@ -27,13 +32,13 @@ impl Location {
       } else {
         column += 1;
       }
-      cursor += character.len_utf8();
+      cursor += 1
     }
-
     if let (Some(start), Some(end)) = (start_cursor, end_cursor) {
-      return Some(Range { start, end: end - 1 });
+      Some(Range { start, end })
+    } else {
+      None
     }
-    return None;
   }
 }
 

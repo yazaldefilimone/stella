@@ -7,15 +7,13 @@ use crate::types::Type;
 impl Checker {
   pub fn check_identifier(&mut self, ident: &ast::Identifier) -> Result<Type, Diagnostic> {
     let text_name = ident.name.clone();
-    if !self.ctx.is_defined(text_name.as_str()) {
-      return Err(self.create_diagnostic(TypeError::UndeclaredVariable(
-        text_name.to_string(),
-        // TODO: hei :), use name location or a value location?
-        Some(ident.location.clone()),
-      )));
+    let (defined, scope_idx) = self.ctx.defined_in_any_scope(text_name.as_str(), false);
+    if !defined {
+      let diagnostic = TypeError::UndeclaredVariable(text_name.to_string(), Some(ident.location.clone()));
+      return Err(self.create_diagnostic(diagnostic));
     }
-    self.ctx.use_variable(text_name.as_str());
-    let t = self.ctx.get_variable(text_name.as_str()).unwrap().clone();
-    Ok(t)
+    self.ctx.set_unused_variable_in_scope(text_name.as_str(), scope_idx);
+    let t = self.ctx.get_variable_in_scope(text_name.as_str(), scope_idx);
+    Ok(t.unwrap().clone())
   }
 }
