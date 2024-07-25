@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::ast::ast::BinaryOperator;
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Type {
   Number,
@@ -46,6 +48,58 @@ pub struct GenericType {
 }
 
 impl Type {
+  pub fn suport_operator(&self, operator: &BinaryOperator) -> bool {
+    match (self, operator) {
+      // number's
+      (Type::Number, BinaryOperator::Add)
+      | (Type::Number, BinaryOperator::Subtract)
+      | (Type::Number, BinaryOperator::Multiply)
+      | (Type::Number, BinaryOperator::Divide)
+      | (Type::Number, BinaryOperator::Modulus)
+      | (Type::Number, BinaryOperator::And)
+      | (Type::Number, BinaryOperator::Or)
+      | (Type::Number, BinaryOperator::Equal)
+      | (Type::Number, BinaryOperator::NotEqual)
+      | (Type::Number, BinaryOperator::LessThan)
+      | (Type::Number, BinaryOperator::GreaterThan)
+      | (Type::Number, BinaryOperator::LessThanOrEqual)
+      | (Type::Number, BinaryOperator::GreaterThanOrEqual)
+      | (Type::Number, BinaryOperator::DoubleDot) => true,
+
+      // string's
+      (Type::String, BinaryOperator::Add)
+      | (Type::String, BinaryOperator::Equal)
+      | (Type::String, BinaryOperator::NotEqual)
+      | (Type::String, BinaryOperator::LessThan)
+      | (Type::String, BinaryOperator::GreaterThan)
+      | (Type::String, BinaryOperator::LessThanOrEqual)
+      | (Type::String, BinaryOperator::GreaterThanOrEqual)
+      | (Type::String, BinaryOperator::DoubleDot) => true,
+
+      // boolean's
+      (Type::Boolean, BinaryOperator::And)
+      | (Type::Boolean, BinaryOperator::Or)
+      | (Type::Boolean, BinaryOperator::Equal)
+      | (Type::Boolean, BinaryOperator::NotEqual) => true,
+
+      // nil's
+      (Type::Nil, BinaryOperator::Equal) | (Type::Nil, BinaryOperator::NotEqual) => true,
+      _ => false,
+    }
+  }
+
+  pub fn get_operator_type(&self, left: &Type, right: &Type, operator: &BinaryOperator) -> Type {
+    match (left, right, operator) {
+      (Type::Number, Type::Number, _) => Type::Number,
+      (Type::Number, Type::String, BinaryOperator::DoubleDot) => Type::String,
+      (Type::String, Type::Number, BinaryOperator::DoubleDot) => Type::String,
+      (Type::String, Type::String, _) => Type::String,
+      (Type::Boolean, Type::Boolean, _) => Type::Boolean,
+      (Type::Nil, Type::Nil, _) => Type::Boolean,
+      _ => Type::Unknown,
+    }
+  }
+
   pub fn check_match(&self, other: &Type) -> bool {
     match (self, other) {
       (Type::Number, Type::Number) => true,
