@@ -31,6 +31,14 @@ impl Token {
     Token::new(TokenKind::String(string), location)
   }
 
+  pub fn new_comment(location: Location, comment: String) -> Token {
+    Token::new(TokenKind::Comment(comment), location)
+  }
+
+  pub fn new_block_comment(location: Location, comment: String) -> Token {
+    Token::new(TokenKind::BlockComment(comment), location)
+  }
+
   pub fn new_keyword_or_identifier(location: Location, keyword: String) -> Token {
     match keyword.as_str() {
       "function" => Token::new(TokenKind::Function, location),
@@ -128,6 +136,9 @@ pub enum TokenKind {
   Number(String),
   String(String),
 
+  // Comments
+  Comment(String),
+  BlockComment(String),
   // Outros
   EOF, // End of file
 }
@@ -139,6 +150,12 @@ impl Token {
       TokenKind::Number(number) => number.clone(),
       TokenKind::String(string) => string.clone(),
       _ => panic!("Invalid token"),
+    }
+  }
+  pub fn is_comment(&self) -> bool {
+    match &self.kind {
+      TokenKind::Comment(_) | TokenKind::BlockComment(_) => true,
+      _ => false,
     }
   }
 }
@@ -205,6 +222,8 @@ impl TokenKind {
       TokenKind::Greater => ">",
       TokenKind::Or => "or",
       TokenKind::And => "and",
+      TokenKind::Comment(_) => "comment",
+      TokenKind::BlockComment(_) => "block comment",
     };
     return text.to_string();
   }

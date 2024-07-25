@@ -34,7 +34,7 @@ pub enum Statement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CallStatement {
-  expression: Expression,
+  pub expression: Expression,
 }
 
 impl CallStatement {
@@ -256,11 +256,12 @@ pub struct BinaryExpression {
   pub operator: BinaryOperator,
   pub left: Box<Expression>,
   pub right: Box<Expression>,
+  pub location: Location,
 }
 
 impl BinaryExpression {
-  pub fn new(operator: BinaryOperator, left: Box<Expression>, right: Box<Expression>) -> Self {
-    BinaryExpression { operator, left, right }
+  pub fn new(operator: BinaryOperator, left: Box<Expression>, right: Box<Expression>, location: Location) -> Self {
+    BinaryExpression { operator, left, right, location }
   }
 }
 
@@ -344,4 +345,26 @@ pub enum BinaryOperator {
   LessThanOrEqual,    // <=
   GreaterThanOrEqual, // >=
   DoubleDot,          // ..
+}
+
+impl BinaryOperator {
+  pub fn to_string(&self) -> String {
+    let text = match self {
+      BinaryOperator::Add => "+",
+      BinaryOperator::Subtract => "-",
+      BinaryOperator::Multiply => "*",
+      BinaryOperator::Divide => "/",
+      BinaryOperator::Modulus => "%",
+      BinaryOperator::And => "and",
+      BinaryOperator::Or => "or",
+      BinaryOperator::Equal => "==",
+      BinaryOperator::NotEqual => "~=",
+      BinaryOperator::LessThan => "<",
+      BinaryOperator::GreaterThan => ">",
+      BinaryOperator::LessThanOrEqual => "<=",
+      BinaryOperator::GreaterThanOrEqual => ">=",
+      BinaryOperator::DoubleDot => "..",
+    };
+    return text.to_string();
+  }
 }
