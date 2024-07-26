@@ -7,7 +7,7 @@ impl Checker {
   pub fn check_assign_statement(&mut self, assign: &ast::AssignStatement) -> Result<Type, Diagnostic> {
     let right_t = self.check_expression(&assign.value)?;
     let lexema = assign.name.lexeme();
-    let (defined, scope_idx) = self.ctx.defined_in_any_scope(lexema.as_str(), false);
+    let (defined, scope_idx) = self.ctx.defined_in_any_scope(lexema.as_str());
 
     if !defined {
       let diagnostic = TypeError::UndeclaredVariable(lexema.to_string(), Some(assign.name.location.clone()));

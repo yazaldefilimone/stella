@@ -16,10 +16,7 @@ impl Checker {
       ast::Statement::FunctionStatement(function) => self.check_function_statement(function),
       ast::Statement::ReturnStatement(return_) => self.check_return_statement(return_),
       ast::Statement::CallStatement(call) => self.check_call_statement(call),
-      ast::Statement::IfStatement(if_) => {
-        self.check_if_statement(if_);
-        Ok(Type::Nil)
-      }
+      ast::Statement::IfStatement(if_) => self.check_if_statement(if_),
       ast::Statement::WhileStatement(while_) => {
         self.check_while_statement(while_);
         Ok(Type::Nil)
