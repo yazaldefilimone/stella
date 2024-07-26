@@ -178,11 +178,16 @@ pub fn report_error(message: &str, location: &mut Location, raw: &str, file_name
   let range = range.unwrap();
   let line_highlight = highlight_text_with_yellow(format!("{}:{}", location.start.line, location.end.column).as_str());
 
-  println!();
-  println!("{}", highlight_error::highlight_error(range.start, range.end, raw));
-  println!();
+  println!("");
+  // todo: improve this
+  if message.matches("WARNING").count() > 0 {
+    println!("{}", code_highlighter::highlight_warning(range.start, range.end, raw));
+  } else {
+    println!("{}", code_highlighter::highlight_error(range.start, range.end, raw));
+  }
+  println!("");
   println!("{}", highlight_text_with_white(message));
-  println!();
+  println!("");
   let absolute_path = get_full_path(file_name);
   let abs_path_highlight = highlight_text_with_cyan(absolute_path.as_str());
   println!(
