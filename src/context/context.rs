@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::types::Type;
+use crate::types::{FunctionType, Type};
 use crate::utils::location::Location;
 use std::collections::{HashMap, HashSet};
 
@@ -9,10 +9,29 @@ pub struct Context {
   pub return_decl_name: String,
 }
 
+fn create_global_scope() -> Scope {
+  let mut global_scope = Scope::new();
+  global_scope.variables.insert("nil".to_string(), Type::Nil);
+  // stdlib (print, type, etc)
+  global_scope.variables.insert("print".to_string(), Type::new_function(vec![Type::String], Type::Nil));
+  global_scope.variables.insert(
+    "type".to_string(),
+    Type::new_function(vec![Type::Unknown], Type::String),
+  );
+  global_scope.variables.insert(
+    "tostring".to_string(),
+    Type::new_function(vec![Type::Unknown], Type::String),
+  );
+  global_scope.variables.insert(
+    "tonumber".to_string(),
+    Type::new_function(vec![Type::String], Type::Number),
+  );
+  global_scope
+}
+
 impl Context {
   pub fn new() -> Context {
-    let global_scope = Scope::new();
-    Context { scopes: vec![global_scope], scope_pointer: 0, return_decl_name: "return".to_string() }
+    Context { scopes: vec![create_global_scope()], scope_pointer: 0, return_decl_name: "return".to_string() }
   }
 
   pub fn declare_variable(&mut self, name: &str, type_: Type) {
@@ -72,18 +91,16 @@ impl Context {
 
   pub fn declare_function(&mut self, name: &str, params: Vec<Type>, return_type: Type) {
     if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.function_types.insert(
-        name.to_owned(),
-        FunctionType { params, return_type: Box::new(return_type) },
-      );
+      scope.variables.insert(name.to_owned(), Type::new_function(params, return_type));
     }
   }
 
   pub fn get_function(&self, name: &str) -> Option<&FunctionType> {
-    for i in (0..=self.scope_pointer).rev() {
-      if let Some(scope) = self.scopes.get(i) {
-        if let Some(function_type) = scope.function_types.get(name) {
-          return Some(function_type);
+    for scope in self.scopes.iter().rev() {
+      if let Some(function_type) = scope.variables.get(name) {
+        match function_type {
+          Type::Function(function_type) => return Some(function_type),
+          _ => return None,
         }
       }
     }
@@ -129,24 +146,20 @@ impl Context {
     }
     None
   }
-  fn contains(&self, name: &str, scope: &Option<&Scope>, check_variable: bool) -> bool {
+  fn contains(&self, name: &str, scope: &Option<&Scope>) -> bool {
     if scope.is_none() {
       return false;
     }
-    if check_variable {
-      scope.unwrap().variables.contains_key(name) || scope.unwrap().function_types.contains_key(name)
-    } else {
-      scope.unwrap().function_types.contains_key(name) || scope.unwrap().variables.contains_key(name)
-    }
+    scope.unwrap().variables.contains_key(name)
   }
 
-  pub fn defined_in_current_scope(&self, name: &str, variable_first: bool) -> bool {
-    self.contains(name, &self.scopes.get(self.scope_pointer), variable_first)
+  pub fn defined_in_current_scope(&self, name: &str) -> bool {
+    self.contains(name, &self.scopes.get(self.scope_pointer))
   }
 
-  pub fn defined_in_any_scope(&self, name: &str, variable_first: bool) -> (bool, usize) {
+  pub fn defined_in_any_scope(&self, name: &str) -> (bool, usize) {
     for (scope_pointer, scope) in self.scopes.iter().enumerate().rev() {
-      if self.contains(name, &Some(scope), variable_first) {
+      if self.contains(name, &Some(scope)) {
         return (true, scope_pointer);
       }
     }
@@ -208,22 +221,10 @@ pub struct Scope {
   pub variables: HashMap<String, Type>,
   pub unused_variables: HashSet<String>,
   pub variables_location: HashMap<String, Location>,
-  pub function_types: HashMap<String, FunctionType>,
 }
 
 impl Scope {
   pub fn new() -> Scope {
-    Scope {
-      variables: HashMap::new(),
-      unused_variables: HashSet::new(),
-      variables_location: HashMap::new(),
-      function_types: HashMap::new(),
-    }
+    Scope { variables: HashMap::new(), unused_variables: HashSet::new(), variables_location: HashMap::new() }
   }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct FunctionType {
-  pub params: Vec<Type>,
-  pub return_type: Box<Type>,
 }
