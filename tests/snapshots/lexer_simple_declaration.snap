@@ -20,7 +20,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 5,
+        column: 6,
       ),
       end: Position(
         line: 1,
@@ -46,7 +46,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 11,
+        column: 12,
       ),
       end: Position(
         line: 1,
@@ -59,7 +59,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 18,
+        column: 19,
       ),
       end: Position(
         line: 1,
@@ -72,7 +72,7 @@ source: tests/snapshot_tests.rs
     location: Location(
       start: Position(
         line: 1,
-        column: 20,
+        column: 21,
       ),
       end: Position(
         line: 1,
@@ -84,8 +84,8 @@ source: tests/snapshot_tests.rs
     kind: EOF,
     location: Location(
       start: Position(
-        line: 1,
-        column: 29,
+        line: 2,
+        column: 0,
       ),
       end: Position(
         line: 2,

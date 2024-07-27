@@ -1,0 +1,127 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("name"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 6,
+          ),
+          end: Position(
+            line: 1,
+            column: 10,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(String),
+      init: Some(LiteralExpression(StringLiteral(StringLiteral(
+        value: "Stella",
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 21,
+          ),
+          end: Position(
+            line: 1,
+            column: 29,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 6,
+        ),
+        end: Position(
+          line: 1,
+          column: 10,
+        ),
+      ),
+    )),
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("age"),
+        location: Location(
+          start: Position(
+            line: 2,
+            column: 6,
+          ),
+          end: Position(
+            line: 2,
+            column: 9,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Number),
+      init: Some(LiteralExpression(NumberLiteral(NumberLiteral(
+        value: "25",
+        location: Location(
+          start: Position(
+            line: 2,
+            column: 20,
+          ),
+          end: Position(
+            line: 2,
+            column: 22,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 2,
+          column: 6,
+        ),
+        end: Position(
+          line: 2,
+          column: 9,
+        ),
+      ),
+    )),
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("is_student"),
+        location: Location(
+          start: Position(
+            line: 3,
+            column: 6,
+          ),
+          end: Position(
+            line: 3,
+            column: 16,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Boolean),
+      init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
+        value: true,
+        location: Location(
+          start: Position(
+            line: 3,
+            column: 28,
+          ),
+          end: Position(
+            line: 3,
+            column: 32,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 3,
+          column: 6,
+        ),
+        end: Position(
+          line: 3,
+          column: 16,
+        ),
+      ),
+    )),
+  ],
+)

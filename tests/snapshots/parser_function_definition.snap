@@ -9,7 +9,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 8,
+            column: 9,
           ),
           end: Position(
             line: 1,
@@ -32,7 +32,7 @@ Program(
           ),
         ), Some(String)),
       ],
-      return_t: Some(String),
+      return_t: Some(Number),
       body: BlockStatement(BlockStatement(
         body: [
           ReturnStatement(ReturnStatement(
@@ -44,7 +44,7 @@ Program(
                   location: Location(
                     start: Position(
                       line: 2,
-                      column: 10,
+                      column: 11,
                     ),
                     end: Position(
                       line: 2,
@@ -57,7 +57,7 @@ Program(
                   location: Location(
                     start: Position(
                       line: 2,
-                      column: 23,
+                      column: 24,
                     ),
                     end: Position(
                       line: 2,
@@ -65,12 +65,22 @@ Program(
                     ),
                   ),
                 )),
+                location: Location(
+                  start: Position(
+                    line: 2,
+                    column: 22,
+                  ),
+                  end: Position(
+                    line: 2,
+                    column: 23,
+                  ),
+                ),
               )),
             ],
             location: Location(
               start: Position(
-                line: 1,
-                column: 36,
+                line: 2,
+                column: 4,
               ),
               end: Position(
                 line: 2,
@@ -81,8 +91,8 @@ Program(
         ],
         location: Location(
           start: Position(
-            line: 1,
-            column: 36,
+            line: 2,
+            column: 4,
           ),
           end: Position(
             line: 2,
@@ -93,7 +103,7 @@ Program(
       location: Location(
         start: Position(
           line: 1,
-          column: 8,
+          column: 9,
         ),
         end: Position(
           line: 1,
@@ -101,98 +111,84 @@ Program(
         ),
       ),
     )),
-    CallStatement(CallStatement(
-      expression: CallExpression(CallExpression(
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("result"),
+        location: Location(
+          start: Position(
+            line: 4,
+            column: 6,
+          ),
+          end: Position(
+            line: 4,
+            column: 12,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Number),
+      init: Some(CallExpression(CallExpression(
         name: Token(
-          kind: Identifier("print"),
+          kind: Identifier("greet"),
           location: Location(
             start: Position(
-              line: 3,
-              column: 3,
+              line: 4,
+              column: 23,
             ),
             end: Position(
-              line: 5,
-              column: 5,
+              line: 4,
+              column: 28,
             ),
           ),
         ),
         args: GroupedExpression(GroupedExpression(
           expression: [
-            CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("greet"),
-                location: Location(
-                  start: Position(
-                    line: 5,
-                    column: 6,
-                  ),
-                  end: Position(
-                    line: 5,
-                    column: 11,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  LiteralExpression(StringLiteral(StringLiteral(
-                    value: "Stella",
-                    location: Location(
-                      start: Position(
-                        line: 5,
-                        column: 12,
-                      ),
-                      end: Position(
-                        line: 5,
-                        column: 20,
-                      ),
-                    ),
-                  ))),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 5,
-                    column: 11,
-                  ),
-                  end: Position(
-                    line: 5,
-                    column: 12,
-                  ),
-                ),
-              )),
+            LiteralExpression(StringLiteral(StringLiteral(
+              value: "Stella",
               location: Location(
                 start: Position(
-                  line: 5,
-                  column: 6,
+                  line: 4,
+                  column: 29,
                 ),
                 end: Position(
-                  line: 5,
-                  column: 11,
+                  line: 4,
+                  column: 37,
                 ),
               ),
-            )),
+            ))),
           ],
           location: Location(
             start: Position(
-              line: 5,
-              column: 5,
+              line: 4,
+              column: 28,
             ),
             end: Position(
-              line: 5,
-              column: 6,
+              line: 4,
+              column: 29,
             ),
           ),
         )),
         location: Location(
           start: Position(
-            line: 3,
-            column: 3,
+            line: 4,
+            column: 23,
           ),
           end: Position(
-            line: 5,
-            column: 5,
+            line: 4,
+            column: 28,
           ),
         ),
-      )),
+      ))),
+      location: Location(
+        start: Position(
+          line: 4,
+          column: 6,
+        ),
+        end: Position(
+          line: 4,
+          column: 12,
+        ),
+      ),
     )),
   ],
 )

@@ -8,11 +8,11 @@ Program(
         kind: Identifier("name"),
         location: Location(
           start: Position(
-            line: 1,
-            column: 5,
+            line: 7,
+            column: 6,
           ),
           end: Position(
-            line: 1,
+            line: 7,
             column: 10,
           ),
         ),
@@ -23,22 +23,22 @@ Program(
         value: "Stella",
         location: Location(
           start: Position(
-            line: 1,
-            column: 20,
+            line: 7,
+            column: 21,
           ),
           end: Position(
-            line: 1,
+            line: 7,
             column: 29,
           ),
         ),
       )))),
       location: Location(
         start: Position(
-          line: 1,
-          column: 5,
+          line: 7,
+          column: 6,
         ),
         end: Position(
-          line: 1,
+          line: 7,
           column: 10,
         ),
       ),
@@ -48,11 +48,11 @@ Program(
         kind: Identifier("age"),
         location: Location(
           start: Position(
-            line: 2,
-            column: 5,
+            line: 8,
+            column: 6,
           ),
           end: Position(
-            line: 2,
+            line: 8,
             column: 9,
           ),
         ),
@@ -63,22 +63,22 @@ Program(
         name: "name",
         location: Location(
           start: Position(
-            line: 2,
-            column: 19,
+            line: 8,
+            column: 20,
           ),
           end: Position(
-            line: 2,
+            line: 8,
             column: 24,
           ),
         ),
       ))),
       location: Location(
         start: Position(
-          line: 2,
-          column: 5,
+          line: 8,
+          column: 6,
         ),
         end: Position(
-          line: 2,
+          line: 8,
           column: 9,
         ),
       ),
@@ -88,11 +88,11 @@ Program(
         kind: Identifier("name"),
         location: Location(
           start: Position(
-            line: 2,
-            column: 24,
+            line: 9,
+            column: 0,
           ),
           end: Position(
-            line: 3,
+            line: 9,
             column: 4,
           ),
         ),
@@ -101,22 +101,22 @@ Program(
         value: "10",
         location: Location(
           start: Position(
-            line: 3,
-            column: 6,
+            line: 9,
+            column: 7,
           ),
           end: Position(
-            line: 3,
+            line: 9,
             column: 9,
           ),
         ),
       ))),
       location: Location(
         start: Position(
-          line: 2,
-          column: 24,
+          line: 9,
+          column: 0,
         ),
         end: Position(
-          line: 3,
+          line: 9,
           column: 4,
         ),
       ),
@@ -126,11 +126,11 @@ Program(
         kind: Identifier("is_student"),
         location: Location(
           start: Position(
-            line: 4,
-            column: 5,
+            line: 10,
+            column: 6,
           ),
           end: Position(
-            line: 4,
+            line: 10,
             column: 16,
           ),
         ),
@@ -141,22 +141,22 @@ Program(
         value: true,
         location: Location(
           start: Position(
-            line: 4,
-            column: 27,
+            line: 10,
+            column: 28,
           ),
           end: Position(
-            line: 4,
+            line: 10,
             column: 32,
           ),
         ),
       )))),
       location: Location(
         start: Position(
-          line: 4,
-          column: 5,
+          line: 10,
+          column: 6,
         ),
         end: Position(
-          line: 4,
+          line: 10,
           column: 16,
         ),
       ),
@@ -166,11 +166,11 @@ Program(
         kind: Identifier("what_is_that"),
         location: Location(
           start: Position(
-            line: 6,
-            column: 5,
+            line: 12,
+            column: 6,
           ),
           end: Position(
-            line: 6,
+            line: 12,
             column: 18,
           ),
         ),
@@ -180,11 +180,11 @@ Program(
       init: None,
       location: Location(
         start: Position(
-          line: 6,
-          column: 5,
+          line: 12,
+          column: 6,
         ),
         end: Position(
-          line: 6,
+          line: 12,
           column: 18,
         ),
       ),
@@ -194,11 +194,11 @@ Program(
         kind: Identifier("what_is_that"),
         location: Location(
           start: Position(
-            line: 6,
-            column: 28,
+            line: 14,
+            column: 0,
           ),
           end: Position(
-            line: 8,
+            line: 14,
             column: 12,
           ),
         ),
@@ -207,22 +207,22 @@ Program(
         value: "10",
         location: Location(
           start: Position(
-            line: 8,
-            column: 14,
+            line: 14,
+            column: 15,
           ),
           end: Position(
-            line: 8,
+            line: 14,
             column: 17,
           ),
         ),
       ))),
       location: Location(
         start: Position(
-          line: 6,
-          column: 28,
+          line: 14,
+          column: 0,
         ),
         end: Position(
-          line: 8,
+          line: 14,
           column: 12,
         ),
       ),
@@ -232,11 +232,11 @@ Program(
         kind: Identifier("what_is_that"),
         location: Location(
           start: Position(
-            line: 8,
-            column: 17,
+            line: 17,
+            column: 0,
           ),
           end: Position(
-            line: 11,
+            line: 17,
             column: 12,
           ),
         ),
@@ -245,22 +245,22 @@ Program(
         value: true,
         location: Location(
           start: Position(
-            line: 11,
-            column: 14,
+            line: 17,
+            column: 15,
           ),
           end: Position(
-            line: 11,
+            line: 17,
             column: 19,
           ),
         ),
       ))),
       location: Location(
         start: Position(
-          line: 8,
-          column: 17,
+          line: 17,
+          column: 0,
         ),
         end: Position(
-          line: 11,
+          line: 17,
           column: 12,
         ),
       ),
