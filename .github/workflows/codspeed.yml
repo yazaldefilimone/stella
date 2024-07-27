@@ -1,0 +1,42 @@
+name: Codspeed Benchmark (MacOS)
+
+on:
+  push:
+    branches:
+      - main
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  benchmark:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install Codspeed
+        run: cargo install codspeed-cli
+
+      - name: Set up Codspeed API key
+        run: codspeed auth ${{ secrets.CODSPEED_API_KEY }}
+
+      - name: Run Codspeed benchmark
+        run: |
+          codspeed bench './target/release/stella check ./tests/golden_tests/assign_expression.lua'
+          codspeed bench './target/release/stella check ./tests/golden_tests/boolean_logic.lua'
+          codspeed bench './target/release/stella check ./tests/golden_tests/conditional_statement.lua'
+          codspeed bench './target/release/stella check ./tests/golden_tests/if_statement.lua'
+          codspeed bench './target/release/stella check ./tests/golden_tests/nested_functions.lua'
+          codspeed bench './target/release/stella check ./tests/golden_tests/simple_declaration.lua'
+
+  # for file in ./tests/golden_tests/*.lua; do
+  #             codspeed bench "./target/release/stella check $file"
+  # done
