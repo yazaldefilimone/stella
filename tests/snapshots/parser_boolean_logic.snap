@@ -9,7 +9,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 5,
+            column: 6,
           ),
           end: Position(
             line: 1,
@@ -24,7 +24,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 18,
+            column: 19,
           ),
           end: Position(
             line: 1,
@@ -35,7 +35,7 @@ Program(
       location: Location(
         start: Position(
           line: 1,
-          column: 5,
+          column: 6,
         ),
         end: Position(
           line: 1,
@@ -49,7 +49,7 @@ Program(
         location: Location(
           start: Position(
             line: 2,
-            column: 5,
+            column: 6,
           ),
           end: Position(
             line: 2,
@@ -64,7 +64,7 @@ Program(
         location: Location(
           start: Position(
             line: 2,
-            column: 18,
+            column: 19,
           ),
           end: Position(
             line: 2,
@@ -75,7 +75,7 @@ Program(
       location: Location(
         start: Position(
           line: 2,
-          column: 5,
+          column: 6,
         ),
         end: Position(
           line: 2,
@@ -91,7 +91,7 @@ Program(
           location: Location(
             start: Position(
               line: 4,
-              column: 2,
+              column: 3,
             ),
             end: Position(
               line: 4,
@@ -106,7 +106,7 @@ Program(
             location: Location(
               start: Position(
                 line: 4,
-                column: 12,
+                column: 13,
               ),
               end: Position(
                 line: 4,
@@ -115,6 +115,16 @@ Program(
             ),
           )),
         )),
+        location: Location(
+          start: Position(
+            line: 4,
+            column: 5,
+          ),
+          end: Position(
+            line: 4,
+            column: 8,
+          ),
+        ),
       )),
       body: BlockStatement(BlockStatement(
         body: [
@@ -124,8 +134,8 @@ Program(
                 kind: Identifier("print"),
                 location: Location(
                   start: Position(
-                    line: 4,
-                    column: 19,
+                    line: 5,
+                    column: 4,
                   ),
                   end: Position(
                     line: 5,
@@ -162,8 +172,8 @@ Program(
               )),
               location: Location(
                 start: Position(
-                  line: 4,
-                  column: 19,
+                  line: 5,
+                  column: 4,
                 ),
                 end: Position(
                   line: 5,
@@ -175,8 +185,8 @@ Program(
         ],
         location: Location(
           start: Position(
-            line: 4,
-            column: 19,
+            line: 5,
+            column: 4,
           ),
           end: Position(
             line: 5,
@@ -187,8 +197,8 @@ Program(
       else_body: None,
       location: Location(
         start: Position(
-          line: 2,
-          column: 24,
+          line: 4,
+          column: 0,
         ),
         end: Position(
           line: 4,

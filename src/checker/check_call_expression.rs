@@ -8,15 +8,20 @@ use crate::{
 impl Checker {
   pub fn check_call_expression(&mut self, call_expr: &ast::CallExpression) -> Result<Type, Diagnostic> {
     let name = call_expr.name.lexeme();
-    if !self.ctx.defined_in_current_scope(name.as_str(), false) {
+    if !self.ctx.defined_in_current_scope(name.as_str()) {
       return Err(self.create_diagnostic(TypeError::UndeclaredVariable(
         name.to_string(),
         Some(call_expr.name.location.clone()),
       )));
     }
-    let call_t = self.ctx.get_function(name.as_str()).unwrap().clone();
-    self.check_call_arguments(&call_expr.args, &call_t.params)?;
-    Ok(*call_t.return_type)
+    if let Some(call_t) = self.ctx.get_function(name.as_str()) {
+      // todo: improve this
+      let call_t = call_t.clone();
+      self.check_call_arguments(&call_expr.args, &call_t.params.to_vec())?;
+      return Ok(*call_t.return_type);
+    }
+    let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.location.clone()));
+    Err(self.create_diagnostic(diagnostic))
   }
 
   pub fn check_call_arguments(&mut self, args_call: &ast::Expression, call_tt: &Vec<Type>) -> Result<(), Diagnostic> {

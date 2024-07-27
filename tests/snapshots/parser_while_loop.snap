@@ -1,0 +1,230 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("count"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 6,
+          ),
+          end: Position(
+            line: 1,
+            column: 11,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Number),
+      init: Some(LiteralExpression(NumberLiteral(NumberLiteral(
+        value: "0",
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 22,
+          ),
+          end: Position(
+            line: 1,
+            column: 23,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 6,
+        ),
+        end: Position(
+          line: 1,
+          column: 11,
+        ),
+      ),
+    )),
+    WhileStatement(WhileStatement(
+      condition: BinaryExpression(BinaryExpression(
+        operator: LessThan,
+        left: Identifier(Identifier(
+          name: "count",
+          location: Location(
+            start: Position(
+              line: 3,
+              column: 6,
+            ),
+            end: Position(
+              line: 3,
+              column: 11,
+            ),
+          ),
+        )),
+        right: LiteralExpression(NumberLiteral(NumberLiteral(
+          value: "10",
+          location: Location(
+            start: Position(
+              line: 3,
+              column: 14,
+            ),
+            end: Position(
+              line: 3,
+              column: 16,
+            ),
+          ),
+        ))),
+        location: Location(
+          start: Position(
+            line: 3,
+            column: 12,
+          ),
+          end: Position(
+            line: 3,
+            column: 13,
+          ),
+        ),
+      )),
+      body: BlockStatement(BlockStatement(
+        body: [
+          CallStatement(CallStatement(
+            expression: CallExpression(CallExpression(
+              name: Token(
+                kind: Identifier("print"),
+                location: Location(
+                  start: Position(
+                    line: 4,
+                    column: 4,
+                  ),
+                  end: Position(
+                    line: 4,
+                    column: 9,
+                  ),
+                ),
+              ),
+              args: GroupedExpression(GroupedExpression(
+                expression: [
+                  Identifier(Identifier(
+                    name: "count",
+                    location: Location(
+                      start: Position(
+                        line: 4,
+                        column: 10,
+                      ),
+                      end: Position(
+                        line: 4,
+                        column: 15,
+                      ),
+                    ),
+                  )),
+                ],
+                location: Location(
+                  start: Position(
+                    line: 4,
+                    column: 9,
+                  ),
+                  end: Position(
+                    line: 4,
+                    column: 10,
+                  ),
+                ),
+              )),
+              location: Location(
+                start: Position(
+                  line: 4,
+                  column: 4,
+                ),
+                end: Position(
+                  line: 4,
+                  column: 9,
+                ),
+              ),
+            )),
+          )),
+          AssignStatement(AssignStatement(
+            name: Token(
+              kind: Identifier("count"),
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 4,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 9,
+                ),
+              ),
+            ),
+            value: BinaryExpression(BinaryExpression(
+              operator: Add,
+              left: Identifier(Identifier(
+                name: "count",
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 12,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 17,
+                  ),
+                ),
+              )),
+              right: LiteralExpression(NumberLiteral(NumberLiteral(
+                value: "1",
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 20,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 21,
+                  ),
+                ),
+              ))),
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 18,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 19,
+                ),
+              ),
+            )),
+            location: Location(
+              start: Position(
+                line: 5,
+                column: 4,
+              ),
+              end: Position(
+                line: 5,
+                column: 9,
+              ),
+            ),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 4,
+            column: 4,
+          ),
+          end: Position(
+            line: 4,
+            column: 9,
+          ),
+        ),
+      )),
+      location: Location(
+        start: Position(
+          line: 3,
+          column: 0,
+        ),
+        end: Position(
+          line: 3,
+          column: 5,
+        ),
+      ),
+    )),
+  ],
+)

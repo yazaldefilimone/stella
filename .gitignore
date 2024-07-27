@@ -17,3 +17,6 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+# ignore playground folder
+/tests/playground

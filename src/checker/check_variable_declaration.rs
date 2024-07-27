@@ -7,7 +7,7 @@ impl Checker {
   pub fn check_variable_declaration(&mut self, declaration: &ast::VariableDeclaration) -> Result<Type, Diagnostic> {
     let text_name = declaration.name.lexeme();
 
-    if self.ctx.defined_in_current_scope(text_name.as_str(), true) && declaration.local {
+    if self.ctx.defined_in_current_scope(text_name.as_str()) && declaration.local {
       let location = declaration.location.clone();
       let diagnostic = TypeError::RedeclaredInSameScope(text_name.to_string(), Some(location));
       return Err(self.create_diagnostic(diagnostic));

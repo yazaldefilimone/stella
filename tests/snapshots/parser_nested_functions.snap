@@ -9,7 +9,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 8,
+            column: 9,
           ),
           end: Position(
             line: 1,
@@ -41,7 +41,7 @@ Program(
               location: Location(
                 start: Position(
                   line: 2,
-                  column: 12,
+                  column: 13,
                 ),
                 end: Position(
                   line: 2,
@@ -64,45 +64,55 @@ Program(
                 ),
               ), Some(Number)),
             ],
-            return_t: Some(Number),
+            return_t: Some(String),
             body: BlockStatement(BlockStatement(
               body: [
                 ReturnStatement(ReturnStatement(
                   value: [
                     BinaryExpression(BinaryExpression(
-                      operator: Add,
-                      left: Identifier(Identifier(
-                        name: "x",
+                      operator: DoubleDot,
+                      left: LiteralExpression(StringLiteral(StringLiteral(
+                        value: "Hello, ",
                         location: Location(
                           start: Position(
                             line: 3,
-                            column: 14,
+                            column: 15,
                           ),
                           end: Position(
                             line: 3,
-                            column: 16,
+                            column: 24,
                           ),
                         ),
-                      )),
-                      right: Identifier(Identifier(
-                        name: "y",
+                      ))),
+                      right: LiteralExpression(StringLiteral(StringLiteral(
+                        value: "World",
                         location: Location(
                           start: Position(
                             line: 3,
-                            column: 18,
+                            column: 28,
                           ),
                           end: Position(
                             line: 3,
-                            column: 20,
+                            column: 35,
                           ),
                         ),
-                      )),
+                      ))),
+                      location: Location(
+                        start: Position(
+                          line: 3,
+                          column: 26,
+                        ),
+                        end: Position(
+                          line: 3,
+                          column: 27,
+                        ),
+                      ),
                     )),
                   ],
                   location: Location(
                     start: Position(
-                      line: 2,
-                      column: 37,
+                      line: 3,
+                      column: 8,
                     ),
                     end: Position(
                       line: 3,
@@ -113,8 +123,8 @@ Program(
               ],
               location: Location(
                 start: Position(
-                  line: 2,
-                  column: 37,
+                  line: 3,
+                  column: 8,
                 ),
                 end: Position(
                   line: 3,
@@ -125,7 +135,7 @@ Program(
             location: Location(
               start: Position(
                 line: 2,
-                column: 12,
+                column: 13,
               ),
               end: Position(
                 line: 2,
@@ -141,7 +151,7 @@ Program(
                   location: Location(
                     start: Position(
                       line: 5,
-                      column: 10,
+                      column: 11,
                     ),
                     end: Position(
                       line: 5,
@@ -171,7 +181,7 @@ Program(
                         location: Location(
                           start: Position(
                             line: 5,
-                            column: 20,
+                            column: 21,
                           ),
                           end: Position(
                             line: 5,
@@ -179,6 +189,16 @@ Program(
                           ),
                         ),
                       ))),
+                      location: Location(
+                        start: Position(
+                          line: 5,
+                          column: 19,
+                        ),
+                        end: Position(
+                          line: 5,
+                          column: 20,
+                        ),
+                      ),
                     )),
                   ],
                   location: Location(
@@ -195,7 +215,7 @@ Program(
                 location: Location(
                   start: Position(
                     line: 5,
-                    column: 10,
+                    column: 11,
                   ),
                   end: Position(
                     line: 5,
@@ -206,8 +226,8 @@ Program(
             ],
             location: Location(
               start: Position(
-                line: 4,
-                column: 7,
+                line: 5,
+                column: 4,
               ),
               end: Position(
                 line: 5,
@@ -218,8 +238,8 @@ Program(
         ],
         location: Location(
           start: Position(
-            line: 1,
-            column: 33,
+            line: 2,
+            column: 4,
           ),
           end: Position(
             line: 2,
@@ -230,7 +250,7 @@ Program(
       location: Location(
         start: Position(
           line: 1,
-          column: 8,
+          column: 9,
         ),
         end: Position(
           line: 1,
@@ -238,98 +258,84 @@ Program(
         ),
       ),
     )),
-    CallStatement(CallStatement(
-      expression: CallExpression(CallExpression(
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("result"),
+        location: Location(
+          start: Position(
+            line: 8,
+            column: 6,
+          ),
+          end: Position(
+            line: 8,
+            column: 12,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(Number),
+      init: Some(CallExpression(CallExpression(
         name: Token(
-          kind: Identifier("print"),
+          kind: Identifier("outer"),
           location: Location(
             start: Position(
-              line: 6,
-              column: 3,
+              line: 8,
+              column: 23,
             ),
             end: Position(
               line: 8,
-              column: 5,
+              column: 28,
             ),
           ),
         ),
         args: GroupedExpression(GroupedExpression(
           expression: [
-            CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("outer"),
-                location: Location(
-                  start: Position(
-                    line: 8,
-                    column: 6,
-                  ),
-                  end: Position(
-                    line: 8,
-                    column: 11,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  LiteralExpression(NumberLiteral(NumberLiteral(
-                    value: "10",
-                    location: Location(
-                      start: Position(
-                        line: 8,
-                        column: 12,
-                      ),
-                      end: Position(
-                        line: 8,
-                        column: 14,
-                      ),
-                    ),
-                  ))),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 8,
-                    column: 11,
-                  ),
-                  end: Position(
-                    line: 8,
-                    column: 12,
-                  ),
-                ),
-              )),
+            LiteralExpression(NumberLiteral(NumberLiteral(
+              value: "10",
               location: Location(
                 start: Position(
                   line: 8,
-                  column: 6,
+                  column: 29,
                 ),
                 end: Position(
                   line: 8,
-                  column: 11,
+                  column: 31,
                 ),
               ),
-            )),
+            ))),
           ],
           location: Location(
             start: Position(
               line: 8,
-              column: 5,
+              column: 28,
             ),
             end: Position(
               line: 8,
-              column: 6,
+              column: 29,
             ),
           ),
         )),
         location: Location(
           start: Position(
-            line: 6,
-            column: 3,
+            line: 8,
+            column: 23,
           ),
           end: Position(
             line: 8,
-            column: 5,
+            column: 28,
           ),
         ),
-      )),
+      ))),
+      location: Location(
+        start: Position(
+          line: 8,
+          column: 6,
+        ),
+        end: Position(
+          line: 8,
+          column: 12,
+        ),
+      ),
     )),
   ],
 )

@@ -112,6 +112,8 @@ impl Type {
       (Type::Table(left), Type::Table(right)) => check_match_table(&left, &right),
       (Type::Function(left), Type::Function(right)) => check_match_function(&left, &right),
       (Type::Generic(left), Type::Generic(right)) => check_match_generic(&left, &right),
+      (Type::Unknown, _) => true,
+      (_, Type::Unknown) => true,
       (_, _) => false,
     }
   }

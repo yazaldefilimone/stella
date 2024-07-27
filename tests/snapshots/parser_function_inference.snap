@@ -9,7 +9,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 8,
+            column: 9,
           ),
           end: Position(
             line: 1,
@@ -49,7 +49,7 @@ Program(
           location: Location(
             start: Position(
               line: 1,
-              column: 15,
+              column: 16,
             ),
             end: Position(
               line: 1,
@@ -70,7 +70,7 @@ Program(
                   location: Location(
                     start: Position(
                       line: 2,
-                      column: 10,
+                      column: 11,
                     ),
                     end: Position(
                       line: 2,
@@ -83,7 +83,7 @@ Program(
                   location: Location(
                     start: Position(
                       line: 2,
-                      column: 14,
+                      column: 15,
                     ),
                     end: Position(
                       line: 2,
@@ -91,12 +91,22 @@ Program(
                     ),
                   ),
                 )),
+                location: Location(
+                  start: Position(
+                    line: 2,
+                    column: 13,
+                  ),
+                  end: Position(
+                    line: 2,
+                    column: 14,
+                  ),
+                ),
               )),
             ],
             location: Location(
               start: Position(
-                line: 1,
-                column: 18,
+                line: 2,
+                column: 4,
               ),
               end: Position(
                 line: 2,
@@ -107,8 +117,8 @@ Program(
         ],
         location: Location(
           start: Position(
-            line: 1,
-            column: 18,
+            line: 2,
+            column: 4,
           ),
           end: Position(
             line: 2,
@@ -119,7 +129,7 @@ Program(
       location: Location(
         start: Position(
           line: 1,
-          column: 8,
+          column: 9,
         ),
         end: Position(
           line: 1,
@@ -133,7 +143,7 @@ Program(
         location: Location(
           start: Position(
             line: 5,
-            column: 5,
+            column: 6,
           ),
           end: Position(
             line: 5,
@@ -149,7 +159,7 @@ Program(
           location: Location(
             start: Position(
               line: 5,
-              column: 14,
+              column: 15,
             ),
             end: Position(
               line: 5,
@@ -177,7 +187,7 @@ Program(
               location: Location(
                 start: Position(
                   line: 5,
-                  column: 21,
+                  column: 22,
                 ),
                 end: Position(
                   line: 5,
@@ -200,7 +210,7 @@ Program(
         location: Location(
           start: Position(
             line: 5,
-            column: 14,
+            column: 15,
           ),
           end: Position(
             line: 5,
@@ -211,7 +221,7 @@ Program(
       location: Location(
         start: Position(
           line: 5,
-          column: 5,
+          column: 6,
         ),
         end: Position(
           line: 5,

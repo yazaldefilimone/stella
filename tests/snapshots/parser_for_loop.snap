@@ -9,7 +9,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 3,
+            column: 4,
           ),
           end: Position(
             line: 1,
@@ -22,7 +22,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 6,
+            column: 7,
           ),
           end: Position(
             line: 1,
@@ -35,7 +35,7 @@ Program(
         location: Location(
           start: Position(
             line: 1,
-            column: 9,
+            column: 10,
           ),
           end: Position(
             line: 1,
@@ -52,8 +52,8 @@ Program(
                 kind: Identifier("print"),
                 location: Location(
                   start: Position(
-                    line: 1,
-                    column: 15,
+                    line: 2,
+                    column: 4,
                   ),
                   end: Position(
                     line: 2,
@@ -90,8 +90,8 @@ Program(
               )),
               location: Location(
                 start: Position(
-                  line: 1,
-                  column: 15,
+                  line: 2,
+                  column: 4,
                 ),
                 end: Position(
                   line: 2,
@@ -103,8 +103,8 @@ Program(
         ],
         location: Location(
           start: Position(
-            line: 1,
-            column: 15,
+            line: 2,
+            column: 4,
           ),
           end: Position(
             line: 2,

@@ -3,220 +3,323 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    VariableDeclaration(VariableDeclaration(
+    FunctionStatement(FunctionStatement(
       name: Token(
-        kind: Identifier("age"),
+        kind: Identifier("test"),
         location: Location(
           start: Position(
-            line: 1,
-            column: 5,
+            line: 10,
+            column: 9,
           ),
           end: Position(
-            line: 1,
-            column: 9,
+            line: 10,
+            column: 13,
+          ),
+        ),
+      ),
+      arguments: [
+        (Token(
+          kind: Identifier("t"),
+          location: Location(
+            start: Position(
+              line: 10,
+              column: 14,
+            ),
+            end: Position(
+              line: 10,
+              column: 15,
+            ),
+          ),
+        ), Some(Boolean)),
+      ],
+      return_t: None,
+      body: BlockStatement(BlockStatement(
+        body: [
+          IfStatement(IfStatement(
+            condition: Identifier(Identifier(
+              name: "t",
+              location: Location(
+                start: Position(
+                  line: 11,
+                  column: 5,
+                ),
+                end: Position(
+                  line: 11,
+                  column: 6,
+                ),
+              ),
+            )),
+            body: BlockStatement(BlockStatement(
+              body: [
+                ReturnStatement(ReturnStatement(
+                  value: [
+                    LiteralExpression(NumberLiteral(NumberLiteral(
+                      value: "10",
+                      location: Location(
+                        start: Position(
+                          line: 12,
+                          column: 11,
+                        ),
+                        end: Position(
+                          line: 12,
+                          column: 13,
+                        ),
+                      ),
+                    ))),
+                  ],
+                  location: Location(
+                    start: Position(
+                      line: 12,
+                      column: 4,
+                    ),
+                    end: Position(
+                      line: 12,
+                      column: 10,
+                    ),
+                  ),
+                )),
+              ],
+              location: Location(
+                start: Position(
+                  line: 12,
+                  column: 4,
+                ),
+                end: Position(
+                  line: 12,
+                  column: 10,
+                ),
+              ),
+            )),
+            else_body: Some(BlockStatement(BlockStatement(
+              body: [
+                ReturnStatement(ReturnStatement(
+                  value: [
+                    LiteralExpression(StringLiteral(StringLiteral(
+                      value: "Hello",
+                      location: Location(
+                        start: Position(
+                          line: 14,
+                          column: 11,
+                        ),
+                        end: Position(
+                          line: 14,
+                          column: 18,
+                        ),
+                      ),
+                    ))),
+                  ],
+                  location: Location(
+                    start: Position(
+                      line: 14,
+                      column: 4,
+                    ),
+                    end: Position(
+                      line: 14,
+                      column: 10,
+                    ),
+                  ),
+                )),
+              ],
+              location: Location(
+                start: Position(
+                  line: 14,
+                  column: 4,
+                ),
+                end: Position(
+                  line: 14,
+                  column: 10,
+                ),
+              ),
+            ))),
+            location: Location(
+              start: Position(
+                line: 11,
+                column: 2,
+              ),
+              end: Position(
+                line: 11,
+                column: 4,
+              ),
+            ),
+          )),
+        ],
+        location: Location(
+          start: Position(
+            line: 11,
+            column: 2,
+          ),
+          end: Position(
+            line: 11,
+            column: 4,
+          ),
+        ),
+      )),
+      location: Location(
+        start: Position(
+          line: 10,
+          column: 9,
+        ),
+        end: Position(
+          line: 10,
+          column: 13,
+        ),
+      ),
+    )),
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("result"),
+        location: Location(
+          start: Position(
+            line: 19,
+            column: 6,
+          ),
+          end: Position(
+            line: 19,
+            column: 12,
           ),
         ),
       ),
       local: true,
       t: Some(Number),
-      init: Some(LiteralExpression(NumberLiteral(NumberLiteral(
-        value: "25",
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 19,
-          ),
-          end: Position(
-            line: 1,
-            column: 22,
-          ),
-        ),
-      )))),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 5,
-        ),
-        end: Position(
-          line: 1,
-          column: 9,
-        ),
-      ),
-    )),
-    IfStatement(IfStatement(
-      condition: BinaryExpression(BinaryExpression(
-        operator: GreaterThanOrEqual,
-        left: Identifier(Identifier(
-          name: "age",
+      init: Some(CallExpression(CallExpression(
+        name: Token(
+          kind: Identifier("test"),
           location: Location(
             start: Position(
-              line: 3,
-              column: 2,
+              line: 19,
+              column: 23,
             ),
             end: Position(
-              line: 3,
-              column: 6,
+              line: 19,
+              column: 27,
+            ),
+          ),
+        ),
+        args: GroupedExpression(GroupedExpression(
+          expression: [
+            LiteralExpression(BoolLiteral(BoolLiteral(
+              value: true,
+              location: Location(
+                start: Position(
+                  line: 19,
+                  column: 28,
+                ),
+                end: Position(
+                  line: 19,
+                  column: 32,
+                ),
+              ),
+            ))),
+          ],
+          location: Location(
+            start: Position(
+              line: 19,
+              column: 27,
+            ),
+            end: Position(
+              line: 19,
+              column: 28,
             ),
           ),
         )),
-        right: LiteralExpression(NumberLiteral(NumberLiteral(
-          value: "18",
-          location: Location(
-            start: Position(
-              line: 3,
-              column: 9,
-            ),
-            end: Position(
-              line: 3,
-              column: 12,
-            ),
-          ),
-        ))),
-      )),
-      body: BlockStatement(BlockStatement(
-        body: [
-          CallStatement(CallStatement(
-            expression: CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("print"),
-                location: Location(
-                  start: Position(
-                    line: 3,
-                    column: 17,
-                  ),
-                  end: Position(
-                    line: 4,
-                    column: 9,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  LiteralExpression(StringLiteral(StringLiteral(
-                    value: "You are an adult.",
-                    location: Location(
-                      start: Position(
-                        line: 4,
-                        column: 10,
-                      ),
-                      end: Position(
-                        line: 4,
-                        column: 29,
-                      ),
-                    ),
-                  ))),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 4,
-                    column: 9,
-                  ),
-                  end: Position(
-                    line: 4,
-                    column: 10,
-                  ),
-                ),
-              )),
-              location: Location(
-                start: Position(
-                  line: 3,
-                  column: 17,
-                ),
-                end: Position(
-                  line: 4,
-                  column: 9,
-                ),
-              ),
-            )),
-          )),
-        ],
         location: Location(
           start: Position(
-            line: 3,
-            column: 17,
+            line: 19,
+            column: 23,
           ),
           end: Position(
-            line: 4,
-            column: 9,
-          ),
-        ),
-      )),
-      else_body: Some(BlockStatement(BlockStatement(
-        body: [
-          CallStatement(CallStatement(
-            expression: CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("print"),
-                location: Location(
-                  start: Position(
-                    line: 5,
-                    column: 4,
-                  ),
-                  end: Position(
-                    line: 6,
-                    column: 9,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  LiteralExpression(StringLiteral(StringLiteral(
-                    value: "You are a minor.",
-                    location: Location(
-                      start: Position(
-                        line: 6,
-                        column: 10,
-                      ),
-                      end: Position(
-                        line: 6,
-                        column: 28,
-                      ),
-                    ),
-                  ))),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 6,
-                    column: 9,
-                  ),
-                  end: Position(
-                    line: 6,
-                    column: 10,
-                  ),
-                ),
-              )),
-              location: Location(
-                start: Position(
-                  line: 5,
-                  column: 4,
-                ),
-                end: Position(
-                  line: 6,
-                  column: 9,
-                ),
-              ),
-            )),
-          )),
-        ],
-        location: Location(
-          start: Position(
-            line: 5,
-            column: 4,
-          ),
-          end: Position(
-            line: 6,
-            column: 9,
+            line: 19,
+            column: 27,
           ),
         ),
       ))),
       location: Location(
         start: Position(
-          line: 1,
-          column: 22,
+          line: 19,
+          column: 6,
         ),
         end: Position(
-          line: 3,
-          column: 2,
+          line: 19,
+          column: 12,
+        ),
+      ),
+    )),
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("n"),
+        location: Location(
+          start: Position(
+            line: 20,
+            column: 6,
+          ),
+          end: Position(
+            line: 20,
+            column: 7,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(String),
+      init: Some(CallExpression(CallExpression(
+        name: Token(
+          kind: Identifier("test"),
+          location: Location(
+            start: Position(
+              line: 20,
+              column: 18,
+            ),
+            end: Position(
+              line: 20,
+              column: 22,
+            ),
+          ),
+        ),
+        args: GroupedExpression(GroupedExpression(
+          expression: [
+            LiteralExpression(BoolLiteral(BoolLiteral(
+              value: false,
+              location: Location(
+                start: Position(
+                  line: 20,
+                  column: 23,
+                ),
+                end: Position(
+                  line: 20,
+                  column: 28,
+                ),
+              ),
+            ))),
+          ],
+          location: Location(
+            start: Position(
+              line: 20,
+              column: 22,
+            ),
+            end: Position(
+              line: 20,
+              column: 23,
+            ),
+          ),
+        )),
+        location: Location(
+          start: Position(
+            line: 20,
+            column: 18,
+          ),
+          end: Position(
+            line: 20,
+            column: 22,
+          ),
+        ),
+      ))),
+      location: Location(
+        start: Position(
+          line: 20,
+          column: 6,
+        ),
+        end: Position(
+          line: 20,
+          column: 7,
         ),
       ),
     )),

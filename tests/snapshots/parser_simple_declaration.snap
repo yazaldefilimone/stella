@@ -1,0 +1,47 @@
+---
+source: tests/snapshot_tests.rs
+---
+Program(
+  statements: [
+    VariableDeclaration(VariableDeclaration(
+      name: Token(
+        kind: Identifier("name"),
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 6,
+          ),
+          end: Position(
+            line: 1,
+            column: 10,
+          ),
+        ),
+      ),
+      local: true,
+      t: Some(String),
+      init: Some(LiteralExpression(StringLiteral(StringLiteral(
+        value: "Stella",
+        location: Location(
+          start: Position(
+            line: 1,
+            column: 21,
+          ),
+          end: Position(
+            line: 1,
+            column: 29,
+          ),
+        ),
+      )))),
+      location: Location(
+        start: Position(
+          line: 1,
+          column: 6,
+        ),
+        end: Position(
+          line: 1,
+          column: 10,
+        ),
+      ),
+    )),
+  ],
+)

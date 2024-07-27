@@ -27,12 +27,17 @@ impl Parser {
   }
 
   fn parse_statement(&mut self) -> ast::Statement {
-    let token = self.lexer.peek_token();
+    let mut token = self.lexer.peek_token();
     // skip comments
-    if token.is_comment() {
+    while token.is_comment() {
       self.lexer.next_token();
-      return self.parse_statement();
-    };
+      token = self.lexer.peek_token();
+    }
+    // todo: improve this
+    if self.is_end() {
+      let empty = ast::EmptyStatement { location: token.location };
+      return ast::Statement::EmptyStatement(empty);
+    }
 
     let statement = match token.kind {
       TokenKind::Local => self.parse_variable_declaration(),
@@ -378,12 +383,11 @@ impl Parser {
     ast::Statement::ReturnStatement(return_statement)
   }
 
+  // return 10, 20, 30
   fn parse_return_value(&mut self) -> Vec<ast::Expression> {
-    let mut values = vec![];
-    while !self.contains_token(&[TokenKind::End]) {
-      if self.match_token(&TokenKind::Comma) {
-        self.consume_expect_token(TokenKind::Comma);
-      }
+    let mut values = vec![self.parse_expression_statement()];
+    while self.match_token(&TokenKind::Comma) {
+      self.consume_expect_token(TokenKind::Comma);
       values.push(self.parse_expression_statement());
     }
     values
