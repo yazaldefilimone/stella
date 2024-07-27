@@ -1,0 +1,56 @@
+name: Performance Benchmark
+
+on:
+  push:
+    branches:
+      - main
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  benchmark:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out the code (current branch)
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install hyperfine
+        run: brew install hyperfine
+
+      - name: Build project (current branch)
+        run: cargo build --release
+
+      - name: Run benchmarks (current branch)
+        run: |
+          hyperfine --warmup 10 './target/release/stella check ./tests/golden_tests/assign_expression.lua' --export-json results_current.json
+
+      - name: Check out main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          clean: true # Ensure a clean slate before building the main branch
+
+      - name: Build project (main branch)
+        run: cargo build --release
+
+      - name: Run benchmarks (main branch)
+        run: |
+          hyperfine --warmup 10 './target/release/stella check ./tests/golden_tests/assign_expression.lua' --export-json results_main.json
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v2
+        with:
+          name: benchmark-results
+          path: |
+            results_current.json
+            results_main.json
