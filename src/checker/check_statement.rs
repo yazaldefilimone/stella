@@ -7,10 +7,7 @@ impl Checker {
   pub fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, Diagnostic> {
     match statement {
       ast::Statement::VariableDeclaration(vaiable) => self.check_variable_declaration(vaiable),
-      ast::Statement::EmptyStatement(empty) => {
-        self.check_empty_statement(empty);
-        Ok(Type::Nil)
-      }
+      ast::Statement::EmptyStatement(empty) => self.check_empty_statement(empty),
       ast::Statement::BlockStatement(block) => self.check_block_statement(block),
       ast::Statement::AssignStatement(assign) => self.check_assign_statement(assign),
       ast::Statement::FunctionStatement(function) => self.check_function_statement(function),
