@@ -1,4 +1,4 @@
-name: CI Tests (MacOS)
+name: CI Tests
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-20.04 # ou ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out the code
         uses: actions/checkout@v2

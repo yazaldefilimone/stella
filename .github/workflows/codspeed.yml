@@ -1,4 +1,4 @@
-name: Codspeed Benchmark (MacOS)
+name: Codspeed Benchmark
 on:
   pull_request:
     branches:
@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: CodSpeedHQ/action@v3.0.0
       - name: Setup rust toolchain, cache and cargo-codspeed binary
         uses: moonrepo/setup-rust@v0
         with:
@@ -21,7 +20,7 @@ jobs:
         run: cargo codspeed build
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@v3
+        uses: CodSpeedHQ/action@main
         with:
           run: cargo codspeed run
           token: ${{ secrets.CODSPEED_TOKEN }}
