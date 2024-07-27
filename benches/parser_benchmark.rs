@@ -1,9 +1,9 @@
 #![allow(dead_code, unused_imports)]
 // use codspeed::{codspeed::black_box, codspeed_bench, codspeed_main};
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use codspeed_criterion_compat::{black_box, criterion_group, criterion_main, Criterion};
 use glob::glob;
 
-pub fn lexer_benchmark(c: &mut criterion::Criterion) {
+pub fn lexer_benchmark(c: &mut Criterion) {
   let mut patterns = Vec::new();
   let glob_pattern = glob("tests/golden_tests/*.lua").expect("Failed to read glob pattern");
   for entry in glob_pattern {
@@ -16,7 +16,10 @@ pub fn lexer_benchmark(c: &mut criterion::Criterion) {
   for (file_name, source_code) in patterns.iter() {
     c.bench_function(format!("parser_{}", file_name).as_str(), |b| {
       b.iter(|| {
-        black_box(stella::parser::parser::Parser::new(source_code).parse_program());
+        let mut parser = stella::parser::parser::Parser::new(source_code);
+        let result = parser.parse_program();
+        println!("{:#?}", result);
+        black_box(result);
       });
     });
   }

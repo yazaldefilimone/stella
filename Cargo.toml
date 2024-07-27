@@ -13,6 +13,7 @@ serde = { version = "1.0.204", features = ["derive"] }
 
 [dev-dependencies]
 codspeed = "2.6.0"
+codspeed-criterion-compat = "2.6.0"
 criterion = "0.5.1"
 glob = "0.3.1"
 insta = { version = "1.39.0", features = ["ron"] }

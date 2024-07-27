@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   benchmarks:
@@ -22,8 +23,13 @@ jobs:
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@main
         with:
-          run: cargo codspeed run
           token: ${{ secrets.CODSPEED_TOKEN }}
+          run: cargo codspeed run
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmarks
+          path: ./target/codspeed/stella
 
   # for file in ./tests/golden_tests/*.lua; do
   #             codspeed bench "./target/release/stella check $file"
