@@ -32,7 +32,7 @@ jobs:
 
       - name: Run benchmarks (current branch)
         run: |
-          hyperfine --warmup 10 './target/release/stella check ./tests/golden_tests/assign_expression.lua' --export-json results_current.json
+          hyperfine--warmup 10 -i -N './target/release/stella check ./tests/golden_tests/assign_expression.lua' --export-json results_current.json
 
       - name: Check out main branch
         uses: actions/checkout@v2
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run benchmarks (main branch)
         run: |
-          hyperfine --warmup 10 './target/release/stella check ./tests/golden_tests/assign_expression.lua' --export-json results_main.json
+          hyperfine --warmup 10 -i -N './target/release/stella check ./tests/golden_tests/assign_expression.lua' --export-json results_main.json
 
       - name: Upload benchmark results
         uses: actions/upload-artifact@v2
