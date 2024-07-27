@@ -1,18 +1,13 @@
 name: CI Tests (MacOS)
 
 on:
-  push:
-    branches:
-      - main
-      - "**"
   pull_request:
     branches:
       - main
 
 jobs:
   tests:
-    runs-on: macos-latest
-
+    runs-on: ubuntu-20.04 # ou ubuntu-latest
     steps:
       - name: Check out the code
         uses: actions/checkout@v2

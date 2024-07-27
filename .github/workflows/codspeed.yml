@@ -1,41 +1,31 @@
 name: Codspeed Benchmark (MacOS)
 
 on:
-  push:
-    branches:
-      - main
-      - "**"
   pull_request:
     branches:
       - main
 
 jobs:
-  benchmark:
-    runs-on: macos-latest
-
+  benchmarks:
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Setup rust toolchain, cache and cargo-codspeed binary
+        uses: moonrepo/setup-rust@v0
         with:
-          toolchain: stable
+          channel: stable
+          cache-target: release
+          bins: cargo-codspeed
 
-      - name: Install Codspeed
-        run: cargo install codspeed-cli
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build
 
-      - name: Set up Codspeed API key
-        run: codspeed auth ${{ secrets.CODSPEED_API_KEY }}
-
-      - name: Run Codspeed benchmark
-        run: |
-          codspeed bench './target/release/stella check ./tests/golden_tests/assign_expression.lua'
-          codspeed bench './target/release/stella check ./tests/golden_tests/boolean_logic.lua'
-          codspeed bench './target/release/stella check ./tests/golden_tests/conditional_statement.lua'
-          codspeed bench './target/release/stella check ./tests/golden_tests/if_statement.lua'
-          codspeed bench './target/release/stella check ./tests/golden_tests/nested_functions.lua'
-          codspeed bench './target/release/stella check ./tests/golden_tests/simple_declaration.lua'
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@v3
+        with:
+          run: cargo codspeed run
+          token: ${{ secrets.CODSPEED_TOKEN }}
 
   # for file in ./tests/golden_tests/*.lua; do
   #             codspeed bench "./target/release/stella check $file"
