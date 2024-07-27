@@ -1,5 +1,4 @@
 name: Codspeed Benchmark (MacOS)
-
 on:
   pull_request:
     branches:
@@ -10,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: CodSpeedHQ/action@v3.0.0
 
       - name: Setup rust toolchain, cache and cargo-codspeed binary
         uses: moonrepo/setup-rust@v0
@@ -26,6 +26,11 @@ jobs:
         with:
           run: cargo codspeed run
           token: ${{ secrets.CODSPEED_TOKEN }}
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: codspeed-results
+          path: codspeed-results.json
 
   # for file in ./tests/golden_tests/*.lua; do
   #             codspeed bench "./target/release/stella check $file"
