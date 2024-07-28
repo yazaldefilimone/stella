@@ -65,6 +65,7 @@ impl Token {
       "and" => Token::new(TokenKind::And, location),
       "or" => Token::new(TokenKind::Or, location),
       "not" => Token::new(TokenKind::Not, location),
+      "require" => Token::new(TokenKind::Require, location),
       _ => Token::new(TokenKind::Identifier(keyword), location),
     }
   }
@@ -94,6 +95,7 @@ pub enum TokenKind {
   Type,
   Enum,
   Continue,
+  Require,
 
   // Operators and Delimiters
   Tilde,        // ~
@@ -224,6 +226,7 @@ impl TokenKind {
       TokenKind::And => "and",
       TokenKind::Comment(_) => "comment",
       TokenKind::BlockComment(_) => "block comment",
+      TokenKind::Require => "require",
     };
     return text.to_string();
   }

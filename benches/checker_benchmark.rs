@@ -23,8 +23,8 @@ pub fn lexer_benchmark(c: &mut criterion::Criterion) {
   for (file_name, source_code) in patterns.iter() {
     c.bench_function(format!("checker_{}", file_name).as_str(), |b| {
       b.iter(|| {
-        let checker = &mut stella::checker::Checker::new();
-        let check = checker.check(&stella::parser::parser::Parser::new(source_code).parse_program());
+        let checker = &mut stella::checker::Checker::new(file_name, source_code);
+        let check = checker.check(&stella::parser::parser::Parser::new(source_code, file_name).parse_program());
         match check {
           Ok(t) => black_box(t),
           _ => black_box(stella::types::Type::Unknown),

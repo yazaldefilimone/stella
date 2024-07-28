@@ -14,13 +14,14 @@ pub struct Lexer {
   cursor: usize, // current character
   pub current_position: Position,
   peeked_token: Option<Token>,
+  pub file_name: String,
 }
 
 impl Lexer {
-  pub fn new(raw: String) -> Lexer {
+  pub fn new(raw: String, file_name: &str) -> Lexer {
     let current_position = Position { line: 1, column: 0 };
     let peeked_token = None;
-    Lexer { raw, column: 0, line: 1, cursor: 0, current_position, peeked_token }
+    Lexer { raw, column: 0, line: 1, cursor: 0, file_name: file_name.to_string(), current_position, peeked_token }
   }
 
   pub fn peek_token(&mut self) -> Token {
@@ -73,7 +74,7 @@ impl Lexer {
       _ => {
         let mut location = self.create_location();
         let message = format!("Invalid character '{}'", current_char);
-        report_and_exit(&message, &mut location, &self.raw);
+        report_and_exit(&message, &mut location, &self.raw, &self.file_name);
       }
     };
 

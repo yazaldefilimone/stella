@@ -21,8 +21,8 @@ fn read_test_files_with_pattern(pattern: &str) -> Vec<(String, String)> {
   patterns
 }
 
-fn create_tokens(source_code: &str) -> Vec<Token> {
-  let mut lexer = Lexer::new(source_code.to_string());
+fn create_tokens(source_code: &str, file_name: &str) -> Vec<Token> {
+  let mut lexer = Lexer::new(source_code.to_string(), file_name);
   let mut tokens = vec![];
   loop {
     let token = lexer.next_token();
@@ -35,8 +35,8 @@ fn create_tokens(source_code: &str) -> Vec<Token> {
   return tokens;
 }
 
-fn create_parser(source_code: &str) -> Parser {
-  let parser = Parser::new(source_code);
+fn create_parser(source_code: &str, file_name: &str) -> Parser {
+  let parser = Parser::new(source_code, file_name);
   return parser;
 }
 fn format_file_name_with_module(file_name: &str, module: &str) -> String {
@@ -56,7 +56,7 @@ fn test_lexer_snapshot() {
   let settings = setings_snapshot();
   for (file_name, source_code) in test_files.iter() {
     settings.bind(|| {
-      let tokens = create_tokens(source_code);
+      let tokens = create_tokens(source_code, file_name);
       let file_name = format_file_name_with_module(file_name, "lexer");
       assert_ron_snapshot!(file_name.clone(), tokens);
     });
@@ -69,7 +69,7 @@ fn test_parser_snapshot() {
   let settings = setings_snapshot();
   for (file_name, source_code) in test_files.iter() {
     settings.bind(|| {
-      let mut parser = create_parser(source_code);
+      let mut parser = create_parser(source_code, file_name);
       let file_name = format_file_name_with_module(file_name, "parser");
       let program = parser.parse_program();
       assert_ron_snapshot!(file_name.clone(), program);

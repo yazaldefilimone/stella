@@ -4,6 +4,7 @@ mod cli;
 mod context;
 mod diagnostics;
 mod lexer;
+mod modules;
 mod parser;
 mod types;
 mod utils;
@@ -29,9 +30,9 @@ fn main() {
 
 fn run_check(path_name: &str) {
   let raw = std::fs::read_to_string(path_name).unwrap();
-  let mut parser = Parser::new(&raw);
+  let mut parser = Parser::new(&raw, path_name);
   let program = parser.parse_program();
-  let mut checker = Checker::new();
+  let mut checker = Checker::new(path_name, &raw);
   let type_result = checker.check(&program);
   if type_result.is_err() || checker.diagnostics.error_count > 0 {
     checker.diagnostics.emit_all(&raw, path_name);
@@ -42,7 +43,7 @@ fn run_check(path_name: &str) {
 }
 fn run_compile(path_name: &str) {
   let raw = std::fs::read_to_string(path_name).unwrap();
-  let mut parser = Parser::new(&raw);
+  let mut parser = Parser::new(&raw, path_name);
   let program = parser.parse_program();
   println!("{:#?}", program);
 }

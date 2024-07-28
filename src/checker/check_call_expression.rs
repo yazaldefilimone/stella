@@ -5,7 +5,7 @@ use crate::{
   types::Type,
 };
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_call_expression(&mut self, call_expr: &ast::CallExpression) -> Result<Type, Diagnostic> {
     let name = call_expr.name.lexeme();
     if !self.ctx.defined_in_current_scope(name.as_str()) {
@@ -16,9 +16,9 @@ impl Checker {
     }
     if let Some(call_t) = self.ctx.get_function(name.as_str()) {
       // todo: improve this
-      let call_t = call_t.clone();
+      let return_t = *call_t.return_type.clone();
       self.check_call_arguments(&call_expr.args, &call_t.params.to_vec())?;
-      return Ok(*call_t.return_type);
+      return Ok(return_t);
     }
     let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.location.clone()));
     Err(self.create_diagnostic(diagnostic))

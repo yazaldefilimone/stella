@@ -4,6 +4,7 @@ pub mod cli;
 pub mod context;
 pub mod diagnostics;
 pub mod lexer;
+pub mod modules;
 pub mod parser;
 pub mod types;
 pub mod utils;

@@ -3,7 +3,7 @@ use crate::ast::ast;
 use crate::diagnostics::Diagnostic;
 use crate::types::Type;
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_statement(&mut self, statement: &ast::Statement) -> Result<Type, Diagnostic> {
     match statement {
       ast::Statement::VariableDeclaration(vaiable) => self.check_variable_declaration(vaiable),

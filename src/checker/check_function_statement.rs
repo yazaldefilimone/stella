@@ -1,7 +1,7 @@
 use super::Checker;
 use crate::{ast::ast, diagnostics::Diagnostic, types::Type};
 
-impl Checker {
+impl Checker<'_> {
   // function name, arguments, return type, body
   pub fn check_function_statement(&mut self, function: &ast::FunctionStatement) -> Result<Type, Diagnostic> {
     self.ctx.enter_scope();
@@ -15,7 +15,7 @@ impl Checker {
       params.push(arg_t);
     }
 
-    self.ctx.declare_return_variable_type(return_t.clone());
+    self.ctx.declare_return_param_type(return_t.clone());
 
     let last_t = self.check_statement(&function.body)?;
 

@@ -3,7 +3,7 @@ use crate::ast::ast;
 use crate::diagnostics::Diagnostic;
 use crate::types::Type;
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_literal_expression(&mut self, literal: &ast::LiteralExpression) -> Result<Type, Diagnostic> {
     match literal {
       ast::LiteralExpression::NumberLiteral(_) => Ok(Type::Number),

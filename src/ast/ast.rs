@@ -30,6 +30,7 @@ pub enum Statement {
   EmptyStatement(EmptyStatement),
   VariableDeclaration(VariableDeclaration),
   CallStatement(CallStatement),
+  ExpressionStatement(Expression),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -173,8 +174,20 @@ pub enum Expression {
   UnaryExpression(UnaryExpression),
   GroupedExpression(GroupedExpression),
   BinaryExpression(BinaryExpression),
+  RequireExpression(RequireExpression),
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RequireExpression {
+  pub module_name: Token,
+  pub location: Location,
+}
+
+impl RequireExpression {
+  pub fn new(module_name: Token, location: Location) -> Self {
+    RequireExpression { module_name, location }
+  }
+}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GroupedExpression {
   pub expression: Vec<Expression>,
@@ -223,6 +236,11 @@ impl Expression {
   pub fn new_call_expression(name: Token, args: Expression, location: Location) -> Self {
     let call_expression = CallExpression::new(name, Box::new(args), location);
     return Expression::CallExpression(call_expression);
+  }
+
+  pub fn new_require_expression(module_name: Token, location: Location) -> Self {
+    let require_expression = RequireExpression::new(module_name, location);
+    return Expression::RequireExpression(require_expression);
   }
 }
 
