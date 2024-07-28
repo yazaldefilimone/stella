@@ -9,7 +9,7 @@ impl Checker<'_> {
   pub fn check_return_statement(&mut self, return_stmt: &ast::ReturnStatement) -> Result<Type, Diagnostic> {
     let mut return_t = Type::Nil;
     // suport single return statement, todo: support multiple return statements
-    let first_return = return_stmt.value.first();
+    let first_return = return_stmt.values.first();
     if let Some(return_value) = first_return {
       return_t = self.check_expression(return_value)?;
     }

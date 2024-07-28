@@ -6,7 +6,7 @@ use crate::types::Type;
 impl Checker<'_> {
   pub fn check_block_statement(&mut self, block: &ast::BlockStatement) -> Result<Type, Diagnostic> {
     let mut last_t = Type::Nil;
-    for statement in &block.body {
+    for statement in &block.statements {
       match self.check_statement(statement) {
         Ok(ty) => last_t = ty,
         Err(diag) => self.diagnostics.add(diag),

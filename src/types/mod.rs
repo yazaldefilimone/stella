@@ -142,14 +142,14 @@ impl Type {
   }
 
   // helper functions to create types
-  pub fn new_type(name: String) -> Self {
-    match name.as_str() {
+  pub fn new_type(name: &str) -> Self {
+    match name {
       "number" => Type::Number,
       "string" => Type::String,
       "boolean" => Type::Boolean,
       "nil" => Type::Nil,
       "unknown" => Type::Unknown,
-      _ => Type::Identifier(name),
+      _ => Type::Identifier(name.to_owned()),
     }
   }
   pub fn new_number() -> Self {

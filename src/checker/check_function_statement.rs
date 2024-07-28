@@ -6,25 +6,25 @@ impl Checker<'_> {
   pub fn check_function_statement(&mut self, function: &ast::FunctionStatement) -> Result<Type, Diagnostic> {
     self.ctx.enter_scope();
     let name = function.name.lexeme();
-    let mut return_t = self.check_t(&function.return_t);
+    let mut return_type = self.check_t(&function.return_type);
 
     let mut params = vec![];
-    for (param, t) in function.arguments.iter() {
-      let arg_t = self.check_t(t);
-      self.ctx.declare_variable(param.lexeme().as_str(), arg_t.clone());
-      params.push(arg_t);
+    for (param, ty) in function.arguments.iter() {
+      let arg_type = self.check_t(ty);
+      self.ctx.declare_variable(param.lexeme(), arg_type.clone());
+      params.push(arg_type);
     }
 
-    self.ctx.declare_return_param_type(return_t.clone());
+    self.ctx.declare_return_param_type(return_type.clone());
 
-    let last_t = self.check_statement(&function.body)?;
+    let last_type = self.check_statement(&function.body)?;
 
-    if last_t.check_is_can_replace(&return_t) {
-      return_t = last_t;
+    if last_type.check_is_can_replace(&return_type) {
+      return_type = last_type;
     }
     self.ctx.leave_scope();
-    self.ctx.declare_function(name.as_str(), params, return_t.clone());
+    self.ctx.declare_function(name, params, return_type.clone());
 
-    Ok(return_t)
+    Ok(return_type)
   }
 }

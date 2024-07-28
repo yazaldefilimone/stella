@@ -19,7 +19,7 @@ impl Checker<'_> {
       return Err(self.create_diagnostic(diagnostic));
     }
 
-    let body_t = self.check_statement(&if_.body)?;
+    let body_t = self.check_statement(&if_.then_body)?;
     if let Some(else_body) = &if_.else_body {
       let else_body_t = self.check_statement(else_body)?;
 

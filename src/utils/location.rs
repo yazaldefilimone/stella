@@ -3,11 +3,24 @@ use serde::{Deserialize, Serialize};
 pub struct Location {
   pub start: Position,
   pub end: Position,
+  pub rage_start: usize,
+  pub rage_end: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq)]
+pub struct Range {
+  pub start: usize,
+  pub end: usize,
 }
 
 impl Location {
   pub fn new() -> Self {
-    Location { start: Position { line: 0, column: 0 }, end: Position { line: 0, column: 0 } }
+    Location {
+      start: Position { line: 0, column: 0 },
+      end: Position { line: 0, column: 0 },
+      rage_end: 0,
+      rage_start: 0,
+    }
   }
   // remove this function
   pub fn cursor_range(&self, raw: &str) -> Option<Range> {
@@ -46,10 +59,4 @@ impl Location {
 pub struct Position {
   pub line: usize,
   pub column: usize,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Range {
-  pub start: usize,
-  pub end: usize,
 }

@@ -76,6 +76,6 @@ impl<'a> Checker<'a> {
       let report = TypeWarning::UnusedVariable(unused_variable.clone(), unused_variable_location);
       self.diagnostics.add(report.into());
     }
-    self.diagnostics.emit_all(self.raw, self.file_name.as_str());
+    self.diagnostics.emit_all(self.raw, &self.file_name);
   }
 }
