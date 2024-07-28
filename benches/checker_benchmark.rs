@@ -1,9 +1,11 @@
 #![allow(dead_code, unused_imports)]
 // use codspeed::{codspeed::black_box, codspeed_bench, codspeed_main};
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+// use criterion::{ criterion_group, criterion_main, Criterion};
+use codspeed_criterion_compat::{black_box, criterion_group, criterion_main, Criterion};
+
 use glob::glob;
 
-pub fn lexer_benchmark(c: &mut criterion::Criterion) {
+pub fn lexer_benchmark(c: &mut Criterion) {
   let paths_names = vec![
     "tests/golden_tests/assign_expression.lua",
     "tests/golden_tests/boolean_logic.lua",
@@ -26,8 +28,14 @@ pub fn lexer_benchmark(c: &mut criterion::Criterion) {
         let checker = &mut stella::checker::Checker::new(file_name, source_code);
         let check = checker.check(&stella::parser::parser::Parser::new(source_code, file_name).parse_program());
         match check {
-          Ok(t) => black_box(t),
-          _ => black_box(stella::types::Type::Unknown),
+          Ok(t) => {
+            println!("{:#?}", t);
+            black_box(t)
+          }
+          _ => {
+            println!("Error in file {}", file_name);
+            black_box(stella::types::Type::Unknown)
+          }
         }
       });
     });
