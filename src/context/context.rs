@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use crate::types::{FunctionType, Type};
 use crate::utils::location::Location;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 pub struct Context {
   pub scope_pointer: usize,
@@ -218,13 +218,13 @@ impl Context {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
-  pub variables: HashMap<String, Type>,
-  pub unused_variables: HashSet<String>,
-  pub variables_location: HashMap<String, Location>,
+  pub variables: BTreeMap<String, Type>,
+  pub unused_variables: BTreeSet<String>,
+  pub variables_location: BTreeMap<String, Location>,
 }
 
 impl Scope {
   pub fn new() -> Scope {
-    Scope { variables: HashMap::new(), unused_variables: HashSet::new(), variables_location: HashMap::new() }
+    Scope { variables: BTreeMap::new(), unused_variables: BTreeSet::new(), variables_location: BTreeMap::new() }
   }
 }
