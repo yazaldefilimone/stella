@@ -108,6 +108,8 @@ impl From<TypeWarning> for Diagnostic {
 pub enum TypeError {
   MismatchedTypes(String, String, Option<Location>),
   UndeclaredVariable(String, Option<Location>),
+  ModuleNotFound(String, Option<Location>),
+  ModuleNotExported(String, Option<Location>),
   TypeMismatchAssignment(String, String, Option<Location>),
   RedeclaredInSameScope(String, Option<Location>),
   InvalidAssignment(String, Option<Location>),
@@ -163,7 +165,19 @@ impl From<TypeError> for Diagnostic {
         format!("{}: '{}' is already declared in this scope.", red_type_error, name),
         location,
       ),
+      TypeError::ModuleNotFound(name, location) => (
+        format!(
+          "{}: unresolved module, can't find module file: '{}.lua'",
+          red_type_error, name
+        ),
+        location,
+      ),
+      TypeError::ModuleNotExported(name, location) => (
+        format!("{}: module '{}' doesn't export anything", red_type_error, name),
+        location,
+      ),
     };
+
     Diagnostic { level, message, location }
   }
 }
@@ -198,7 +212,7 @@ pub fn report_error(message: &str, location: &mut Location, raw: &str, file_name
   );
 }
 
-pub fn report_and_exit(message: &str, location: &mut Location, raw: &str) -> ! {
-  report_error(message, location, raw, "<stdin>");
+pub fn report_and_exit(message: &str, location: &mut Location, raw: &str, file_name: &str) -> ! {
+  report_error(message, location, raw, file_name);
   std::process::exit(1);
 }

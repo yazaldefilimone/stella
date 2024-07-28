@@ -6,7 +6,7 @@ use crate::{
   utils::location::Location,
 };
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_binary_expression(&mut self, binary_expr: &ast::BinaryExpression) -> Result<Type, Diagnostic> {
     let left_t = self.check_expression(&binary_expr.left)?;
     let right_t = self.check_expression(&binary_expr.right)?;

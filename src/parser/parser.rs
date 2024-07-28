@@ -13,8 +13,8 @@ pub struct Parser {
 }
 
 impl Parser {
-  pub fn new(raw: &str) -> Self {
-    Self { lexer: Lexer::new(raw.to_string()), raw: raw.to_string() }
+  pub fn new(raw: &str, file_name: &str) -> Self {
+    Self { lexer: Lexer::new(raw.to_string(), file_name), raw: raw.to_string() }
   }
 
   pub fn parse_program(&mut self) -> ast::Program {
@@ -56,6 +56,13 @@ impl Parser {
     statement
   }
 
+  // require "module"
+  fn parse_require_expression(&mut self) -> ast::Expression {
+    let require_token = self.consume_expect_token(TokenKind::Require);
+    let module_name = self.consume_token();
+    let location = require_token.location;
+    return ast::Expression::new_require_expression(module_name, location);
+  }
   fn parse_expression_statement(&mut self) -> ast::Expression {
     self.parse_or_expression()
   }
@@ -140,9 +147,15 @@ impl Parser {
       TokenKind::Identifier(_) => self.parse_call_expression_or_identifier(),
       TokenKind::LeftParen => self.parse_grouped_expression(),
       TokenKind::LeftBrace => self.parse_table_construction(),
+      TokenKind::Require => self.parse_require_expression(),
       _ => {
         let mut location = token.location.clone();
-        report_and_exit("Expected a primary expression", &mut location, &self.raw.as_str());
+        report_and_exit(
+          "Expected a primary expression",
+          &mut location,
+          &self.raw.as_str(),
+          &self.lexer.file_name,
+        );
       }
     }
   }
@@ -173,7 +186,12 @@ impl Parser {
     }
 
     let mut location = token.location;
-    report_and_exit("Invalid identifier expression", &mut location, &self.raw.as_str());
+    report_and_exit(
+      "Invalid identifier expression",
+      &mut location,
+      &self.raw.as_str(),
+      &self.lexer.file_name,
+    );
   }
 
   fn parse_identifier(&mut self) -> ast::Expression {
@@ -182,7 +200,12 @@ impl Parser {
       TokenKind::Identifier(name) => ast::Expression::new_identifier(name, token.location),
       _ => {
         let mut location = token.location;
-        report_and_exit("Invalid identifier", &mut location, &self.raw.as_str());
+        report_and_exit(
+          "Invalid identifier",
+          &mut location,
+          &self.raw.as_str(),
+          &self.lexer.file_name,
+        );
       }
     }
   }
@@ -196,7 +219,12 @@ impl Parser {
       TokenKind::False => ast::Expression::new_bool_literal(false, token.location),
       _ => {
         let mut location = token.location;
-        report_and_exit("Invalid literal expression", &mut location, &self.raw.as_str());
+        report_and_exit(
+          "Invalid literal expression",
+          &mut location,
+          &self.raw.as_str(),
+          &self.lexer.file_name,
+        );
       }
     }
   }
@@ -220,7 +248,12 @@ impl Parser {
     } else {
       let mut location = ident.location.clone();
       let report_message = format!("Expected a function call, found '{:?}'", ident.kind);
-      report_and_exit(&report_message, &mut location, &self.raw.as_str());
+      report_and_exit(
+        &report_message,
+        &mut location,
+        &self.raw.as_str(),
+        &self.lexer.file_name,
+      );
     }
   }
 
@@ -398,7 +431,12 @@ impl Parser {
     if token.kind != kind {
       let mut location = token.location.clone();
       let message = format!("Expected '{:?}' but found '{:?}'", kind, token.kind);
-      report_and_exit(message.as_str(), &mut location, &self.raw.as_str());
+      report_and_exit(
+        message.as_str(),
+        &mut location,
+        &self.raw.as_str(),
+        &self.lexer.file_name,
+      );
     }
     token
   }

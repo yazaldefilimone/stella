@@ -5,7 +5,7 @@ use crate::{
   types::Type,
 };
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_return_statement(&mut self, return_stmt: &ast::ReturnStatement) -> Result<Type, Diagnostic> {
     let mut return_t = Type::Nil;
     // suport single return statement, todo: support multiple return statements
@@ -14,7 +14,7 @@ impl Checker {
       return_t = self.check_expression(return_value)?;
     }
 
-    let expected_return_t = self.ctx.get_return_variable_type();
+    let expected_return_t = self.ctx.get_return_param_type();
     if let Some(expected_t) = expected_return_t {
       if !return_t.check_match(expected_t) {
         let localtion = Some(return_stmt.location.clone());
@@ -25,6 +25,10 @@ impl Checker {
       if return_t.check_is_can_replace(expected_t) {
         return_t = expected_t.clone();
       }
+    }
+
+    if self.ctx.is_global_scope() {
+      self.ctx.set_last_return(return_t.clone());
     }
 
     Ok(return_t)

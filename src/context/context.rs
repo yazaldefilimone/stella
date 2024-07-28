@@ -6,6 +6,8 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct Context {
   pub scope_pointer: usize,
   pub scopes: Vec<Scope>,
+  pub exports: HashMap<String, Type>,
+  pub modules: HashMap<String, Type>,
   pub return_decl_name: String,
 }
 
@@ -31,7 +33,11 @@ fn create_global_scope() -> Scope {
 
 impl Context {
   pub fn new() -> Context {
-    Context { scopes: vec![create_global_scope()], scope_pointer: 0, return_decl_name: "return".to_string() }
+    let scopes = vec![create_global_scope()];
+    let exports = HashMap::new();
+    let return_decl_name = "return".to_string();
+    let modules = HashMap::new();
+    Context { scopes, scope_pointer: 0, exports, return_decl_name, modules }
   }
 
   pub fn declare_variable(&mut self, name: &str, type_: Type) {
@@ -41,22 +47,34 @@ impl Context {
     }
   }
 
-  pub fn declare_return_variable_type(&mut self, type_: Type) {
+  pub fn declare_return_param_type(&mut self, type_: Type) {
     if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.insert("return".to_owned(), type_);
+      scope.variables.insert("return_param".to_owned(), type_);
     }
   }
-
-  pub fn get_return_variable_type(&self) -> Option<&Type> {
+  pub fn get_last_return(&self) -> Option<&Type> {
     if let Some(scope) = self.scopes.get(self.scope_pointer) {
       return scope.variables.get("return");
     }
     None
   }
 
-  pub fn set_remove_return_variable_type(&mut self) {
+  pub fn set_last_return(&mut self, type_: Type) {
     if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.remove("return");
+      scope.variables.insert("return".to_owned(), type_);
+    }
+  }
+
+  pub fn get_return_param_type(&self) -> Option<&Type> {
+    if let Some(scope) = self.scopes.get(self.scope_pointer) {
+      return scope.variables.get("return_param");
+    }
+    None
+  }
+
+  pub fn set_remove_return_param_type(&mut self) {
+    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
+      scope.variables.remove("return_param");
     }
   }
 
@@ -213,6 +231,28 @@ impl Context {
     if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
       scope.variables_location.insert(name.to_owned(), location);
     }
+  }
+
+  pub fn is_global_scope(&self) -> bool {
+    if self.scope_pointer == 0 && self.scopes.len() == 1 {
+      return true;
+    }
+    return false;
+  }
+
+  pub fn get_module(&self, name: &str) -> Option<&Type> {
+    if self.modules.contains_key(name) {
+      return Some(self.modules.get(name).unwrap());
+    }
+    return None;
+  }
+  pub fn set_module(&mut self, name: &str, module: Type) {
+    self.modules.insert(name.to_owned(), module);
+  }
+
+  pub fn get_exports(&self) -> Vec<&Type> {
+    let values = self.exports.values().collect::<Vec<&Type>>();
+    return values.to_vec();
   }
 }
 

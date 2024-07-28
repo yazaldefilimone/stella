@@ -5,7 +5,7 @@ use crate::{
   types::Type,
 };
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_if_statement(&mut self, if_: &ast::IfStatement) -> Result<Type, Diagnostic> {
     let condition_t = self.check_expression(&if_.condition)?;
 

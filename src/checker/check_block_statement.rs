@@ -3,7 +3,7 @@ use crate::ast::ast;
 use crate::diagnostics::Diagnostic;
 use crate::types::Type;
 
-impl Checker {
+impl Checker<'_> {
   pub fn check_block_statement(&mut self, block: &ast::BlockStatement) -> Result<Type, Diagnostic> {
     let mut last_t = Type::Nil;
     for statement in &block.body {
