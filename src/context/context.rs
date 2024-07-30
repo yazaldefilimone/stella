@@ -1,13 +1,13 @@
 #![allow(dead_code)]
 use crate::types::{FunctionType, Type};
 use crate::utils::location::Location;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet};
 
 pub struct Context {
   pub scope_pointer: usize,
   pub scopes: Vec<Scope>,
-  pub exports: HashMap<String, Type>,
-  pub modules: HashMap<String, Type>,
+  pub exports: BTreeMap<String, Type>,
+  pub modules: BTreeMap<String, Type>,
   pub return_decl_name: String,
 }
 
@@ -34,9 +34,9 @@ fn create_global_scope() -> Scope {
 impl Context {
   pub fn new() -> Context {
     let scopes = vec![create_global_scope()];
-    let exports = HashMap::new();
+    let exports = BTreeMap::new();
     let return_decl_name = "return".to_string();
-    let modules = HashMap::new();
+    let modules = BTreeMap::new();
     Context { scopes, scope_pointer: 0, exports, return_decl_name, modules }
   }
 
@@ -258,13 +258,13 @@ impl Context {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
-  pub variables: HashMap<String, Type>,
-  pub unused_variables: HashSet<String>,
-  pub variables_location: HashMap<String, Location>,
+  pub variables: BTreeMap<String, Type>,
+  pub unused_variables: BTreeSet<String>,
+  pub variables_location: BTreeMap<String, Location>,
 }
 
 impl Scope {
   pub fn new() -> Scope {
-    Scope { variables: HashMap::new(), unused_variables: HashSet::new(), variables_location: HashMap::new() }
+    Scope { variables: BTreeMap::new(), unused_variables: BTreeSet::new(), variables_location: BTreeMap::new() }
   }
 }
