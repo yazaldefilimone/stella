@@ -15,11 +15,13 @@ Program(
             line: 1,
             column: 7,
           ),
+          rage_start: 6,
+          rage_end: 7,
         ),
       ),
       local: true,
-      t: Some(Boolean),
-      init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
+      var_type: Some(Boolean),
+      initializer: Some(Literal(Boolean(BooleanLiteral(
         value: true,
         location: Location(
           start: Position(
@@ -30,6 +32,8 @@ Program(
             line: 1,
             column: 23,
           ),
+          rage_start: 19,
+          rage_end: 23,
         ),
       )))),
       location: Location(
@@ -41,6 +45,8 @@ Program(
           line: 1,
           column: 7,
         ),
+        rage_start: 6,
+        rage_end: 7,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
@@ -55,11 +61,13 @@ Program(
             line: 2,
             column: 7,
           ),
+          rage_start: 30,
+          rage_end: 31,
         ),
       ),
       local: true,
-      t: Some(Boolean),
-      init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
+      var_type: Some(Boolean),
+      initializer: Some(Literal(Boolean(BooleanLiteral(
         value: false,
         location: Location(
           start: Position(
@@ -70,6 +78,8 @@ Program(
             line: 2,
             column: 24,
           ),
+          rage_start: 43,
+          rage_end: 48,
         ),
       )))),
       location: Location(
@@ -81,10 +91,12 @@ Program(
           line: 2,
           column: 7,
         ),
+        rage_start: 30,
+        rage_end: 31,
       ),
     )),
-    IfStatement(IfStatement(
-      condition: BinaryExpression(BinaryExpression(
+    If(IfStatement(
+      condition: Binary(BinaryExpression(
         operator: And,
         left: Identifier(Identifier(
           name: "a",
@@ -97,9 +109,11 @@ Program(
               line: 4,
               column: 4,
             ),
+            rage_start: 53,
+            rage_end: 54,
           ),
         )),
-        right: UnaryExpression(UnaryExpression(
+        right: Unary(UnaryExpression(
           operator: Not,
           operand: Identifier(Identifier(
             name: "b",
@@ -112,6 +126,8 @@ Program(
                 line: 4,
                 column: 14,
               ),
+              rage_start: 63,
+              rage_end: 64,
             ),
           )),
         )),
@@ -124,52 +140,15 @@ Program(
             line: 4,
             column: 8,
           ),
+          rage_start: 55,
+          rage_end: 58,
         ),
       )),
-      body: BlockStatement(BlockStatement(
-        body: [
-          CallStatement(CallStatement(
-            expression: CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("print"),
-                location: Location(
-                  start: Position(
-                    line: 5,
-                    column: 4,
-                  ),
-                  end: Position(
-                    line: 5,
-                    column: 9,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  LiteralExpression(StringLiteral(StringLiteral(
-                    value: "a is true and b is false",
-                    location: Location(
-                      start: Position(
-                        line: 5,
-                        column: 10,
-                      ),
-                      end: Position(
-                        line: 5,
-                        column: 36,
-                      ),
-                    ),
-                  ))),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 5,
-                    column: 9,
-                  ),
-                  end: Position(
-                    line: 5,
-                    column: 10,
-                  ),
-                ),
-              )),
+      then_body: Block(BlockStatement(
+        statements: [
+          Expression(Call(CallExpression(
+            name: Token(
+              kind: Identifier("print"),
               location: Location(
                 start: Position(
                   line: 5,
@@ -179,9 +158,38 @@ Program(
                   line: 5,
                   column: 9,
                 ),
+                rage_start: 74,
+                rage_end: 79,
               ),
-            )),
-          )),
+            ),
+            args: Literal(String(StringLiteral(
+              value: "a is true and b is false",
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 10,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 36,
+                ),
+                rage_start: 80,
+                rage_end: 106,
+              ),
+            ))),
+            location: Location(
+              start: Position(
+                line: 5,
+                column: 4,
+              ),
+              end: Position(
+                line: 5,
+                column: 9,
+              ),
+              rage_start: 74,
+              rage_end: 79,
+            ),
+          ))),
         ],
         location: Location(
           start: Position(
@@ -192,6 +200,8 @@ Program(
             line: 5,
             column: 9,
           ),
+          rage_start: 74,
+          rage_end: 79,
         ),
       )),
       else_body: None,
@@ -204,6 +214,8 @@ Program(
           line: 4,
           column: 2,
         ),
+        rage_start: 50,
+        rage_end: 52,
       ),
     )),
   ],

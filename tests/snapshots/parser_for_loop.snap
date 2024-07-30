@@ -3,7 +3,7 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    ForStatement(ForStatement(
+    For(ForStatement(
       variable: Identifier(Identifier(
         name: "i",
         location: Location(
@@ -15,9 +15,11 @@ Program(
             line: 1,
             column: 5,
           ),
+          rage_start: 4,
+          rage_end: 5,
         ),
       )),
-      init: LiteralExpression(NumberLiteral(NumberLiteral(
+      init: Literal(Number(NumberLiteral(
         value: "1",
         location: Location(
           start: Position(
@@ -28,9 +30,11 @@ Program(
             line: 1,
             column: 8,
           ),
+          rage_start: 7,
+          rage_end: 8,
         ),
       ))),
-      limit: LiteralExpression(NumberLiteral(NumberLiteral(
+      limit: Literal(Number(NumberLiteral(
         value: "10",
         location: Location(
           start: Position(
@@ -41,53 +45,16 @@ Program(
             line: 1,
             column: 12,
           ),
+          rage_start: 10,
+          rage_end: 12,
         ),
       ))),
       step: None,
-      body: BlockStatement(BlockStatement(
-        body: [
-          CallStatement(CallStatement(
-            expression: CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("print"),
-                location: Location(
-                  start: Position(
-                    line: 2,
-                    column: 4,
-                  ),
-                  end: Position(
-                    line: 2,
-                    column: 9,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  Identifier(Identifier(
-                    name: "i",
-                    location: Location(
-                      start: Position(
-                        line: 2,
-                        column: 10,
-                      ),
-                      end: Position(
-                        line: 2,
-                        column: 11,
-                      ),
-                    ),
-                  )),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 2,
-                    column: 9,
-                  ),
-                  end: Position(
-                    line: 2,
-                    column: 10,
-                  ),
-                ),
-              )),
+      body: Block(BlockStatement(
+        statements: [
+          Expression(Call(CallExpression(
+            name: Token(
+              kind: Identifier("print"),
               location: Location(
                 start: Position(
                   line: 2,
@@ -97,9 +64,38 @@ Program(
                   line: 2,
                   column: 9,
                 ),
+                rage_start: 20,
+                rage_end: 25,
+              ),
+            ),
+            args: Identifier(Identifier(
+              name: "i",
+              location: Location(
+                start: Position(
+                  line: 2,
+                  column: 10,
+                ),
+                end: Position(
+                  line: 2,
+                  column: 11,
+                ),
+                rage_start: 26,
+                rage_end: 27,
               ),
             )),
-          )),
+            location: Location(
+              start: Position(
+                line: 2,
+                column: 4,
+              ),
+              end: Position(
+                line: 2,
+                column: 9,
+              ),
+              rage_start: 20,
+              rage_end: 25,
+            ),
+          ))),
         ],
         location: Location(
           start: Position(
@@ -110,6 +106,8 @@ Program(
             line: 2,
             column: 9,
           ),
+          rage_start: 20,
+          rage_end: 25,
         ),
       )),
       location: Location(
@@ -121,6 +119,8 @@ Program(
           line: 1,
           column: 3,
         ),
+        rage_start: 0,
+        rage_end: 3,
       ),
     )),
   ],

@@ -3,7 +3,7 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    FunctionStatement(FunctionStatement(
+    Function(FunctionStatement(
       name: Token(
         kind: Identifier("greet"),
         location: Location(
@@ -15,8 +15,11 @@ Program(
             line: 1,
             column: 14,
           ),
+          rage_start: 9,
+          rage_end: 14,
         ),
       ),
+      local: false,
       arguments: [
         (Token(
           kind: Identifier("name"),
@@ -29,17 +32,19 @@ Program(
               line: 1,
               column: 19,
             ),
+            rage_start: 15,
+            rage_end: 19,
           ),
         ), Some(String)),
       ],
-      return_t: Some(Number),
-      body: BlockStatement(BlockStatement(
-        body: [
-          ReturnStatement(ReturnStatement(
-            value: [
-              BinaryExpression(BinaryExpression(
+      return_type: Some(Number),
+      body: Block(BlockStatement(
+        statements: [
+          Return(ReturnStatement(
+            values: [
+              Binary(BinaryExpression(
                 operator: DoubleDot,
-                left: LiteralExpression(StringLiteral(StringLiteral(
+                left: Literal(String(StringLiteral(
                   value: "Hello, ",
                   location: Location(
                     start: Position(
@@ -50,6 +55,8 @@ Program(
                       line: 2,
                       column: 20,
                     ),
+                    rage_start: 48,
+                    rage_end: 57,
                   ),
                 ))),
                 right: Identifier(Identifier(
@@ -63,17 +70,21 @@ Program(
                       line: 2,
                       column: 28,
                     ),
+                    rage_start: 61,
+                    rage_end: 65,
                   ),
                 )),
                 location: Location(
                   start: Position(
                     line: 2,
-                    column: 22,
+                    column: 21,
                   ),
                   end: Position(
                     line: 2,
                     column: 23,
                   ),
+                  rage_start: 58,
+                  rage_end: 60,
                 ),
               )),
             ],
@@ -86,6 +97,8 @@ Program(
                 line: 2,
                 column: 10,
               ),
+              rage_start: 41,
+              rage_end: 47,
             ),
           )),
         ],
@@ -98,6 +111,8 @@ Program(
             line: 2,
             column: 10,
           ),
+          rage_start: 41,
+          rage_end: 47,
         ),
       )),
       location: Location(
@@ -109,6 +124,8 @@ Program(
           line: 1,
           column: 14,
         ),
+        rage_start: 9,
+        rage_end: 14,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
@@ -123,11 +140,13 @@ Program(
             line: 4,
             column: 12,
           ),
+          rage_start: 76,
+          rage_end: 82,
         ),
       ),
       local: true,
-      t: Some(Number),
-      init: Some(CallExpression(CallExpression(
+      var_type: Some(Number),
+      initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("greet"),
           location: Location(
@@ -139,35 +158,25 @@ Program(
               line: 4,
               column: 28,
             ),
+            rage_start: 93,
+            rage_end: 98,
           ),
         ),
-        args: GroupedExpression(GroupedExpression(
-          expression: [
-            LiteralExpression(StringLiteral(StringLiteral(
-              value: "Stella",
-              location: Location(
-                start: Position(
-                  line: 4,
-                  column: 29,
-                ),
-                end: Position(
-                  line: 4,
-                  column: 37,
-                ),
-              ),
-            ))),
-          ],
+        args: Literal(String(StringLiteral(
+          value: "Stella",
           location: Location(
             start: Position(
               line: 4,
-              column: 28,
+              column: 29,
             ),
             end: Position(
               line: 4,
-              column: 29,
+              column: 37,
             ),
+            rage_start: 99,
+            rage_end: 107,
           ),
-        )),
+        ))),
         location: Location(
           start: Position(
             line: 4,
@@ -177,6 +186,8 @@ Program(
             line: 4,
             column: 28,
           ),
+          rage_start: 93,
+          rage_end: 98,
         ),
       ))),
       location: Location(
@@ -188,6 +199,8 @@ Program(
           line: 4,
           column: 12,
         ),
+        rage_start: 76,
+        rage_end: 82,
       ),
     )),
   ],
