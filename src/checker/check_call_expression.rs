@@ -25,31 +25,36 @@ impl Checker<'_> {
     Err(self.create_diagnostic(diagnostic))
   }
 
-  pub fn check_call_arguments(&mut self, args_call: &ast::Expression, call_tt: &[Type]) -> Result<(), Diagnostic> {
-    if let ast::Expression::Grouped(ast::GroupedExpression { expressions }) = args_call {
-      if expressions.len() != call_tt.len() {
-        let location = args_call.get_location();
-        let diagnostic = TypeError::FunctionArityMismatch(call_tt.len(), expressions.len(), Some(location.clone()));
+  pub fn check_call_arguments(&mut self, args_call: &ast::Expression, params_tt: &[Type]) -> Result<(), Diagnostic> {
+    if let ast::Expression::Grouped(ast::GroupedExpression { expressions, location }) = args_call {
+      if expressions.len() != params_tt.len() {
+        let diagnostic = TypeError::FunctionArityMismatch(params_tt.len(), expressions.len(), Some(location.clone()));
         return Err(self.create_diagnostic(diagnostic));
       }
 
-      for (arg_expr, param_t) in expressions.iter().zip(call_tt.iter()) {
+      for (arg_expr, param_t) in expressions.iter().zip(params_tt.iter()) {
         let arg_t = self.check_expression(arg_expr)?;
         if !arg_t.check_match(param_t) {
           let location = arg_expr.get_location();
-          self.diagnostics.add(
-            TypeError::TypeMismatchAssignment(arg_t.to_string(), param_t.to_string(), Some(location.clone())).into(),
-          );
+          let diagnostic = TypeError::MismatchedTypes(param_t.to_string(), arg_t.to_string(), Some(location.clone()));
+          return Err(self.create_diagnostic(diagnostic));
         }
       }
       return Ok(());
     }
 
     let arg_t = self.check_expression(args_call)?;
-    let first_call_t = call_tt.first().unwrap();
 
-    if !arg_t.check_match(first_call_t) {
-      let diagnostic = TypeError::TypeMismatchAssignment(first_call_t.to_string(), arg_t.to_string(), None);
+    if params_tt.len() != 1 {
+      let location = args_call.get_location();
+      let diagnostic = TypeError::FunctionArityMismatch(params_tt.len(), 1, Some(location));
+      return Err(self.create_diagnostic(diagnostic));
+    }
+
+    let param_tt = params_tt.first().unwrap();
+
+    if !arg_t.check_match(param_tt) {
+      let diagnostic = TypeError::MismatchedTypes(param_tt.to_string(), arg_t.to_string(), None);
       return Err(self.create_diagnostic(diagnostic));
     }
 

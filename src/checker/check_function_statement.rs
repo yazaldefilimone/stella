@@ -12,6 +12,7 @@ impl Checker<'_> {
     for (param, ty) in function.arguments.iter() {
       let arg_type = self.check_t(ty);
       self.ctx.declare_variable(param.lexeme(), arg_type.clone());
+      self.ctx.set_variable_location(param.lexeme(), param.location.clone());
       params.push(arg_type);
     }
 

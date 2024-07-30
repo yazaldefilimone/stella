@@ -5,7 +5,7 @@ use crate::ast::tokens::{Token, TokenKind};
 use crate::diagnostics::report::report_and_exit;
 use crate::lexer::Lexer;
 use crate::types::Type;
-use crate::utils::location::Location;
+use crate::utils::location::{get_middle_location, Location};
 
 pub struct Parser<'a> {
   lexer: Lexer<'a>,
@@ -169,7 +169,13 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_grouped_expression(&mut self) -> ast::Expression {
-    self.consume_expect_token(TokenKind::LeftParen);
+    let left_location = self.consume_expect_token(TokenKind::LeftParen).location;
+    if self.match_token(&TokenKind::RightParen) {
+      let right_location = self.consume_expect_token(TokenKind::RightParen).location;
+      let location = get_middle_location(&left_location, &right_location);
+      return ast::Expression::new_grouped(vec![], location);
+    }
+
     let mut expressions = Vec::new();
 
     expressions.push(self.parse_expression_statement());
@@ -179,8 +185,9 @@ impl<'a> Parser<'a> {
       expressions.push(self.parse_expression_statement());
     }
 
-    self.consume_expect_token(TokenKind::RightParen);
-    return ast::Expression::new_grouped(expressions);
+    let right_location = self.consume_expect_token(TokenKind::RightParen).location;
+    let location = get_middle_location(&left_location, &right_location);
+    return ast::Expression::new_grouped(expressions, location);
   }
 
   fn parse_require_expression(&mut self) -> ast::Expression {
