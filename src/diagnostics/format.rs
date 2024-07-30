@@ -7,7 +7,11 @@ pub fn format_undeclared_variable(name: &str) -> String {
 }
 
 pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
-  format!("expected `{}` arguments, found `{}`", expected, found)
+  if expected > 1 {
+    format!("expected `{}` arguments, found `{}`", expected, found)
+  } else {
+    format!("expected `{}` argument, found `{}`", expected, found)
+  }
 }
 
 pub fn format_unsupported_operator(left: &str, right: &str, oper: &str) -> String {
