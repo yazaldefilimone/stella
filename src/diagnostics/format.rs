@@ -1,5 +1,3 @@
-use crate::ast::ast::BinaryOperator;
-
 pub fn format_mismatched_types(expected: &str, found: &str) -> String {
   format!("expected type `{}`, found `{}`", expected, found)
 }
@@ -12,13 +10,8 @@ pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
   format!("expected `{}` arguments, found `{}`", expected, found)
 }
 
-pub fn format_unsupported_operator(left: &str, right: &str, oper: &BinaryOperator) -> String {
-  format!(
-    "unsupported operator `{}` for `{}` and `{}`",
-    oper.to_string(),
-    left,
-    right
-  )
+pub fn format_unsupported_operator(left: &str, right: &str, oper: &str) -> String {
+  format!("unsupported operator `{}` for `{}` and `{}`", oper, left, right)
 }
 
 pub fn format_redeclared_in_same_scope(name: &str) -> String {

@@ -15,11 +15,13 @@ Program(
             line: 1,
             column: 11,
           ),
+          rage_start: 6,
+          rage_end: 11,
         ),
       ),
       local: true,
-      t: Some(Number),
-      init: Some(LiteralExpression(NumberLiteral(NumberLiteral(
+      var_type: Some(Number),
+      initializer: Some(Literal(Number(NumberLiteral(
         value: "0",
         location: Location(
           start: Position(
@@ -30,6 +32,8 @@ Program(
             line: 1,
             column: 23,
           ),
+          rage_start: 22,
+          rage_end: 23,
         ),
       )))),
       location: Location(
@@ -41,10 +45,12 @@ Program(
           line: 1,
           column: 11,
         ),
+        rage_start: 6,
+        rage_end: 11,
       ),
     )),
-    WhileStatement(WhileStatement(
-      condition: BinaryExpression(BinaryExpression(
+    While(WhileStatement(
+      condition: Binary(BinaryExpression(
         operator: LessThan,
         left: Identifier(Identifier(
           name: "count",
@@ -57,9 +63,11 @@ Program(
               line: 3,
               column: 11,
             ),
+            rage_start: 31,
+            rage_end: 36,
           ),
         )),
-        right: LiteralExpression(NumberLiteral(NumberLiteral(
+        right: Literal(Number(NumberLiteral(
           value: "10",
           location: Location(
             start: Position(
@@ -70,6 +78,8 @@ Program(
               line: 3,
               column: 16,
             ),
+            rage_start: 39,
+            rage_end: 41,
           ),
         ))),
         location: Location(
@@ -81,52 +91,15 @@ Program(
             line: 3,
             column: 13,
           ),
+          rage_start: 37,
+          rage_end: 38,
         ),
       )),
-      body: BlockStatement(BlockStatement(
-        body: [
-          CallStatement(CallStatement(
-            expression: CallExpression(CallExpression(
-              name: Token(
-                kind: Identifier("print"),
-                location: Location(
-                  start: Position(
-                    line: 4,
-                    column: 4,
-                  ),
-                  end: Position(
-                    line: 4,
-                    column: 9,
-                  ),
-                ),
-              ),
-              args: GroupedExpression(GroupedExpression(
-                expression: [
-                  Identifier(Identifier(
-                    name: "count",
-                    location: Location(
-                      start: Position(
-                        line: 4,
-                        column: 10,
-                      ),
-                      end: Position(
-                        line: 4,
-                        column: 15,
-                      ),
-                    ),
-                  )),
-                ],
-                location: Location(
-                  start: Position(
-                    line: 4,
-                    column: 9,
-                  ),
-                  end: Position(
-                    line: 4,
-                    column: 10,
-                  ),
-                ),
-              )),
+      body: Block(BlockStatement(
+        statements: [
+          Expression(Call(CallExpression(
+            name: Token(
+              kind: Identifier("print"),
               location: Location(
                 start: Position(
                   line: 4,
@@ -136,10 +109,43 @@ Program(
                   line: 4,
                   column: 9,
                 ),
+                rage_start: 49,
+                rage_end: 54,
               ),
+            ),
+            args: Grouped(GroupedExpression(
+              expressions: [
+                Identifier(Identifier(
+                  name: "count",
+                  location: Location(
+                    start: Position(
+                      line: 4,
+                      column: 10,
+                    ),
+                    end: Position(
+                      line: 4,
+                      column: 15,
+                    ),
+                    rage_start: 55,
+                    rage_end: 60,
+                  ),
+                )),
+              ],
             )),
-          )),
-          AssignStatement(AssignStatement(
+            location: Location(
+              start: Position(
+                line: 4,
+                column: 4,
+              ),
+              end: Position(
+                line: 4,
+                column: 9,
+              ),
+              rage_start: 49,
+              rage_end: 54,
+            ),
+          ))),
+          Assign(AssignStatement(
             name: Token(
               kind: Identifier("count"),
               location: Location(
@@ -151,9 +157,11 @@ Program(
                   line: 5,
                   column: 9,
                 ),
+                rage_start: 66,
+                rage_end: 71,
               ),
             ),
-            value: BinaryExpression(BinaryExpression(
+            value: Binary(BinaryExpression(
               operator: Add,
               left: Identifier(Identifier(
                 name: "count",
@@ -166,9 +174,11 @@ Program(
                     line: 5,
                     column: 17,
                   ),
+                  rage_start: 74,
+                  rage_end: 79,
                 ),
               )),
-              right: LiteralExpression(NumberLiteral(NumberLiteral(
+              right: Literal(Number(NumberLiteral(
                 value: "1",
                 location: Location(
                   start: Position(
@@ -179,6 +189,8 @@ Program(
                     line: 5,
                     column: 21,
                   ),
+                  rage_start: 82,
+                  rage_end: 83,
                 ),
               ))),
               location: Location(
@@ -190,6 +202,8 @@ Program(
                   line: 5,
                   column: 19,
                 ),
+                rage_start: 80,
+                rage_end: 81,
               ),
             )),
             location: Location(
@@ -201,6 +215,8 @@ Program(
                 line: 5,
                 column: 9,
               ),
+              rage_start: 66,
+              rage_end: 71,
             ),
           )),
         ],
@@ -213,6 +229,8 @@ Program(
             line: 4,
             column: 9,
           ),
+          rage_start: 49,
+          rage_end: 54,
         ),
       )),
       location: Location(
@@ -224,6 +242,8 @@ Program(
           line: 3,
           column: 5,
         ),
+        rage_start: 25,
+        rage_end: 30,
       ),
     )),
   ],

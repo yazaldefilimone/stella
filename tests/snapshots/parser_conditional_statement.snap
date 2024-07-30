@@ -224,21 +224,25 @@ Program(
             rage_end: 249,
           ),
         ),
-        args: Literal(Boolean(BooleanLiteral(
-          value: true,
-          location: Location(
-            start: Position(
-              line: 19,
-              column: 28,
-            ),
-            end: Position(
-              line: 19,
-              column: 32,
-            ),
-            rage_start: 250,
-            rage_end: 254,
-          ),
-        ))),
+        args: Grouped(GroupedExpression(
+          expressions: [
+            Literal(Boolean(BooleanLiteral(
+              value: true,
+              location: Location(
+                start: Position(
+                  line: 19,
+                  column: 28,
+                ),
+                end: Position(
+                  line: 19,
+                  column: 32,
+                ),
+                rage_start: 250,
+                rage_end: 254,
+              ),
+            ))),
+          ],
+        )),
         location: Location(
           start: Position(
             line: 19,
@@ -299,21 +303,25 @@ Program(
             rage_end: 278,
           ),
         ),
-        args: Literal(Boolean(BooleanLiteral(
-          value: false,
-          location: Location(
-            start: Position(
-              line: 20,
-              column: 23,
-            ),
-            end: Position(
-              line: 20,
-              column: 28,
-            ),
-            rage_start: 279,
-            rage_end: 284,
-          ),
-        ))),
+        args: Grouped(GroupedExpression(
+          expressions: [
+            Literal(Boolean(BooleanLiteral(
+              value: false,
+              location: Location(
+                start: Position(
+                  line: 20,
+                  column: 23,
+                ),
+                end: Position(
+                  line: 20,
+                  column: 28,
+                ),
+                rage_start: 279,
+                rage_end: 284,
+              ),
+            ))),
+          ],
+        )),
         location: Location(
           start: Position(
             line: 20,

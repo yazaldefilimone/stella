@@ -23,7 +23,7 @@ impl Checker<'_> {
       return Err(self.create_diagnostic(diagnostic));
     }
 
-    if right_t.check_is_can_replace(&left_t) {
+    if right_t.can_replace(&left_t) {
       let ok = self.ctx.redeclare_variable(lexema, right_t.clone());
       return Ok(right_t);
     }

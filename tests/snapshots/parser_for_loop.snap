@@ -68,20 +68,24 @@ Program(
                 rage_end: 25,
               ),
             ),
-            args: Identifier(Identifier(
-              name: "i",
-              location: Location(
-                start: Position(
-                  line: 2,
-                  column: 10,
-                ),
-                end: Position(
-                  line: 2,
-                  column: 11,
-                ),
-                rage_start: 26,
-                rage_end: 27,
-              ),
+            args: Grouped(GroupedExpression(
+              expressions: [
+                Identifier(Identifier(
+                  name: "i",
+                  location: Location(
+                    start: Position(
+                      line: 2,
+                      column: 10,
+                    ),
+                    end: Position(
+                      line: 2,
+                      column: 11,
+                    ),
+                    rage_start: 26,
+                    rage_end: 27,
+                  ),
+                )),
+              ],
             )),
             location: Location(
               start: Position(

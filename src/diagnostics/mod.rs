@@ -4,7 +4,6 @@ mod format;
 mod format_awesome;
 pub mod report;
 
-use crate::ast::ast::BinaryOperator;
 use crate::utils::highlight_text_with_gray;
 use crate::utils::location::Location;
 use report::report_error;
@@ -116,7 +115,7 @@ pub enum TypeError {
   TypeMismatchAssignment(String, String, Option<Location>),
   RedeclaredInSameScope(String, Option<Location>),
   FunctionArityMismatch(usize, usize, Option<Location>),
-  UnsupportedOperator(String, String, BinaryOperator, Option<Location>),
+  UnsupportedOperator(String, String, String, Option<Location>),
 }
 
 impl From<TypeError> for Diagnostic {

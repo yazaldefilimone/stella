@@ -60,3 +60,9 @@ pub struct Position {
   pub line: usize,
   pub column: usize,
 }
+
+pub fn get_middle_location(left: &Location, right: &Location) -> Location {
+  let start = Position { line: left.start.line, column: left.start.column };
+  let end = Position { line: right.end.line, column: right.end.column };
+  Location { start, end, rage_start: left.rage_start, rage_end: right.rage_end }
+}

@@ -18,6 +18,7 @@ pub mod check_return_statement;
 pub mod check_statement;
 pub mod check_type;
 pub mod check_type_statement;
+pub mod check_unary_expression;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
 

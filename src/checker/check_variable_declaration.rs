@@ -33,7 +33,7 @@ impl Checker<'_> {
       return Err(self.create_diagnostic(diagnostic));
     }
 
-    if left_type.check_is_can_replace(&right_type) {
+    if left_type.can_replace(&right_type) {
       left_type = right_type;
     }
 

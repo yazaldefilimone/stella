@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 use super::tokens::Token;
-use crate::{types::Type, utils::location::Location};
+use crate::{
+  types::Type,
+  utils::location::{get_middle_location, Location},
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -231,14 +234,18 @@ impl Expression {
     Expression::Require(RequireExpression::new(module_name, location))
   }
 
+  pub fn new_grouped(expressions: Vec<Expression>) -> Self {
+    Expression::Grouped(GroupedExpression::new(expressions))
+  }
+
   pub fn get_location(&self) -> Location {
     match self {
       Expression::Literal(literal) => literal.get_location(),
       Expression::Identifier(identifier) => identifier.location.clone(),
-      Expression::Call(call) => call.location.clone(),
-      Expression::Binary(binary) => binary.location.clone(),
-      Expression::Require(require) => require.location.clone(),
-      Expression::Grouped(grouped) => grouped.location.clone(),
+      Expression::Call(call) => call.get_location(),
+      Expression::Binary(binary) => binary.get_location(),
+      Expression::Require(require) => require.get_location(),
+      Expression::Grouped(grouped) => grouped.get_location(),
       Expression::Unary(unary) => unary.get_location(),
     }
   }
@@ -254,17 +261,28 @@ impl RequireExpression {
   pub fn new(module_name: Token, location: Location) -> Self {
     RequireExpression { module_name, location }
   }
+
+  pub fn get_location(&self) -> Location {
+    let right_location = self.module_name.location.clone();
+    let left_location = self.location.clone();
+    get_middle_location(&left_location, &right_location)
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GroupedExpression {
   pub expressions: Vec<Expression>,
-  pub location: Location,
 }
 
 impl GroupedExpression {
-  pub fn new(expressions: Vec<Expression>, location: Location) -> Self {
-    GroupedExpression { expressions, location }
+  pub fn new(expressions: Vec<Expression>) -> Self {
+    GroupedExpression { expressions }
+  }
+
+  pub fn get_location(&self) -> Location {
+    let left_location = self.expressions.first().unwrap().get_location();
+    let right_location = self.expressions.last().unwrap().get_location();
+    get_middle_location(&left_location, &right_location)
   }
 }
 
@@ -291,21 +309,34 @@ impl CallExpression {
   pub fn new(name: Token, args: Box<Expression>, location: Location) -> Self {
     CallExpression { name, args, location }
   }
+
+  pub fn get_location(&self) -> Location {
+    let left_location = self.name.location.clone();
+    let right_location = self.args.get_location();
+    get_middle_location(&left_location, &right_location)
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UnaryExpression {
+  pub location: Location,
   pub operator: UnaryOperator,
   pub operand: Box<Expression>,
 }
 
 impl UnaryExpression {
-  pub fn new(operator: UnaryOperator, operand: Box<Expression>) -> Self {
-    UnaryExpression { operator, operand }
+  pub fn new(operator: UnaryOperator, operand: Box<Expression>, location: Location) -> Self {
+    UnaryExpression { operator, operand, location }
   }
 
   pub fn get_location(&self) -> Location {
-    self.operand.get_location()
+    let left_location = self.operand.get_location();
+    let right_location = self.get_operator_location();
+    get_middle_location(&left_location, &right_location)
+  }
+
+  pub fn get_operator_location(&self) -> Location {
+    self.location.clone()
   }
 }
 
@@ -320,6 +351,11 @@ pub struct BinaryExpression {
 impl BinaryExpression {
   pub fn new(operator: BinaryOperator, left: Box<Expression>, right: Box<Expression>, location: Location) -> Self {
     BinaryExpression { operator, left, right, location }
+  }
+  pub fn get_location(&self) -> Location {
+    let left_location = self.left.get_location();
+    let right_location = self.right.get_location();
+    get_middle_location(&left_location, &right_location)
   }
 }
 
@@ -394,6 +430,17 @@ impl BooleanLiteral {
 pub enum UnaryOperator {
   Negate,
   Not,
+  Hash,
+}
+
+impl UnaryOperator {
+  pub fn to_str(&self) -> &str {
+    match self {
+      UnaryOperator::Negate => "-",
+      UnaryOperator::Not => "not",
+      UnaryOperator::Hash => "#",
+    }
+  }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -415,7 +462,7 @@ pub enum BinaryOperator {
 }
 
 impl BinaryOperator {
-  pub fn to_string(&self) -> &str {
+  pub fn to_str(&self) -> &str {
     match self {
       BinaryOperator::Add => "+",
       BinaryOperator::Subtract => "-",

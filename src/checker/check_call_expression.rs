@@ -26,8 +26,9 @@ impl Checker<'_> {
   }
 
   pub fn check_call_arguments(&mut self, args_call: &ast::Expression, call_tt: &[Type]) -> Result<(), Diagnostic> {
-    if let ast::Expression::Grouped(ast::GroupedExpression { expressions, location }) = args_call {
+    if let ast::Expression::Grouped(ast::GroupedExpression { expressions }) = args_call {
       if expressions.len() != call_tt.len() {
+        let location = args_call.get_location();
         let diagnostic = TypeError::FunctionArityMismatch(call_tt.len(), expressions.len(), Some(location.clone()));
         return Err(self.create_diagnostic(diagnostic));
       }
@@ -35,6 +36,7 @@ impl Checker<'_> {
       for (arg_expr, param_t) in expressions.iter().zip(call_tt.iter()) {
         let arg_t = self.check_expression(arg_expr)?;
         if !arg_t.check_match(param_t) {
+          let location = arg_expr.get_location();
           self.diagnostics.add(
             TypeError::TypeMismatchAssignment(arg_t.to_string(), param_t.to_string(), Some(location.clone())).into(),
           );

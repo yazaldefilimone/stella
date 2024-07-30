@@ -22,7 +22,7 @@ impl Checker<'_> {
         return Err(self.create_diagnostic(diagnostic));
       }
 
-      if return_t.check_is_can_replace(expected_t) {
+      if return_t.can_replace(expected_t) {
         return_t = expected_t.clone();
       }
     }

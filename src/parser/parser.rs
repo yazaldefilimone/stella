@@ -107,9 +107,10 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_unary_expression(&mut self) -> ast::Expression {
+    let unary_location = self.lexer.peek_token().location.clone();
     if let Some(operator) = self.parse_unary_operator() {
       let expression = self.parse_expression_statement();
-      let unary_expression = ast::UnaryExpression::new(operator, Box::new(expression));
+      let unary_expression = ast::UnaryExpression::new(operator, Box::new(expression), unary_location);
       ast::Expression::Unary(unary_expression)
     } else {
       self.parse_primary_expression()
@@ -121,7 +122,7 @@ impl<'a> Parser<'a> {
     let operator = match token.kind {
       TokenKind::Minus => ast::UnaryOperator::Negate,
       TokenKind::Not => ast::UnaryOperator::Not,
-      TokenKind::Hash => ast::UnaryOperator::Not,
+      TokenKind::Hash => ast::UnaryOperator::Hash,
       _ => return None,
     };
     self.lexer.next_token();
@@ -169,9 +170,17 @@ impl<'a> Parser<'a> {
 
   fn parse_grouped_expression(&mut self) -> ast::Expression {
     self.consume_expect_token(TokenKind::LeftParen);
-    let expression = self.parse_expression_statement();
+    let mut expressions = Vec::new();
+
+    expressions.push(self.parse_expression_statement());
+
+    while self.match_token(&TokenKind::Comma) {
+      self.consume_expect_token(TokenKind::Comma);
+      expressions.push(self.parse_expression_statement());
+    }
+
     self.consume_expect_token(TokenKind::RightParen);
-    expression
+    return ast::Expression::new_grouped(expressions);
   }
 
   fn parse_require_expression(&mut self) -> ast::Expression {

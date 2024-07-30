@@ -162,21 +162,25 @@ Program(
             rage_end: 98,
           ),
         ),
-        args: Literal(String(StringLiteral(
-          value: "Stella",
-          location: Location(
-            start: Position(
-              line: 4,
-              column: 29,
-            ),
-            end: Position(
-              line: 4,
-              column: 37,
-            ),
-            rage_start: 99,
-            rage_end: 107,
-          ),
-        ))),
+        args: Grouped(GroupedExpression(
+          expressions: [
+            Literal(String(StringLiteral(
+              value: "Stella",
+              location: Location(
+                start: Position(
+                  line: 4,
+                  column: 29,
+                ),
+                end: Position(
+                  line: 4,
+                  column: 37,
+                ),
+                rage_start: 99,
+                rage_end: 107,
+              ),
+            ))),
+          ],
+        )),
         location: Location(
           start: Position(
             line: 4,

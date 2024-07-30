@@ -19,7 +19,7 @@ impl Checker<'_> {
 
     let last_type = self.check_statement(&function.body)?;
 
-    if last_type.check_is_can_replace(&return_type) {
+    if last_type.can_replace(&return_type) {
       return_type = last_type;
     }
     self.ctx.leave_scope();

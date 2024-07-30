@@ -21,7 +21,12 @@ impl Checker<'_> {
         self.check_repeat_statement(repeat);
         Ok(Type::Nil)
       }
-      _ => todo!("Implement more statement checks"),
+      ast::Statement::For(for_) => {
+        self.check_for_statement(for_);
+        Ok(Type::Nil)
+      }
+      ast::Statement::Expression(expression) => self.check_expression(&expression),
+      _ => todo!("Implement more statement checks: {:#?}", statement),
     }
   }
 }

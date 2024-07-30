@@ -114,6 +114,18 @@ Program(
           ),
         )),
         right: Unary(UnaryExpression(
+          location: Location(
+            start: Position(
+              line: 4,
+              column: 9,
+            ),
+            end: Position(
+              line: 4,
+              column: 12,
+            ),
+            rage_start: 59,
+            rage_end: 62,
+          ),
           operator: Not,
           operand: Identifier(Identifier(
             name: "b",
@@ -162,21 +174,25 @@ Program(
                 rage_end: 79,
               ),
             ),
-            args: Literal(String(StringLiteral(
-              value: "a is true and b is false",
-              location: Location(
-                start: Position(
-                  line: 5,
-                  column: 10,
-                ),
-                end: Position(
-                  line: 5,
-                  column: 36,
-                ),
-                rage_start: 80,
-                rage_end: 106,
-              ),
-            ))),
+            args: Grouped(GroupedExpression(
+              expressions: [
+                Literal(String(StringLiteral(
+                  value: "a is true and b is false",
+                  location: Location(
+                    start: Position(
+                      line: 5,
+                      column: 10,
+                    ),
+                    end: Position(
+                      line: 5,
+                      column: 36,
+                    ),
+                    rage_start: 80,
+                    rage_end: 106,
+                  ),
+                ))),
+              ],
+            )),
             location: Location(
               start: Position(
                 line: 5,
