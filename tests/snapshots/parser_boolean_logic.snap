@@ -192,6 +192,18 @@ Program(
                   ),
                 ))),
               ],
+              location: Location(
+                start: Position(
+                  line: 5,
+                  column: 9,
+                ),
+                end: Position(
+                  line: 5,
+                  column: 37,
+                ),
+                rage_start: 79,
+                rage_end: 107,
+              ),
             )),
             location: Location(
               start: Position(
