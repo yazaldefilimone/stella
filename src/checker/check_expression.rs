@@ -6,11 +6,12 @@ use crate::types::Type;
 impl Checker<'_> {
   pub fn check_expression(&mut self, expression: &ast::Expression) -> Result<Type, Diagnostic> {
     match expression {
-      ast::Expression::LiteralExpression(literal) => self.check_literal_expression(literal),
+      ast::Expression::Literal(literal) => self.check_literal_expression(literal),
       ast::Expression::Identifier(ident) => self.check_identifier(ident),
-      ast::Expression::CallExpression(call) => self.check_call_expression(call),
-      ast::Expression::BinaryExpression(binary_expr) => self.check_binary_expression(binary_expr),
-      ast::Expression::RequireExpression(require) => self.check_require_expression(require),
+      ast::Expression::Call(call) => self.check_call_expression(call),
+      ast::Expression::Binary(binary_expr) => self.check_binary_expression(binary_expr),
+      ast::Expression::Require(require) => self.check_require_expression(require),
+      ast::Expression::Unary(unary_expr) => self.check_unary_expression(unary_expr),
       _ => todo!("Oops, try go to: {:#?}", expression),
     }
   }

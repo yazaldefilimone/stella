@@ -13,6 +13,8 @@ source: tests/snapshot_tests.rs
         line: 1,
         column: 5,
       ),
+      rage_start: 0,
+      rage_end: 5,
     ),
   ),
   Token(
@@ -26,6 +28,8 @@ source: tests/snapshot_tests.rs
         line: 1,
         column: 10,
       ),
+      rage_start: 6,
+      rage_end: 10,
     ),
   ),
   Token(
@@ -39,6 +43,8 @@ source: tests/snapshot_tests.rs
         line: 1,
         column: 11,
       ),
+      rage_start: 10,
+      rage_end: 11,
     ),
   ),
   Token(
@@ -52,6 +58,8 @@ source: tests/snapshot_tests.rs
         line: 1,
         column: 18,
       ),
+      rage_start: 12,
+      rage_end: 18,
     ),
   ),
   Token(
@@ -65,6 +73,8 @@ source: tests/snapshot_tests.rs
         line: 1,
         column: 20,
       ),
+      rage_start: 19,
+      rage_end: 20,
     ),
   ),
   Token(
@@ -78,6 +88,8 @@ source: tests/snapshot_tests.rs
         line: 1,
         column: 29,
       ),
+      rage_start: 21,
+      rage_end: 29,
     ),
   ),
   Token(
@@ -91,6 +103,8 @@ source: tests/snapshot_tests.rs
         line: 2,
         column: 5,
       ),
+      rage_start: 30,
+      rage_end: 35,
     ),
   ),
   Token(
@@ -104,6 +118,8 @@ source: tests/snapshot_tests.rs
         line: 2,
         column: 9,
       ),
+      rage_start: 36,
+      rage_end: 39,
     ),
   ),
   Token(
@@ -117,6 +133,8 @@ source: tests/snapshot_tests.rs
         line: 2,
         column: 10,
       ),
+      rage_start: 39,
+      rage_end: 40,
     ),
   ),
   Token(
@@ -130,6 +148,8 @@ source: tests/snapshot_tests.rs
         line: 2,
         column: 17,
       ),
+      rage_start: 41,
+      rage_end: 47,
     ),
   ),
   Token(
@@ -143,6 +163,8 @@ source: tests/snapshot_tests.rs
         line: 2,
         column: 19,
       ),
+      rage_start: 48,
+      rage_end: 49,
     ),
   ),
   Token(
@@ -156,6 +178,8 @@ source: tests/snapshot_tests.rs
         line: 2,
         column: 22,
       ),
+      rage_start: 50,
+      rage_end: 52,
     ),
   ),
   Token(
@@ -169,6 +193,8 @@ source: tests/snapshot_tests.rs
         line: 3,
         column: 5,
       ),
+      rage_start: 53,
+      rage_end: 58,
     ),
   ),
   Token(
@@ -182,6 +208,8 @@ source: tests/snapshot_tests.rs
         line: 3,
         column: 16,
       ),
+      rage_start: 59,
+      rage_end: 69,
     ),
   ),
   Token(
@@ -195,6 +223,8 @@ source: tests/snapshot_tests.rs
         line: 3,
         column: 17,
       ),
+      rage_start: 69,
+      rage_end: 70,
     ),
   ),
   Token(
@@ -208,6 +238,8 @@ source: tests/snapshot_tests.rs
         line: 3,
         column: 25,
       ),
+      rage_start: 71,
+      rage_end: 78,
     ),
   ),
   Token(
@@ -221,6 +253,8 @@ source: tests/snapshot_tests.rs
         line: 3,
         column: 27,
       ),
+      rage_start: 79,
+      rage_end: 80,
     ),
   ),
   Token(
@@ -234,6 +268,8 @@ source: tests/snapshot_tests.rs
         line: 3,
         column: 32,
       ),
+      rage_start: 81,
+      rage_end: 85,
     ),
   ),
   Token(
@@ -247,6 +283,8 @@ source: tests/snapshot_tests.rs
         line: 4,
         column: 0,
       ),
+      rage_start: 86,
+      rage_end: 86,
     ),
   ),
 ]

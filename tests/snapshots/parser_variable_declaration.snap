@@ -15,11 +15,13 @@ Program(
             line: 1,
             column: 10,
           ),
+          rage_start: 6,
+          rage_end: 10,
         ),
       ),
       local: true,
-      t: Some(String),
-      init: Some(LiteralExpression(StringLiteral(StringLiteral(
+      var_type: Some(String),
+      initializer: Some(Literal(String(StringLiteral(
         value: "Stella",
         location: Location(
           start: Position(
@@ -30,6 +32,8 @@ Program(
             line: 1,
             column: 29,
           ),
+          rage_start: 21,
+          rage_end: 29,
         ),
       )))),
       location: Location(
@@ -41,6 +45,8 @@ Program(
           line: 1,
           column: 10,
         ),
+        rage_start: 6,
+        rage_end: 10,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
@@ -55,11 +61,13 @@ Program(
             line: 2,
             column: 9,
           ),
+          rage_start: 36,
+          rage_end: 39,
         ),
       ),
       local: true,
-      t: Some(Number),
-      init: Some(LiteralExpression(NumberLiteral(NumberLiteral(
+      var_type: Some(Number),
+      initializer: Some(Literal(Number(NumberLiteral(
         value: "25",
         location: Location(
           start: Position(
@@ -70,6 +78,8 @@ Program(
             line: 2,
             column: 22,
           ),
+          rage_start: 50,
+          rage_end: 52,
         ),
       )))),
       location: Location(
@@ -81,6 +91,8 @@ Program(
           line: 2,
           column: 9,
         ),
+        rage_start: 36,
+        rage_end: 39,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
@@ -95,11 +107,13 @@ Program(
             line: 3,
             column: 16,
           ),
+          rage_start: 59,
+          rage_end: 69,
         ),
       ),
       local: true,
-      t: Some(Boolean),
-      init: Some(LiteralExpression(BoolLiteral(BoolLiteral(
+      var_type: Some(Boolean),
+      initializer: Some(Literal(Boolean(BooleanLiteral(
         value: true,
         location: Location(
           start: Position(
@@ -110,6 +124,8 @@ Program(
             line: 3,
             column: 32,
           ),
+          rage_start: 81,
+          rage_end: 85,
         ),
       )))),
       location: Location(
@@ -121,6 +137,8 @@ Program(
           line: 3,
           column: 16,
         ),
+        rage_start: 59,
+        rage_end: 69,
       ),
     )),
   ],

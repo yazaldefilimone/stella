@@ -16,18 +16,6 @@ fn create_global_scope() -> Scope {
   global_scope.variables.insert("nil".to_string(), Type::Nil);
   // stdlib (print, type, etc)
   global_scope.variables.insert("print".to_string(), Type::new_function(vec![Type::String], Type::Nil));
-  global_scope.variables.insert(
-    "type".to_string(),
-    Type::new_function(vec![Type::Unknown], Type::String),
-  );
-  global_scope.variables.insert(
-    "tostring".to_string(),
-    Type::new_function(vec![Type::Unknown], Type::String),
-  );
-  global_scope.variables.insert(
-    "tonumber".to_string(),
-    Type::new_function(vec![Type::String], Type::Number),
-  );
   global_scope
 }
 

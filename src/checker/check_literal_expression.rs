@@ -6,10 +6,10 @@ use crate::types::Type;
 impl Checker<'_> {
   pub fn check_literal_expression(&mut self, literal: &ast::LiteralExpression) -> Result<Type, Diagnostic> {
     match literal {
-      ast::LiteralExpression::NumberLiteral(_) => Ok(Type::Number),
-      ast::LiteralExpression::StringLiteral(_) => Ok(Type::String),
-      ast::LiteralExpression::BoolLiteral(_) => Ok(Type::Boolean),
-      ast::LiteralExpression::NilLiteral => Ok(Type::Nil),
+      ast::LiteralExpression::Number(_) => Ok(Type::Number),
+      ast::LiteralExpression::String(_) => Ok(Type::String),
+      ast::LiteralExpression::Boolean(_) => Ok(Type::Boolean),
+      ast::LiteralExpression::Nil => Ok(Type::Nil),
     }
   }
 }

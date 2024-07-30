@@ -3,7 +3,7 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    FunctionStatement(FunctionStatement(
+    Function(FunctionStatement(
       name: Token(
         kind: Identifier("outer"),
         location: Location(
@@ -15,8 +15,11 @@ Program(
             line: 1,
             column: 14,
           ),
+          rage_start: 9,
+          rage_end: 14,
         ),
       ),
+      local: false,
       arguments: [
         (Token(
           kind: Identifier("x"),
@@ -29,13 +32,15 @@ Program(
               line: 1,
               column: 16,
             ),
+            rage_start: 15,
+            rage_end: 16,
           ),
         ), Some(Number)),
       ],
-      return_t: Some(Number),
-      body: BlockStatement(BlockStatement(
-        body: [
-          FunctionStatement(FunctionStatement(
+      return_type: Some(Number),
+      body: Block(BlockStatement(
+        statements: [
+          Function(FunctionStatement(
             name: Token(
               kind: Identifier("inner"),
               location: Location(
@@ -47,8 +52,11 @@ Program(
                   line: 2,
                   column: 18,
                 ),
+                rage_start: 47,
+                rage_end: 52,
               ),
             ),
+            local: false,
             arguments: [
               (Token(
                 kind: Identifier("y"),
@@ -61,17 +69,19 @@ Program(
                     line: 2,
                     column: 20,
                   ),
+                  rage_start: 53,
+                  rage_end: 54,
                 ),
               ), Some(Number)),
             ],
-            return_t: Some(String),
-            body: BlockStatement(BlockStatement(
-              body: [
-                ReturnStatement(ReturnStatement(
-                  value: [
-                    BinaryExpression(BinaryExpression(
+            return_type: Some(String),
+            body: Block(BlockStatement(
+              statements: [
+                Return(ReturnStatement(
+                  values: [
+                    Binary(BinaryExpression(
                       operator: DoubleDot,
-                      left: LiteralExpression(StringLiteral(StringLiteral(
+                      left: Literal(String(StringLiteral(
                         value: "Hello, ",
                         location: Location(
                           start: Position(
@@ -82,9 +92,11 @@ Program(
                             line: 3,
                             column: 24,
                           ),
+                          rage_start: 87,
+                          rage_end: 96,
                         ),
                       ))),
-                      right: LiteralExpression(StringLiteral(StringLiteral(
+                      right: Literal(String(StringLiteral(
                         value: "World",
                         location: Location(
                           start: Position(
@@ -95,17 +107,21 @@ Program(
                             line: 3,
                             column: 35,
                           ),
+                          rage_start: 100,
+                          rage_end: 107,
                         ),
                       ))),
                       location: Location(
                         start: Position(
                           line: 3,
-                          column: 26,
+                          column: 25,
                         ),
                         end: Position(
                           line: 3,
                           column: 27,
                         ),
+                        rage_start: 97,
+                        rage_end: 99,
                       ),
                     )),
                   ],
@@ -118,6 +134,8 @@ Program(
                       line: 3,
                       column: 14,
                     ),
+                    rage_start: 80,
+                    rage_end: 86,
                   ),
                 )),
               ],
@@ -130,6 +148,8 @@ Program(
                   line: 3,
                   column: 14,
                 ),
+                rage_start: 80,
+                rage_end: 86,
               ),
             )),
             location: Location(
@@ -141,11 +161,13 @@ Program(
                 line: 2,
                 column: 18,
               ),
+              rage_start: 47,
+              rage_end: 52,
             ),
           )),
-          ReturnStatement(ReturnStatement(
-            value: [
-              CallExpression(CallExpression(
+          Return(ReturnStatement(
+            values: [
+              Call(CallExpression(
                 name: Token(
                   kind: Identifier("inner"),
                   location: Location(
@@ -157,11 +179,13 @@ Program(
                       line: 5,
                       column: 16,
                     ),
+                    rage_start: 127,
+                    rage_end: 132,
                   ),
                 ),
-                args: GroupedExpression(GroupedExpression(
-                  expression: [
-                    BinaryExpression(BinaryExpression(
+                args: Grouped(GroupedExpression(
+                  expressions: [
+                    Binary(BinaryExpression(
                       operator: Multiply,
                       left: Identifier(Identifier(
                         name: "x",
@@ -174,9 +198,11 @@ Program(
                             line: 5,
                             column: 18,
                           ),
+                          rage_start: 133,
+                          rage_end: 134,
                         ),
                       )),
-                      right: LiteralExpression(NumberLiteral(NumberLiteral(
+                      right: Literal(Number(NumberLiteral(
                         value: "2",
                         location: Location(
                           start: Position(
@@ -187,6 +213,8 @@ Program(
                             line: 5,
                             column: 22,
                           ),
+                          rage_start: 137,
+                          rage_end: 138,
                         ),
                       ))),
                       location: Location(
@@ -198,19 +226,11 @@ Program(
                           line: 5,
                           column: 20,
                         ),
+                        rage_start: 135,
+                        rage_end: 136,
                       ),
                     )),
                   ],
-                  location: Location(
-                    start: Position(
-                      line: 5,
-                      column: 16,
-                    ),
-                    end: Position(
-                      line: 5,
-                      column: 17,
-                    ),
-                  ),
                 )),
                 location: Location(
                   start: Position(
@@ -221,6 +241,8 @@ Program(
                     line: 5,
                     column: 16,
                   ),
+                  rage_start: 127,
+                  rage_end: 132,
                 ),
               )),
             ],
@@ -233,6 +255,8 @@ Program(
                 line: 5,
                 column: 10,
               ),
+              rage_start: 120,
+              rage_end: 126,
             ),
           )),
         ],
@@ -245,6 +269,8 @@ Program(
             line: 2,
             column: 12,
           ),
+          rage_start: 38,
+          rage_end: 46,
         ),
       )),
       location: Location(
@@ -256,6 +282,8 @@ Program(
           line: 1,
           column: 14,
         ),
+        rage_start: 9,
+        rage_end: 14,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
@@ -270,11 +298,13 @@ Program(
             line: 8,
             column: 12,
           ),
+          rage_start: 151,
+          rage_end: 157,
         ),
       ),
       local: true,
-      t: Some(Number),
-      init: Some(CallExpression(CallExpression(
+      var_type: Some(Number),
+      initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("outer"),
           location: Location(
@@ -286,11 +316,13 @@ Program(
               line: 8,
               column: 28,
             ),
+            rage_start: 168,
+            rage_end: 173,
           ),
         ),
-        args: GroupedExpression(GroupedExpression(
-          expression: [
-            LiteralExpression(NumberLiteral(NumberLiteral(
+        args: Grouped(GroupedExpression(
+          expressions: [
+            Literal(Number(NumberLiteral(
               value: "10",
               location: Location(
                 start: Position(
@@ -301,19 +333,11 @@ Program(
                   line: 8,
                   column: 31,
                 ),
+                rage_start: 174,
+                rage_end: 176,
               ),
             ))),
           ],
-          location: Location(
-            start: Position(
-              line: 8,
-              column: 28,
-            ),
-            end: Position(
-              line: 8,
-              column: 29,
-            ),
-          ),
         )),
         location: Location(
           start: Position(
@@ -324,6 +348,8 @@ Program(
             line: 8,
             column: 28,
           ),
+          rage_start: 168,
+          rage_end: 173,
         ),
       ))),
       location: Location(
@@ -335,6 +361,8 @@ Program(
           line: 8,
           column: 12,
         ),
+        rage_start: 151,
+        rage_end: 157,
       ),
     )),
   ],

@@ -8,18 +8,18 @@ use crate::{
 impl Checker<'_> {
   pub fn check_if_statement(&mut self, if_: &ast::IfStatement) -> Result<Type, Diagnostic> {
     let condition_t = self.check_expression(&if_.condition)?;
-
     if !condition_t.check_match(&Type::Boolean) {
-      let diagnostic = TypeError::TypeMismatchAssignment(
+      let left_location = if_.condition.get_location();
+      let diagnostic = TypeError::MismatchedTypes(
+        Type::new_boolean().to_string(),
         condition_t.to_string(),
-        Type::Boolean.to_string(),
-        Some(if_.location.clone()),
+        Some(left_location),
       );
 
       return Err(self.create_diagnostic(diagnostic));
     }
 
-    let body_t = self.check_statement(&if_.body)?;
+    let body_t = self.check_statement(&if_.then_body)?;
     if let Some(else_body) = &if_.else_body {
       let else_body_t = self.check_statement(else_body)?;
 

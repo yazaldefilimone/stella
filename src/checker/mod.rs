@@ -18,6 +18,7 @@ pub mod check_return_statement;
 pub mod check_statement;
 pub mod check_type;
 pub mod check_type_statement;
+pub mod check_unary_expression;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
 
@@ -76,6 +77,6 @@ impl<'a> Checker<'a> {
       let report = TypeWarning::UnusedVariable(unused_variable.clone(), unused_variable_location);
       self.diagnostics.add(report.into());
     }
-    self.diagnostics.emit_all(self.raw, self.file_name.as_str());
+    self.diagnostics.emit_all(self.raw, &self.file_name);
   }
 }

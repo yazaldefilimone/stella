@@ -22,7 +22,7 @@ fn read_test_files_with_pattern(pattern: &str) -> Vec<(String, String)> {
 }
 
 fn create_tokens(source_code: &str, file_name: &str) -> Vec<Token> {
-  let mut lexer = Lexer::new(source_code.to_string(), file_name);
+  let mut lexer = Lexer::new(source_code, file_name);
   let mut tokens = vec![];
   loop {
     let token = lexer.next_token();
@@ -35,7 +35,7 @@ fn create_tokens(source_code: &str, file_name: &str) -> Vec<Token> {
   return tokens;
 }
 
-fn create_parser(source_code: &str, file_name: &str) -> Parser {
+fn create_parser<'a>(source_code: &'a str, file_name: &'a str) -> Parser<'a> {
   let parser = Parser::new(source_code, file_name);
   return parser;
 }

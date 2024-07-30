@@ -146,11 +146,11 @@ pub enum TokenKind {
 }
 
 impl Token {
-  pub fn lexeme(&self) -> String {
+  pub fn lexeme(&self) -> &str {
     match &self.kind {
-      TokenKind::Identifier(name) => name.clone(),
-      TokenKind::Number(number) => number.clone(),
-      TokenKind::String(string) => string.clone(),
+      TokenKind::Identifier(name) => name,
+      TokenKind::Number(number) => number,
+      TokenKind::String(string) => string,
       _ => panic!("Invalid token"),
     }
   }
@@ -163,9 +163,9 @@ impl Token {
 }
 
 impl TokenKind {
-  pub fn to_string(&self) -> String {
+  pub fn to_string(&self) -> &str {
     let text = match self {
-      TokenKind::Identifier(name) => name.as_str(),
+      TokenKind::Identifier(name) => name,
       TokenKind::Number(number) => number.as_str(),
       TokenKind::String(string) => string.as_str(),
       TokenKind::EOF => "EOF",
@@ -228,6 +228,6 @@ impl TokenKind {
       TokenKind::BlockComment(_) => "block comment",
       TokenKind::Require => "require",
     };
-    return text.to_string();
+    return text;
   }
 }
