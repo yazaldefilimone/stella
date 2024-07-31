@@ -4,7 +4,7 @@ use crate::diagnostics::Diagnostic;
 use crate::diagnostics::TypeError;
 use crate::types::Type;
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_identifier(&mut self, ident: &ast::Identifier) -> Result<Type, Diagnostic> {
     let (defined, scope_idx) = self.ctx.defined_in_any_scope(&ident.name);
     if !defined {

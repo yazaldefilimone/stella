@@ -5,7 +5,7 @@ use crate::parser::parser::Parser;
 use crate::types::Type;
 use crate::utils::location::Location;
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_require_expression(&mut self, require: &ast::RequireExpression) -> Result<Type, Diagnostic> {
     let module_name = require.module_name.lexeme();
     let export_type = self.check_module(&module_name, require.location.clone())?;

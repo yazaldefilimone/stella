@@ -3,7 +3,7 @@ use crate::ast::ast;
 use crate::diagnostics::{Diagnostic, TypeError};
 use crate::types::Type;
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_assign_statement(&mut self, assign: &ast::AssignStatement) -> Result<Type, Diagnostic> {
     let right_t = self.check_expression(&assign.value)?;
     let value_location = assign.value.get_location();

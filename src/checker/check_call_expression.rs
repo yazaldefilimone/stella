@@ -5,7 +5,7 @@ use crate::{
   types::Type,
 };
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_call_expression(&mut self, call_expr: &ast::CallExpression) -> Result<Type, Diagnostic> {
     let name = call_expr.name.lexeme();
 
