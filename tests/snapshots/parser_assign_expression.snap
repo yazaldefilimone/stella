@@ -4,23 +4,24 @@ source: tests/snapshot_tests.rs
 Program(
   statements: [
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("name"),
-        location: Location(
-          start: Position(
-            line: 7,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("name"),
+          location: Location(
+            start: Position(
+              line: 7,
+              column: 6,
+            ),
+            end: Position(
+              line: 7,
+              column: 10,
+            ),
+            rage_start: 101,
+            rage_end: 105,
           ),
-          end: Position(
-            line: 7,
-            column: 10,
-          ),
-          rage_start: 101,
-          rage_end: 105,
-        ),
-      ),
+        ), Some(String)),
+      ],
       local: true,
-      var_type: Some(String),
       initializer: Some(Literal(String(StringLiteral(
         value: "Stella",
         location: Location(
@@ -36,37 +37,26 @@ Program(
           rage_end: 124,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 7,
-          column: 6,
-        ),
-        end: Position(
-          line: 7,
-          column: 10,
-        ),
-        rage_start: 101,
-        rage_end: 105,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("age"),
-        location: Location(
-          start: Position(
-            line: 8,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("age"),
+          location: Location(
+            start: Position(
+              line: 8,
+              column: 6,
+            ),
+            end: Position(
+              line: 8,
+              column: 9,
+            ),
+            rage_start: 131,
+            rage_end: 134,
           ),
-          end: Position(
-            line: 8,
-            column: 9,
-          ),
-          rage_start: 131,
-          rage_end: 134,
-        ),
-      ),
+        ), Some(Number)),
+      ],
       local: true,
-      var_type: Some(Number),
       initializer: Some(Identifier(Identifier(
         name: "name",
         location: Location(
@@ -82,35 +72,25 @@ Program(
           rage_end: 149,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 8,
-          column: 6,
-        ),
-        end: Position(
-          line: 8,
-          column: 9,
-        ),
-        rage_start: 131,
-        rage_end: 134,
-      ),
     )),
     Assign(AssignStatement(
-      name: Token(
-        kind: Identifier("name"),
-        location: Location(
-          start: Position(
-            line: 9,
-            column: 0,
+      values: [
+        (Token(
+          kind: Identifier("name"),
+          location: Location(
+            start: Position(
+              line: 9,
+              column: 0,
+            ),
+            end: Position(
+              line: 9,
+              column: 4,
+            ),
+            rage_start: 151,
+            rage_end: 155,
           ),
-          end: Position(
-            line: 9,
-            column: 4,
-          ),
-          rage_start: 151,
-          rage_end: 155,
-        ),
-      ),
+        ), None),
+      ],
       value: Literal(Number(NumberLiteral(
         value: "10",
         location: Location(
@@ -126,37 +106,26 @@ Program(
           rage_end: 160,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 9,
-          column: 0,
-        ),
-        end: Position(
-          line: 9,
-          column: 4,
-        ),
-        rage_start: 151,
-        rage_end: 155,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("is_student"),
-        location: Location(
-          start: Position(
-            line: 10,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("is_student"),
+          location: Location(
+            start: Position(
+              line: 10,
+              column: 6,
+            ),
+            end: Position(
+              line: 10,
+              column: 16,
+            ),
+            rage_start: 167,
+            rage_end: 177,
           ),
-          end: Position(
-            line: 10,
-            column: 16,
-          ),
-          rage_start: 167,
-          rage_end: 177,
-        ),
-      ),
+        ), Some(Boolean)),
+      ],
       local: true,
-      var_type: Some(Boolean),
       initializer: Some(Literal(Boolean(BooleanLiteral(
         value: true,
         location: Location(
@@ -172,67 +141,46 @@ Program(
           rage_end: 193,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 10,
-          column: 6,
-        ),
-        end: Position(
-          line: 10,
-          column: 16,
-        ),
-        rage_start: 167,
-        rage_end: 177,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("what_is_that"),
-        location: Location(
-          start: Position(
-            line: 12,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("what_is_that"),
+          location: Location(
+            start: Position(
+              line: 12,
+              column: 6,
+            ),
+            end: Position(
+              line: 12,
+              column: 18,
+            ),
+            rage_start: 201,
+            rage_end: 213,
           ),
-          end: Position(
-            line: 12,
-            column: 18,
-          ),
-          rage_start: 201,
-          rage_end: 213,
-        ),
-      ),
+        ), Some(Unknown)),
+      ],
       local: true,
-      var_type: Some(Unknown),
       initializer: None,
-      location: Location(
-        start: Position(
-          line: 12,
-          column: 6,
-        ),
-        end: Position(
-          line: 12,
-          column: 18,
-        ),
-        rage_start: 201,
-        rage_end: 213,
-      ),
     )),
     Assign(AssignStatement(
-      name: Token(
-        kind: Identifier("what_is_that"),
-        location: Location(
-          start: Position(
-            line: 14,
-            column: 0,
+      values: [
+        (Token(
+          kind: Identifier("what_is_that"),
+          location: Location(
+            start: Position(
+              line: 14,
+              column: 0,
+            ),
+            end: Position(
+              line: 14,
+              column: 12,
+            ),
+            rage_start: 225,
+            rage_end: 237,
           ),
-          end: Position(
-            line: 14,
-            column: 12,
-          ),
-          rage_start: 225,
-          rage_end: 237,
-        ),
-      ),
+        ), None),
+      ],
       value: Literal(Number(NumberLiteral(
         value: "10",
         location: Location(
@@ -248,35 +196,25 @@ Program(
           rage_end: 242,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 14,
-          column: 0,
-        ),
-        end: Position(
-          line: 14,
-          column: 12,
-        ),
-        rage_start: 225,
-        rage_end: 237,
-      ),
     )),
     Assign(AssignStatement(
-      name: Token(
-        kind: Identifier("what_is_that"),
-        location: Location(
-          start: Position(
-            line: 17,
-            column: 0,
+      values: [
+        (Token(
+          kind: Identifier("what_is_that"),
+          location: Location(
+            start: Position(
+              line: 17,
+              column: 0,
+            ),
+            end: Position(
+              line: 17,
+              column: 12,
+            ),
+            rage_start: 245,
+            rage_end: 257,
           ),
-          end: Position(
-            line: 17,
-            column: 12,
-          ),
-          rage_start: 245,
-          rage_end: 257,
-        ),
-      ),
+        ), None),
+      ],
       value: Literal(Boolean(BooleanLiteral(
         value: true,
         location: Location(
@@ -292,18 +230,6 @@ Program(
           rage_end: 264,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 17,
-          column: 0,
-        ),
-        end: Position(
-          line: 17,
-          column: 12,
-        ),
-        rage_start: 245,
-        rage_end: 257,
-      ),
     )),
   ],
 )

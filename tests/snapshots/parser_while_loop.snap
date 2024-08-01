@@ -4,23 +4,24 @@ source: tests/snapshot_tests.rs
 Program(
   statements: [
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("count"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("count"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 6,
+            ),
+            end: Position(
+              line: 1,
+              column: 11,
+            ),
+            rage_start: 6,
+            rage_end: 11,
           ),
-          end: Position(
-            line: 1,
-            column: 11,
-          ),
-          rage_start: 6,
-          rage_end: 11,
-        ),
-      ),
+        ), Some(Number)),
+      ],
       local: true,
-      var_type: Some(Number),
       initializer: Some(Literal(Number(NumberLiteral(
         value: "0",
         location: Location(
@@ -36,18 +37,6 @@ Program(
           rage_end: 23,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 6,
-        ),
-        end: Position(
-          line: 1,
-          column: 11,
-        ),
-        rage_start: 6,
-        rage_end: 11,
-      ),
     )),
     While(WhileStatement(
       condition: Binary(BinaryExpression(
@@ -158,21 +147,23 @@ Program(
             ),
           ))),
           Assign(AssignStatement(
-            name: Token(
-              kind: Identifier("count"),
-              location: Location(
-                start: Position(
-                  line: 5,
-                  column: 4,
+            values: [
+              (Token(
+                kind: Identifier("count"),
+                location: Location(
+                  start: Position(
+                    line: 5,
+                    column: 4,
+                  ),
+                  end: Position(
+                    line: 5,
+                    column: 9,
+                  ),
+                  rage_start: 66,
+                  rage_end: 71,
                 ),
-                end: Position(
-                  line: 5,
-                  column: 9,
-                ),
-                rage_start: 66,
-                rage_end: 71,
-              ),
-            ),
+              ), None),
+            ],
             value: Binary(BinaryExpression(
               operator: Add,
               left: Identifier(Identifier(
@@ -218,18 +209,6 @@ Program(
                 rage_end: 81,
               ),
             )),
-            location: Location(
-              start: Position(
-                line: 5,
-                column: 4,
-              ),
-              end: Position(
-                line: 5,
-                column: 9,
-              ),
-              rage_start: 66,
-              rage_end: 71,
-            ),
           )),
         ],
         location: Location(

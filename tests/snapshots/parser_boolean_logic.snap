@@ -4,23 +4,24 @@ source: tests/snapshot_tests.rs
 Program(
   statements: [
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("a"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("a"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 6,
+            ),
+            end: Position(
+              line: 1,
+              column: 7,
+            ),
+            rage_start: 6,
+            rage_end: 7,
           ),
-          end: Position(
-            line: 1,
-            column: 7,
-          ),
-          rage_start: 6,
-          rage_end: 7,
-        ),
-      ),
+        ), Some(Boolean)),
+      ],
       local: true,
-      var_type: Some(Boolean),
       initializer: Some(Literal(Boolean(BooleanLiteral(
         value: true,
         location: Location(
@@ -36,37 +37,26 @@ Program(
           rage_end: 23,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 6,
-        ),
-        end: Position(
-          line: 1,
-          column: 7,
-        ),
-        rage_start: 6,
-        rage_end: 7,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("b"),
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("b"),
+          location: Location(
+            start: Position(
+              line: 2,
+              column: 6,
+            ),
+            end: Position(
+              line: 2,
+              column: 7,
+            ),
+            rage_start: 30,
+            rage_end: 31,
           ),
-          end: Position(
-            line: 2,
-            column: 7,
-          ),
-          rage_start: 30,
-          rage_end: 31,
-        ),
-      ),
+        ), Some(Boolean)),
+      ],
       local: true,
-      var_type: Some(Boolean),
       initializer: Some(Literal(Boolean(BooleanLiteral(
         value: false,
         location: Location(
@@ -82,18 +72,6 @@ Program(
           rage_end: 48,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 2,
-          column: 6,
-        ),
-        end: Position(
-          line: 2,
-          column: 7,
-        ),
-        rage_start: 30,
-        rage_end: 31,
-      ),
     )),
     If(IfStatement(
       condition: Binary(BinaryExpression(
