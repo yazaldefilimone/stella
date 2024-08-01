@@ -3,7 +3,7 @@ use crate::ast::ast;
 use crate::diagnostics::{Diagnostic, TypeError};
 use crate::types::Type;
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_variable_declaration(&mut self, declaration: &ast::VariableDeclaration) -> Result<Type, Diagnostic> {
     let text_name = declaration.name.lexeme();
 

@@ -180,6 +180,18 @@ Program(
               ),
             ))),
           ],
+          location: Location(
+            start: Position(
+              line: 4,
+              column: 28,
+            ),
+            end: Position(
+              line: 4,
+              column: 38,
+            ),
+            rage_start: 98,
+            rage_end: 108,
+          ),
         )),
         location: Location(
           start: Position(

@@ -207,7 +207,7 @@ impl Context {
   }
 
   pub fn get_variable_location(&self, name: &str) -> Option<Location> {
-    if let Some(scope) = self.scopes.get(self.scope_pointer) {
+    for scope in self.scopes.iter().rev() {
       if let Some(location) = scope.variables_location.get(name) {
         return Some(location.clone());
       }

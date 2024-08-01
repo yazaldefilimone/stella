@@ -5,7 +5,7 @@ use crate::{
   types::Type,
 };
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_return_statement(&mut self, return_stmt: &ast::ReturnStatement) -> Result<Type, Diagnostic> {
     let mut return_t = Type::Nil;
     // suport single return statement, todo: support multiple return statements

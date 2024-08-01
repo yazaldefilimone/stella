@@ -90,6 +90,17 @@ impl DiagnosticManager {
       std::process::exit(1)
     }
   }
+
+  pub fn emit_warnings(&self, raw: &str, file_name: &str) {
+    for diagnostic in &self.diagnostics {
+      match diagnostic.level {
+        DiagnosticLevel::Warning => {
+          diagnostic.emit(raw, file_name);
+        }
+        _ => {}
+      }
+    }
+  }
 }
 
 #[derive(Debug, Clone)]

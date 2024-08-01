@@ -242,6 +242,18 @@ Program(
               ),
             ))),
           ],
+          location: Location(
+            start: Position(
+              line: 19,
+              column: 27,
+            ),
+            end: Position(
+              line: 19,
+              column: 33,
+            ),
+            rage_start: 249,
+            rage_end: 255,
+          ),
         )),
         location: Location(
           start: Position(
@@ -321,6 +333,18 @@ Program(
               ),
             ))),
           ],
+          location: Location(
+            start: Position(
+              line: 20,
+              column: 22,
+            ),
+            end: Position(
+              line: 20,
+              column: 29,
+            ),
+            rage_start: 278,
+            rage_end: 285,
+          ),
         )),
         location: Location(
           start: Position(

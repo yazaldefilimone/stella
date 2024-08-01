@@ -215,6 +215,18 @@ Program(
                         ),
                       )),
                     ],
+                    location: Location(
+                      start: Position(
+                        line: 5,
+                        column: 20,
+                      ),
+                      end: Position(
+                        line: 5,
+                        column: 27,
+                      ),
+                      rage_start: 101,
+                      rage_end: 108,
+                    ),
                   )),
                   right: Call(CallExpression(
                     name: Token(
@@ -280,6 +292,18 @@ Program(
                           ),
                         )),
                       ],
+                      location: Location(
+                        start: Position(
+                          line: 5,
+                          column: 39,
+                        ),
+                        end: Position(
+                          line: 5,
+                          column: 46,
+                        ),
+                        rage_start: 120,
+                        rage_end: 127,
+                      ),
                     )),
                     location: Location(
                       start: Position(

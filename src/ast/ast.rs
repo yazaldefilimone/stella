@@ -204,6 +204,12 @@ impl VariableDeclaration {
   ) -> Self {
     VariableDeclaration { name, local, var_type, initializer, location }
   }
+
+  pub fn get_location(&self) -> Location {
+    let left_location = self.name.location.clone();
+    let right_location = self.initializer.as_ref().unwrap().get_location();
+    get_middle_location(&left_location, &right_location)
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -234,8 +240,8 @@ impl Expression {
     Expression::Require(RequireExpression::new(module_name, location))
   }
 
-  pub fn new_grouped(expressions: Vec<Expression>) -> Self {
-    Expression::Grouped(GroupedExpression::new(expressions))
+  pub fn new_grouped(expressions: Vec<Expression>, location: Location) -> Self {
+    Expression::Grouped(GroupedExpression::new(expressions, location))
   }
 
   pub fn get_location(&self) -> Location {
@@ -272,17 +278,16 @@ impl RequireExpression {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GroupedExpression {
   pub expressions: Vec<Expression>,
+  pub location: Location,
 }
 
 impl GroupedExpression {
-  pub fn new(expressions: Vec<Expression>) -> Self {
-    GroupedExpression { expressions }
+  pub fn new(expressions: Vec<Expression>, location: Location) -> Self {
+    GroupedExpression { expressions, location }
   }
 
   pub fn get_location(&self) -> Location {
-    let left_location = self.expressions.first().unwrap().get_location();
-    let right_location = self.expressions.last().unwrap().get_location();
-    get_middle_location(&left_location, &right_location)
+    self.location.clone()
   }
 }
 

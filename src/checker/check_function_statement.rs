@@ -1,7 +1,7 @@
 use super::Checker;
 use crate::{ast::ast, diagnostics::Diagnostic, types::Type};
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   // function name, arguments, return type, body
   pub fn check_function_statement(&mut self, function: &ast::FunctionStatement) -> Result<Type, Diagnostic> {
     self.ctx.enter_scope();
@@ -12,6 +12,7 @@ impl Checker<'_> {
     for (param, ty) in function.arguments.iter() {
       let arg_type = self.check_t(ty);
       self.ctx.declare_variable(param.lexeme(), arg_type.clone());
+      self.ctx.set_variable_location(param.lexeme(), param.location.clone());
       params.push(arg_type);
     }
 

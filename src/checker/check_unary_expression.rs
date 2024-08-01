@@ -4,7 +4,7 @@ use crate::{diagnostics::Diagnostic, types::Type};
 
 use super::Checker;
 
-impl Checker<'_> {
+impl<'a> Checker<'a> {
   pub fn check_unary_expression(&mut self, unary_expr: &ast::UnaryExpression) -> Result<Type, Diagnostic> {
     let operand_t = self.check_expression(&unary_expr.operand)?;
     self.check_unary_operator(&operand_t, &unary_expr)?;

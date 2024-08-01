@@ -79,4 +79,16 @@ impl<'a> Checker<'a> {
     }
     self.diagnostics.emit_all(self.raw, &self.file_name);
   }
+
+  pub fn show_warnings(&mut self) {
+    for unused_variable in self.ctx.check_unused_variables() {
+      let unused_variable_location = self.ctx.get_variable_location(&unused_variable);
+      if unused_variable_location.is_none() {
+        continue;
+      }
+      let report = TypeWarning::UnusedVariable(unused_variable.clone(), unused_variable_location);
+      self.diagnostics.add(report.into());
+    }
+    self.diagnostics.emit_warnings(self.raw, &self.file_name);
+  }
 }
