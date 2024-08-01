@@ -104,6 +104,7 @@ pub enum TokenKind {
   Star,         // *
   StarAssign,   // *=
   Slash,        // /
+  DoubleSlash,  // //
   SlashAssign,  // /=
   Percent,      // %
   Equal,        // ==
@@ -217,6 +218,7 @@ impl TokenKind {
       TokenKind::Minus => "-",
       TokenKind::Star => "*",
       TokenKind::Slash => "/",
+      TokenKind::DoubleSlash => "//",
       TokenKind::Not => "not",
       TokenKind::Percent => "%",
       TokenKind::Equal => "==",

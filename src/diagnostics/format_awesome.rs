@@ -1,10 +1,7 @@
 use crate::ast::ast::BinaryOperator;
 
 pub fn format_mismatched_types(expected: &str, found: &str) -> String {
-  format!(
-    "uh-oh, expected '{}', but found '{}'. are you sure? 😅",
-    expected, found
-  )
+  format!("uh-oh, expected '{}', but found '{}'. are you sure? 😅", expected, found)
 }
 
 pub fn format_undeclared_variable(name: &str) -> String {
@@ -16,19 +13,11 @@ pub fn format_invalid_assignment(name: &str) -> String {
 }
 
 pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
-  format!(
-    "expected {} arguments, but got {} instead. check your function call! 🤔",
-    expected, found
-  )
+  format!("expected {} arguments, but got {} instead. check your function call! 🤔", expected, found)
 }
 
 pub fn format_unsupported_operator(left: &str, right: &str, op: &BinaryOperator) -> String {
-  format!(
-    "can't use '{}' between '{}' and '{}'. that's not allowed! 🛑",
-    op.to_str(),
-    left,
-    right
-  )
+  format!("can't use '{}' between '{}' and '{}'. that's not allowed! 🛑", op.to_str(), left, right)
 }
 
 pub fn format_redeclared_in_same_scope(name: &str) -> String {
@@ -64,10 +53,7 @@ pub fn format_nil_access(name: &str) -> String {
 }
 
 pub fn format_unexpected_type(expected: &str, found: &str) -> String {
-  format!(
-    "expected type '{}', but found '{}'. that's surprising! 🤨",
-    expected, found
-  )
+  format!("expected type '{}', but found '{}'. that's surprising! 🤨", expected, found)
 }
 
 pub fn format_recursive_function(name: &str) -> String {
@@ -91,15 +77,9 @@ pub fn format_invalid_literal_in_table() -> String {
 }
 
 pub fn format_incorrect_table_structure(expected: &str, found: &str) -> String {
-  format!(
-    "expected table structure '{}', but got '{}'. double-check your table! 🛠️",
-    expected, found
-  )
+  format!("expected table structure '{}', but got '{}'. double-check your table! 🛠️", expected, found)
 }
 
 pub fn format_unused_variable(name: &str) -> String {
-  format!(
-    "hey, the variable '{}' isn't being used. don't forget about it! 🐾",
-    name
-  )
+  format!("hey, the variable '{}' isn't being used. don't forget about it! 🐾", name)
 }

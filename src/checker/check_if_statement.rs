@@ -10,11 +10,8 @@ impl<'a> Checker<'a> {
     let condition_t = self.check_expression(&if_.condition)?;
     if !condition_t.check_match(&Type::Boolean) {
       let left_location = if_.condition.get_location();
-      let diagnostic = TypeError::MismatchedTypes(
-        Type::new_boolean().to_string(),
-        condition_t.to_string(),
-        Some(left_location),
-      );
+      let diagnostic =
+        TypeError::MismatchedTypes(Type::new_boolean().to_string(), condition_t.to_string(), Some(left_location));
 
       return Err(self.create_diagnostic(diagnostic));
     }

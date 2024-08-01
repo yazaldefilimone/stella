@@ -17,17 +17,18 @@ pub mod check_require_expression;
 pub mod check_return_statement;
 pub mod check_statement;
 pub mod check_type;
-pub mod check_type_statement;
 pub mod check_unary_expression;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
 
 use crate::ast::ast;
+use crate::ast::tokens::Token;
 use crate::context::context::Context;
 use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError, TypeWarning};
 use crate::modules::loader::Loader;
 use crate::modules::resolver::Resolver;
 use crate::types::Type;
+use crate::utils::location::Location;
 
 pub struct Checker<'a> {
   pub ctx: Context,
@@ -68,27 +69,86 @@ impl<'a> Checker<'a> {
     error.into()
   }
 
-  pub fn show_diagnostics(&mut self) {
-    for unused_variable in self.ctx.check_unused_variables() {
-      let unused_variable_location = self.ctx.get_variable_location(&unused_variable);
-      if unused_variable_location.is_none() {
+  pub fn check_used_variable_in_current_scope(&mut self) {
+    let used_variables = self.ctx.check_unused_variables();
+    for used_variable in used_variables {
+      let used_variable_location = self.ctx.get_variable_location(&used_variable);
+      if used_variable_location.is_none() {
         continue;
       }
-      let report = TypeWarning::UnusedVariable(unused_variable.clone(), unused_variable_location);
+      let report = TypeWarning::UnusedVariable(used_variable.clone(), used_variable_location);
       self.diagnostics.add(report.into());
     }
+  }
+
+  pub fn show_diagnostics(&mut self) {
+    self.check_used_variable_in_current_scope();
     self.diagnostics.emit_all(self.raw, &self.file_name);
   }
 
-  pub fn show_warnings(&mut self) {
-    for unused_variable in self.ctx.check_unused_variables() {
-      let unused_variable_location = self.ctx.get_variable_location(&unused_variable);
-      if unused_variable_location.is_none() {
+  pub fn _declaration(
+    &mut self,
+    names: &Vec<(Token, Option<Type>)>,
+    ty: Type,
+    local: bool,
+    loc: Location,
+  ) -> Result<(), Diagnostic> {
+    if let Type::Grup(group) = ty {
+      for (index, token) in names.iter().enumerate() {
+        let tt = if index >= group.types.len() { Type::Nil } else { group.types[index].clone() };
+        self._declare_variable(token, tt, local)?;
+      }
+      return Ok(());
+    }
+    for (index, token) in names.iter().enumerate() {
+      if index == 0 {
+        self._declare_variable(token, ty.clone(), local)?;
         continue;
       }
-      let report = TypeWarning::UnusedVariable(unused_variable.clone(), unused_variable_location);
-      self.diagnostics.add(report.into());
+
+      self._declare_variable(token, Type::Nil, local)?;
     }
-    self.diagnostics.emit_warnings(self.raw, &self.file_name);
+
+    Ok(())
+  }
+
+  pub fn _declare_variable(&mut self, value: &(Token, Option<Type>), ty: Type, local: bool) -> Result<(), Diagnostic> {
+    let lexeme = value.0.lexeme();
+
+    if let Some(value_type) = &value.1 {
+      if !value_type.check_match(&ty) {
+        let location = value.0.location.clone();
+        let diagnostic = TypeError::TypeMismatchAssignment(value_type.to_string(), ty.to_string(), Some(location));
+        return Err(self.create_diagnostic(diagnostic));
+      }
+    }
+
+    if local && self.ctx.defined_in_current_scope(lexeme) {
+      let location = value.0.location.clone();
+      if self.ctx.lookup_local_variable(lexeme) {
+        let diagnostic = TypeError::RedeclaredInSameScope(lexeme.to_string(), Some(location));
+        return Err(self.create_diagnostic(diagnostic));
+      }
+
+      let diagnostic = TypeWarning::ShadowedVariable(lexeme.to_string(), Some(location));
+      self.diagnostics.add(diagnostic.into());
+    }
+
+    if let Some(previous_type) = self.ctx.get_variable_in_global_scope(lexeme) {
+      let loc = value.0.location.clone();
+      if !ty.check_match(&previous_type) {
+        let diagnostic = TypeError::TypeMismatchAssignment(previous_type.to_string(), ty.to_string(), Some(loc));
+        return Err(self.create_diagnostic(diagnostic));
+      }
+      self.ctx.set_variable_location(lexeme, loc);
+    }
+
+    // if it's a local variable, then set it in the current scope
+    if local {
+      self.ctx.set_local_variable(lexeme);
+    }
+
+    self.ctx.declare_variable(lexeme, ty);
+    return Ok(());
   }
 }
