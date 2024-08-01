@@ -36,14 +36,19 @@ pub enum Statement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AssignStatement {
-  pub name: Token,
+  pub values: Vec<(Token, Option<Type>)>,
   pub value: Expression,
-  pub location: Location,
 }
 
 impl AssignStatement {
-  pub fn new(name: Token, value: Expression, location: Location) -> Self {
-    AssignStatement { name, value, location }
+  pub fn new(values: Vec<(Token, Option<Type>)>, value: Expression) -> Self {
+    AssignStatement { values, value }
+  }
+
+  pub fn get_location(&self) -> Location {
+    let left_location = self.values.first().unwrap().0.location.clone();
+    let right_location = self.value.get_location();
+    get_middle_location(&left_location, &right_location)
   }
 }
 
@@ -187,26 +192,18 @@ impl EmptyStatement {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VariableDeclaration {
-  pub name: Token,
+  pub values: Vec<(Token, Option<Type>)>,
   pub local: bool,
-  pub var_type: Option<Type>,
   pub initializer: Option<Expression>,
-  pub location: Location,
 }
 
 impl VariableDeclaration {
-  pub fn new(
-    name: Token,
-    local: bool,
-    var_type: Option<Type>,
-    initializer: Option<Expression>,
-    location: Location,
-  ) -> Self {
-    VariableDeclaration { name, local, var_type, initializer, location }
+  pub fn new(values: Vec<(Token, Option<Type>)>, local: bool, initializer: Option<Expression>) -> Self {
+    VariableDeclaration { values, local, initializer }
   }
 
   pub fn get_location(&self) -> Location {
-    let left_location = self.name.location.clone();
+    let left_location = self.values.first().unwrap().0.location.clone();
     let right_location = self.initializer.as_ref().unwrap().get_location();
     get_middle_location(&left_location, &right_location)
   }
@@ -464,6 +461,7 @@ pub enum BinaryOperator {
   LessThanOrEqual,    // <=
   GreaterThanOrEqual, // >=
   DoubleDot,          // ..
+  DoubleSlash,        // //
 }
 
 impl BinaryOperator {
@@ -483,6 +481,7 @@ impl BinaryOperator {
       BinaryOperator::LessThanOrEqual => "<=",
       BinaryOperator::GreaterThanOrEqual => ">=",
       BinaryOperator::DoubleDot => "..",
+      BinaryOperator::DoubleSlash => "//",
     }
   }
 }

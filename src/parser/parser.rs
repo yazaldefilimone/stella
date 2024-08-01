@@ -100,6 +100,7 @@ impl<'a> Parser<'a> {
       TokenKind::LessEqual => ast::BinaryOperator::LessThanOrEqual,
       TokenKind::GreaterEqual => ast::BinaryOperator::GreaterThanOrEqual,
       TokenKind::DoubleDot => ast::BinaryOperator::DoubleDot,
+      TokenKind::DoubleSlash => ast::BinaryOperator::DoubleSlash,
       _ => return None,
     };
     self.lexer.next_token();
@@ -207,7 +208,8 @@ impl<'a> Parser<'a> {
 
   fn parse_possible_assign_or_call(&mut self, ident_token: Token) -> ast::Statement {
     self.lexer.next_token(); // consume identifier
-    if self.match_token(&TokenKind::Assign) {
+                             // if next is `=` or `:` then it's an assign statement
+    if self.match_token(&TokenKind::Assign) || self.match_token(&TokenKind::Colon) {
       self.parse_assign_statement(ident_token)
     } else if self.match_token(&TokenKind::LeftParen) {
       let expression = self.parse_call_expression(ident_token);
@@ -217,11 +219,31 @@ impl<'a> Parser<'a> {
     }
   }
 
-  fn parse_assign_statement(&mut self, name: Token) -> ast::Statement {
+  fn parse_assign_statement(&mut self, ident_token: Token) -> ast::Statement {
+    let values = self.parse_variable_and_type(Some(ident_token));
     self.consume_expect_token(TokenKind::Assign);
-    let value = self.parse_expression_statement();
-    let location = name.location.clone();
-    ast::Statement::Assign(ast::AssignStatement::new(name, value, location))
+    let init = self.parse_expression_statement();
+    ast::Statement::Assign(ast::AssignStatement::new(values, init))
+  }
+
+  fn parse_variable_and_type(&mut self, token: Option<Token>) -> Vec<(Token, Option<Type>)> {
+    let mut names: Vec<(Token, Option<Type>)> = Vec::new();
+
+    let token = if token.is_some() { token.unwrap() } else { self.consume_token() };
+
+    let mut name = (token, None);
+    if self.match_token_and_consume(TokenKind::Colon).is_some() {
+      name.1 = Some(self.parse_type(false));
+    };
+    names.push(name);
+    while self.match_token_and_consume(TokenKind::Comma).is_some() {
+      name = (self.consume_token(), None);
+      if self.match_token_and_consume(TokenKind::Colon).is_some() {
+        name.1 = Some(self.parse_type(false));
+      };
+      names.push(name);
+    }
+    names
   }
 
   fn parse_call_expression(&mut self, ident: Token) -> ast::Expression {
@@ -242,29 +264,40 @@ impl<'a> Parser<'a> {
 
     if self.match_token(&TokenKind::Colon) {
       self.consume_expect_token(TokenKind::Colon);
-      return_type = Some(self.parse_type())
+      return_type = Some(self.parse_type(true))
     }
 
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
     let location = name.location.clone();
 
-    ast::Statement::Function(ast::FunctionStatement::new(
-      name,
-      local,
-      arguments,
-      return_type,
-      body,
-      location,
-    ))
+    ast::Statement::Function(ast::FunctionStatement::new(name, local, arguments, return_type, body, location))
   }
 
-  fn parse_type(&mut self) -> Type {
-    let token = self.lexer.next_token();
+  fn parse_type(&mut self, is_function_return: bool) -> Type {
+    let token = self.lexer.peek_token();
+    if !is_function_return && token.kind == TokenKind::LeftParen {
+      self.report_unexpected_token(token)
+    }
     match token.kind {
-      TokenKind::Identifier(name) => Type::new_type(&name),
+      TokenKind::Identifier(name) => {
+        self.lexer.next_token();
+        Type::new_type(&name)
+      }
+      TokenKind::LeftParen => self.parse_grup_return_type(),
       _ => self.report_unexpected_token(token),
     }
+  }
+
+  fn parse_grup_return_type(&mut self) -> Type {
+    self.consume_expect_token(TokenKind::LeftParen);
+    let mut types = Vec::new();
+    while !self.match_token(&TokenKind::RightParen) {
+      types.push(self.parse_type(false));
+      self.match_token_and_consume(TokenKind::Comma);
+    }
+    self.consume_expect_token(TokenKind::RightParen);
+    Type::new_grup(types)
   }
 
   fn parse_arguments_with_option_type(&mut self) -> Vec<(Token, Option<Type>)> {
@@ -273,7 +306,7 @@ impl<'a> Parser<'a> {
       let name = self.consume_token();
       let mut tty = None;
       if self.match_token_and_consume(TokenKind::Colon).is_some() {
-        tty = Some(self.parse_type());
+        tty = Some(self.parse_type(false));
       };
       arguments.push((name, tty));
       self.match_token_and_consume(TokenKind::Comma);
@@ -282,29 +315,12 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_variable_declaration(&mut self, local: bool) -> ast::Statement {
-    let name = self.consume_token();
-    let mut var_type = None;
+    let valyes = self.parse_variable_and_type(None);
     let mut initializer = None;
-
-    if self.match_token(&TokenKind::Colon) {
-      self.consume_expect_token(TokenKind::Colon);
-      var_type = Some(self.parse_type());
-    }
-
-    if self.match_token(&TokenKind::Assign) {
-      self.consume_expect_token(TokenKind::Assign);
+    if self.match_token_and_consume(TokenKind::Assign).is_some() {
       initializer = Some(self.parse_expression_statement());
     }
-
-    let location = name.location.clone();
-
-    ast::Statement::VariableDeclaration(ast::VariableDeclaration::new(
-      name,
-      local,
-      var_type,
-      initializer,
-      location,
-    ))
+    ast::Statement::VariableDeclaration(ast::VariableDeclaration::new(valyes, local, initializer))
   }
 
   fn parse_block_statement(&mut self, end_tokens: &[TokenKind]) -> ast::Statement {
@@ -321,19 +337,13 @@ impl<'a> Parser<'a> {
     let condition = self.parse_expression_statement();
     self.consume_expect_token(TokenKind::Then);
     let then_body = self.parse_block_statement(&[TokenKind::Else, TokenKind::End]);
-    let else_body = if self.match_token(&TokenKind::Else) {
-      self.consume_expect_token(TokenKind::Else);
+    let else_body = if self.match_token_and_consume(TokenKind::Else).is_some() {
       Some(self.parse_block_statement(&[TokenKind::End]))
     } else {
       None
     };
     self.consume_expect_token(TokenKind::End);
-    ast::Statement::If(ast::IfStatement::new(
-      condition,
-      then_body,
-      else_body,
-      if_token.location,
-    ))
+    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_body, if_token.location))
   }
 
   fn parse_while_statement(&mut self) -> ast::Statement {
@@ -368,14 +378,7 @@ impl<'a> Parser<'a> {
     self.consume_expect_token(TokenKind::Do);
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
-    ast::Statement::For(ast::ForStatement::new(
-      variable,
-      init,
-      limit,
-      step,
-      body,
-      for_token.location,
-    ))
+    ast::Statement::For(ast::ForStatement::new(variable, init, limit, step, body, for_token.location))
   }
 
   fn parse_break_statement(&mut self) -> ast::Statement {
@@ -396,11 +399,12 @@ impl<'a> Parser<'a> {
 
   fn parse_return_value(&mut self) -> Vec<ast::Expression> {
     let mut values = Vec::new();
-    if !self.match_token(&TokenKind::Semicolon) {
+    if self.match_token(&TokenKind::Semicolon) {
+      return values;
+    }
+    values.push(self.parse_expression_statement());
+    while self.match_token_and_consume(TokenKind::Comma).is_some() {
       values.push(self.parse_expression_statement());
-      while self.match_token_and_consume(TokenKind::Comma).is_some() {
-        values.push(self.parse_expression_statement());
-      }
     }
     values
   }

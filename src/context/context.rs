@@ -19,6 +19,9 @@ fn create_global_scope() -> Scope {
   global_scope
 }
 
+fn create_anonymous_function() -> Type {
+  Type::new_function(vec![], Type::Unknown)
+}
 impl Context {
   pub fn new() -> Context {
     let scopes = vec![create_global_scope()];
@@ -26,6 +29,28 @@ impl Context {
     let return_decl_name = "return".to_string();
     let modules = BTreeMap::new();
     Context { scopes, scope_pointer: 0, exports, return_decl_name, modules }
+  }
+
+  pub fn lookup_local_variable(&mut self, name: &str) -> bool {
+    return self.lookup_local_variable_in_scope(name, self.scope_pointer);
+  }
+
+  pub fn lookup_local_variable_in_scope(&mut self, name: &str, scope_pointer: usize) -> bool {
+    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
+      if scope.local_variables.contains(name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  pub fn set_local_variable(&mut self, name: &str) {
+    self.set_local_variable_in_scope(name, self.scope_pointer);
+  }
+  pub fn set_local_variable_in_scope(&mut self, name: &str, scope_pointer: usize) {
+    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
+      scope.local_variables.insert(name.to_owned());
+    }
   }
 
   pub fn declare_variable(&mut self, name: &str, type_: Type) {
@@ -103,14 +128,33 @@ impl Context {
 
   pub fn get_function(&self, name: &str) -> Option<&FunctionType> {
     for scope in self.scopes.iter().rev() {
-      if let Some(function_type) = scope.variables.get(name) {
-        match function_type {
-          Type::Function(function_type) => return Some(function_type),
-          _ => return None,
-        }
+      if let Some(function_type) = self.get_function_helper(scope, name) {
+        return Some(function_type);
       }
     }
     None
+  }
+
+  pub fn get_function_helper<'a>(&'a self, scope: &'a Scope, name: &str) -> Option<&'a FunctionType> {
+    if let Some(function_type) = scope.variables.get(name) {
+      match function_type {
+        Type::Function(function_type) => return Some(function_type),
+        _ => return None,
+      }
+    }
+    return None;
+  }
+
+  pub fn get_function_in_scope(&self, name: &str, scope_pointer: usize) -> Option<&FunctionType> {
+    if let Some(scope) = self.scopes.get(scope_pointer) {
+      return self.get_function_helper(scope, name);
+    }
+    None
+  }
+  pub fn set_function_in_scope(&mut self, name: &str, scope_pointer: usize, function_type: Type) {
+    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
+      scope.variables.insert(name.to_owned(), function_type);
+    }
   }
 
   pub fn declare_global_variable(&mut self, name: &str, type_: Type) {
@@ -161,6 +205,23 @@ impl Context {
 
   pub fn defined_in_current_scope(&self, name: &str) -> bool {
     self.contains(name, &self.scopes.get(self.scope_pointer))
+  }
+
+  pub fn defined_in_global_scope(&self, name: &str) -> bool {
+    self.contains(name, &self.scopes.get(0))
+  }
+
+  pub fn get_variable_in_global_scope(&self, name: &str) -> Option<&Type> {
+    if let Some(scope) = self.scopes.get(0) {
+      return scope.variables.get(name);
+    }
+    None
+  }
+
+  pub fn set_variable_in_global_scope(&mut self, name: &str, type_: Type) {
+    if let Some(scope) = self.scopes.get_mut(0) {
+      scope.variables.insert(name.to_owned(), type_);
+    }
   }
 
   pub fn defined_in_any_scope(&self, name: &str) -> (bool, usize) {
@@ -221,6 +282,19 @@ impl Context {
     }
   }
 
+  pub fn declare_function_placeholder(&mut self, name: &str) -> usize {
+    let function = create_anonymous_function();
+    self.declare_variable(name, function);
+    return self.scope_pointer;
+  }
+
+  pub fn update_function_placeholder(&mut self, name: &str, params: Vec<Type>, return_type: Type, scope: usize) {
+    if let Some(scope) = self.scopes.get_mut(scope) {
+      if let Some(function) = scope.variables.get_mut(name) {
+        *function = Type::new_function(params, return_type);
+      }
+    }
+  }
   pub fn is_global_scope(&self) -> bool {
     if self.scope_pointer == 0 && self.scopes.len() == 1 {
       return true;
@@ -247,12 +321,18 @@ impl Context {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
   pub variables: BTreeMap<String, Type>,
+  pub local_variables: BTreeSet<String>,
   pub unused_variables: BTreeSet<String>,
   pub variables_location: BTreeMap<String, Location>,
 }
 
 impl Scope {
   pub fn new() -> Scope {
-    Scope { variables: BTreeMap::new(), unused_variables: BTreeSet::new(), variables_location: BTreeMap::new() }
+    Scope {
+      local_variables: BTreeSet::new(),
+      variables: BTreeMap::new(),
+      unused_variables: BTreeSet::new(),
+      variables_location: BTreeMap::new(),
+    }
   }
 }

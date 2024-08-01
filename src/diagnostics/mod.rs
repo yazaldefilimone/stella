@@ -10,9 +10,10 @@ use report::report_error;
 use std::fmt::{self, Debug};
 
 use format::{
-  format_function_arity_mismatch, format_mismatched_types, format_module_not_exported, format_module_not_found,
-  format_redeclared_in_same_scope, format_type_mismatch_assignment, format_undeclared_variable,
-  format_unsupported_operator, format_warning_unused_variable,
+  format_function_arity_mismatch, format_mismatched_types, format_missing_variable_declaration,
+  format_module_not_exported, format_module_not_found, format_redeclared_in_same_scope,
+  format_type_mismatch_assignment, format_undeclared_variable, format_unsupported_operator,
+  format_warning_shadow_warning, format_warning_unused_variable,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -20,13 +21,6 @@ pub enum DiagnosticLevel {
   Info,
   Warning,
   Error,
-}
-
-#[derive(Debug, Clone)]
-pub enum TypeErrorKind {
-  MismatchedTypes,
-  UndeclaredVariable,
-  FunctionArityMismatch,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -106,12 +100,14 @@ impl DiagnosticManager {
 #[derive(Debug, Clone)]
 pub enum TypeWarning {
   UnusedVariable(String, Option<Location>),
+  ShadowedVariable(String, Option<Location>),
 }
 
 impl From<TypeWarning> for Diagnostic {
   fn from(warning: TypeWarning) -> Self {
     let (message, location) = match warning {
       TypeWarning::UnusedVariable(name, loc) => (format_warning_unused_variable(&name), loc),
+      TypeWarning::ShadowedVariable(name, loc) => (format_warning_shadow_warning(&name), loc),
     };
     Diagnostic::new(DiagnosticLevel::Warning, message, location)
   }
@@ -127,6 +123,7 @@ pub enum TypeError {
   RedeclaredInSameScope(String, Option<Location>),
   FunctionArityMismatch(usize, usize, Option<Location>),
   UnsupportedOperator(String, String, String, Option<Location>),
+  MissingVariableDeclaration(Option<Location>),
 }
 
 impl From<TypeError> for Diagnostic {
@@ -139,6 +136,7 @@ impl From<TypeError> for Diagnostic {
       TypeError::RedeclaredInSameScope(name, loc) => (format_redeclared_in_same_scope(&name), loc),
       TypeError::ModuleNotFound(name, loc) => (format_module_not_found(&name), loc),
       TypeError::ModuleNotExported(name, loc) => (format_module_not_exported(&name), loc),
+      TypeError::MissingVariableDeclaration(loc) => (format_missing_variable_declaration(), loc),
       TypeError::TypeMismatchAssignment(expected, found, loc) => {
         (format_type_mismatch_assignment(&expected, &found), loc)
       }

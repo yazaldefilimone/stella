@@ -31,7 +31,14 @@ pub fn format_module_not_exported(name: &str) -> String {
 }
 
 pub fn format_type_mismatch_assignment(expected: &str, found: &str) -> String {
-  format!("can't assign `{}` to `{}`", found, expected)
+  format!("can't assign `{}` to `{}`", expected, found)
+}
+
+pub fn format_missing_variable_declaration() -> String {
+  format!("missing variable name in declaration or assignment")
+}
+pub fn format_warning_shadow_warning(name: &str) -> String {
+  format!("local variable '{}' shadows global variable", name)
 }
 
 pub fn format_missing_return_value() -> String {
@@ -62,10 +69,6 @@ pub fn format_invalid_use_of_varargs() -> String {
   format!("invalid use of '...'")
 }
 
-pub fn format_global_shadowing(name: &str) -> String {
-  format!("global variable shadowed: `{}`", name)
-}
-
 pub fn format_unreachable_code() -> String {
   format!("unreachable code detected")
 }
@@ -81,15 +84,39 @@ pub fn format_incorrect_table_structure(expected: &str, found: &str) -> String {
 // warning
 
 pub fn format_warning_unused_variable(name: &str) -> String {
-  format!("value `{}` is defined but not used", name)
+  format!("value '{}' is defined but never used", name)
+}
+
+pub fn format_warning_redeclaration(name: &str) -> String {
+  format!("redeclaration of local variable '{}'", name)
+}
+
+pub fn format_warning_uninitialized_variable(name: &str) -> String {
+  format!("value '{}' used before initialization", name)
+}
+
+pub fn format_warning_undeclared_global(name: &str) -> String {
+  format!("usage of undeclared global variable '{}'", name)
+}
+
+pub fn format_warning_execution_order(name: &str) -> String {
+  format!("usage of variable '{}' may depend on execution order", name)
+}
+
+pub fn format_warning_variable_declared_not_initialized(name: &str) -> String {
+  format!("value '{}' declared but not initialized", name)
+}
+
+pub fn format_warning_scope_end(name: &str) -> String {
+  format!("value '{}' used outside its valid scope", name)
 }
 
 pub fn format_warning_shadowed_variable(name: &str) -> String {
-  format!("variable `{}` shadows a global variable", name)
+  format!("value `{}` shadows an existing value", name)
 }
 
 pub fn format_warning_deprecated_function(name: &str) -> String {
-  format!("function `{}` is deprecated", name)
+  format!("value `{}` is deprecated", name)
 }
 
 pub fn format_warning_possible_nil_access(name: &str) -> String {
@@ -105,7 +132,7 @@ pub fn format_warning_unreachable_code() -> String {
 }
 
 pub fn format_warning_missing_return_in_function(name: &str) -> String {
-  format!("function `{}` may not return a value", name)
+  format!("value `{}` may not return a value", name)
 }
 
 pub fn format_warning_suspect_empty_block() -> String {
@@ -117,7 +144,7 @@ pub fn format_warning_duplicate_case_in_switch(case: &str) -> String {
 }
 
 pub fn format_warning_large_function(name: &str) -> String {
-  format!("function `{}` is too large, consider refactoring", name)
+  format!("value `{}` is too large, consider refactoring", name)
 }
 
 pub fn format_warning_unused_import(module: &str) -> String {
@@ -125,7 +152,7 @@ pub fn format_warning_unused_import(module: &str) -> String {
 }
 
 pub fn format_warning_variable_never_assigned(name: &str) -> String {
-  format!("variable `{}` is declared but never assigned", name)
+  format!("value `{}` is declared but never assigned", name)
 }
 
 pub fn format_warning_potential_floating_point_error() -> String {
@@ -135,86 +162,3 @@ pub fn format_warning_potential_floating_point_error() -> String {
 pub fn format_warning_unoptimized_code_segment() -> String {
   format!("unoptimized code segment detected")
 }
-
-// cooll
-// pub fn format_mismatched_types(expected: &str, found: &str) -> String {
-//   format!("expected type `{}`, found `{}`", expected, found)
-// }
-
-// pub fn format_undeclared_variable(name: &str) -> String {
-//   format!("undeclared variable `{}`", name)
-// }
-
-// pub fn format_invalid_assignment(name: &str) -> String {
-//   format!("invalid assignment to `{}`", name)
-// }
-
-// pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
-//   format!("expected {} arguments, found {}", expected, found)
-// }
-
-// pub fn format_unsupported_operator(left: &str, right: &str, operator: &BinaryOperator) -> String {
-//   format!(
-//     "unsupported operator `{}` for types `{}` and `{}`",
-//     operator.to_string(),
-//     left,
-//     right
-//   )
-// }
-
-// pub fn format_redeclared_in_same_scope(name: &str) -> String {
-//   format!("`{}` redeclared in same scope", name)
-// }
-
-// pub fn format_module_not_found(name: &str) -> String {
-//   format!("unresolved module, can't find '{}.lua'", name)
-// }
-
-// pub fn format_module_not_exported(name: &str) -> String {
-//   format!("module `{}` doesn't export anything", name)
-// }
-
-// pub fn format_type_mismatch_assignment(expected: &str, found: &str) -> String {
-//   format!("type `{}` not assignable to `{}`", found, expected)
-// }
-// -------------------- I really want it :) --------------------
-// pub fn format_mismatched_types(expected: &str, found: &str) -> String {
-//   format!("oops, expected `{}`, but found `{}` 😳", expected, found)
-// }
-
-// pub fn format_undeclared_variable(name: &str) -> String {
-//   format!("uh-oh, couldn't find the variable `{}` 😢", name)
-// }
-
-// pub fn format_invalid_assignment(name: &str) -> String {
-//   format!("invalid assignment to `{}`, oops 🛑", name)
-// }
-
-// pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
-//   format!("expected {} arguments, but found {} 🤔", expected, found)
-// }
-
-// pub fn format_unsupported_operator(left: &str, right: &str, operator: &BinaryOperator) -> String {
-//   format!(
-//     "hmm, can't use `{}` between `{}` and `{}` 🧐",
-//     operator.to_string(),
-//     left,
-//     right
-//   )
-// }
-
-// pub fn format_redeclared_in_same_scope(name: &str) -> String {
-//   format!("`{}` is already declared here! 🎭", name)
-// }
-
-// pub fn format_module_not_found(name: &str) -> String {
-//   format!("module not found: '{}.lua' 🕵️‍♂️", name)
-// }
-
-// pub fn format_module_not_exported(name: &str) -> String {
-//   format!("module `{}` doesn't export anything 🤷", name)
-// }
-
-// pub fn format_type_mismatch_assignment(expected: &str, found: &str) -> String {
-//   format!("can't assign `{}` to `{}`, type mismatch 💡", found, expected)
-// }

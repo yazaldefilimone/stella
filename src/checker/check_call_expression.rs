@@ -9,7 +9,8 @@ impl<'a> Checker<'a> {
   pub fn check_call_expression(&mut self, call_expr: &ast::CallExpression) -> Result<Type, Diagnostic> {
     let name = call_expr.name.lexeme();
 
-    if !self.ctx.defined_in_current_scope(name) {
+    let (defined, scope_idx) = self.ctx.defined_in_any_scope(name);
+    if !defined {
       let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.location.clone()));
       return Err(self.create_diagnostic(diagnostic));
     }

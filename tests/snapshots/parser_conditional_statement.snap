@@ -191,23 +191,24 @@ Program(
       ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("result"),
-        location: Location(
-          start: Position(
-            line: 19,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("result"),
+          location: Location(
+            start: Position(
+              line: 19,
+              column: 6,
+            ),
+            end: Position(
+              line: 19,
+              column: 12,
+            ),
+            rage_start: 228,
+            rage_end: 234,
           ),
-          end: Position(
-            line: 19,
-            column: 12,
-          ),
-          rage_start: 228,
-          rage_end: 234,
-        ),
-      ),
+        ), Some(Number)),
+      ],
       local: true,
-      var_type: Some(Number),
       initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("test"),
@@ -268,37 +269,26 @@ Program(
           rage_end: 249,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 19,
-          column: 6,
-        ),
-        end: Position(
-          line: 19,
-          column: 12,
-        ),
-        rage_start: 228,
-        rage_end: 234,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("n"),
-        location: Location(
-          start: Position(
-            line: 20,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("n"),
+          location: Location(
+            start: Position(
+              line: 20,
+              column: 6,
+            ),
+            end: Position(
+              line: 20,
+              column: 7,
+            ),
+            rage_start: 262,
+            rage_end: 263,
           ),
-          end: Position(
-            line: 20,
-            column: 7,
-          ),
-          rage_start: 262,
-          rage_end: 263,
-        ),
-      ),
+        ), Some(String)),
+      ],
       local: true,
-      var_type: Some(String),
       initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("test"),
@@ -359,18 +349,6 @@ Program(
           rage_end: 278,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 20,
-          column: 6,
-        ),
-        end: Position(
-          line: 20,
-          column: 7,
-        ),
-        rage_start: 262,
-        rage_end: 263,
-      ),
     )),
   ],
 )

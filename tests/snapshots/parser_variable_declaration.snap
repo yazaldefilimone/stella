@@ -4,23 +4,24 @@ source: tests/snapshot_tests.rs
 Program(
   statements: [
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("name"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("name"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 6,
+            ),
+            end: Position(
+              line: 1,
+              column: 10,
+            ),
+            rage_start: 6,
+            rage_end: 10,
           ),
-          end: Position(
-            line: 1,
-            column: 10,
-          ),
-          rage_start: 6,
-          rage_end: 10,
-        ),
-      ),
+        ), Some(String)),
+      ],
       local: true,
-      var_type: Some(String),
       initializer: Some(Literal(String(StringLiteral(
         value: "Stella",
         location: Location(
@@ -36,37 +37,26 @@ Program(
           rage_end: 29,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 6,
-        ),
-        end: Position(
-          line: 1,
-          column: 10,
-        ),
-        rage_start: 6,
-        rage_end: 10,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("age"),
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("age"),
+          location: Location(
+            start: Position(
+              line: 2,
+              column: 6,
+            ),
+            end: Position(
+              line: 2,
+              column: 9,
+            ),
+            rage_start: 36,
+            rage_end: 39,
           ),
-          end: Position(
-            line: 2,
-            column: 9,
-          ),
-          rage_start: 36,
-          rage_end: 39,
-        ),
-      ),
+        ), Some(Number)),
+      ],
       local: true,
-      var_type: Some(Number),
       initializer: Some(Literal(Number(NumberLiteral(
         value: "25",
         location: Location(
@@ -82,37 +72,26 @@ Program(
           rage_end: 52,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 2,
-          column: 6,
-        ),
-        end: Position(
-          line: 2,
-          column: 9,
-        ),
-        rage_start: 36,
-        rage_end: 39,
-      ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("is_student"),
-        location: Location(
-          start: Position(
-            line: 3,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("is_student"),
+          location: Location(
+            start: Position(
+              line: 3,
+              column: 6,
+            ),
+            end: Position(
+              line: 3,
+              column: 16,
+            ),
+            rage_start: 59,
+            rage_end: 69,
           ),
-          end: Position(
-            line: 3,
-            column: 16,
-          ),
-          rage_start: 59,
-          rage_end: 69,
-        ),
-      ),
+        ), Some(Boolean)),
+      ],
       local: true,
-      var_type: Some(Boolean),
       initializer: Some(Literal(Boolean(BooleanLiteral(
         value: true,
         location: Location(
@@ -128,18 +107,6 @@ Program(
           rage_end: 85,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 3,
-          column: 6,
-        ),
-        end: Position(
-          line: 3,
-          column: 16,
-        ),
-        rage_start: 59,
-        rage_end: 69,
-      ),
     )),
   ],
 )

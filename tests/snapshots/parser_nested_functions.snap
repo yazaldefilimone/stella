@@ -299,23 +299,24 @@ Program(
       ),
     )),
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("result"),
-        location: Location(
-          start: Position(
-            line: 8,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("result"),
+          location: Location(
+            start: Position(
+              line: 8,
+              column: 6,
+            ),
+            end: Position(
+              line: 8,
+              column: 12,
+            ),
+            rage_start: 151,
+            rage_end: 157,
           ),
-          end: Position(
-            line: 8,
-            column: 12,
-          ),
-          rage_start: 151,
-          rage_end: 157,
-        ),
-      ),
+        ), Some(Number)),
+      ],
       local: true,
-      var_type: Some(Number),
       initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("outer"),
@@ -376,18 +377,6 @@ Program(
           rage_end: 173,
         ),
       ))),
-      location: Location(
-        start: Position(
-          line: 8,
-          column: 6,
-        ),
-        end: Position(
-          line: 8,
-          column: 12,
-        ),
-        rage_start: 151,
-        rage_end: 157,
-      ),
     )),
   ],
 )

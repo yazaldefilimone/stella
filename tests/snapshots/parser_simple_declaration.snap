@@ -4,23 +4,24 @@ source: tests/snapshot_tests.rs
 Program(
   statements: [
     VariableDeclaration(VariableDeclaration(
-      name: Token(
-        kind: Identifier("name"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 6,
+      values: [
+        (Token(
+          kind: Identifier("name"),
+          location: Location(
+            start: Position(
+              line: 1,
+              column: 6,
+            ),
+            end: Position(
+              line: 1,
+              column: 10,
+            ),
+            rage_start: 6,
+            rage_end: 10,
           ),
-          end: Position(
-            line: 1,
-            column: 10,
-          ),
-          rage_start: 6,
-          rage_end: 10,
-        ),
-      ),
+        ), Some(String)),
+      ],
       local: true,
-      var_type: Some(String),
       initializer: Some(Literal(String(StringLiteral(
         value: "Stella",
         location: Location(
@@ -36,18 +37,6 @@ Program(
           rage_end: 29,
         ),
       )))),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 6,
-        ),
-        end: Position(
-          line: 1,
-          column: 10,
-        ),
-        rage_start: 6,
-        rage_end: 10,
-      ),
     )),
   ],
 )

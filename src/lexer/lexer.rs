@@ -54,7 +54,6 @@ impl<'a> Lexer<'a> {
       '+' => self.read_check_ahead("+=", TokenKind::Plus, TokenKind::PlusAssign),
       '-' => self.read_comment_or_minus(),
       '*' => self.read_check_ahead("*=", TokenKind::Star, TokenKind::StarAssign),
-      '/' => self.read_check_ahead("/=", TokenKind::Slash, TokenKind::SlashAssign),
       '=' => self.read_check_ahead("==", TokenKind::Assign, TokenKind::Equal),
       '~' => self.read_check_ahead("~=", TokenKind::Tilde, TokenKind::NotEqual),
       '<' => self.read_check_ahead("<=", TokenKind::Less, TokenKind::LessEqual),
@@ -72,6 +71,7 @@ impl<'a> Lexer<'a> {
       '[' => self.read_simple_token(TokenKind::LeftBracket),
       ']' => self.read_simple_token(TokenKind::RightBracket),
       '"' => self.read_string(),
+      '/' => self.read_slash(),
       '0'..='9' => self.read_number(),
       'a'..='z' | 'A'..='Z' | '_' => self.read_keyword_or_identifier(),
       _ => {
@@ -79,6 +79,14 @@ impl<'a> Lexer<'a> {
         let message = format!("Invalid character '{}'", current_char);
         report_and_exit(&message, &mut location, &self.raw, &self.file_name);
       }
+    }
+  }
+
+  fn read_slash(&mut self) -> Token {
+    if self.starts_with("//") {
+      self.read_check_ahead("//", TokenKind::DoubleSlash, TokenKind::DoubleSlash)
+    } else {
+      self.read_check_ahead("/=", TokenKind::Slash, TokenKind::SlashAssign)
     }
   }
 
