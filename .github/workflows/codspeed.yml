@@ -21,15 +21,10 @@ jobs:
         run: cargo codspeed build
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@main
+        uses: CodSpeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
           run: cargo codspeed run
-      - name: Upload benchmark results
-        uses: actions/upload-artifact@v3
-        with:
-          name: benchmarks
-          path: ./target/codspeed/stella
 
   # for file in ./tests/golden_tests/*.lua; do
   #             codspeed bench "./target/release/stella check $file"
