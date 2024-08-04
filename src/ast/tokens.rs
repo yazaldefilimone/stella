@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::utils::location::Location;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Token {
   pub kind: TokenKind,
   pub location: Location,
@@ -71,7 +71,7 @@ impl Token {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum TokenKind {
   // keywords
   Function,
@@ -153,6 +153,13 @@ impl Token {
       TokenKind::Number(number) => number,
       TokenKind::String(string) => string,
       _ => panic!("Invalid token"),
+    }
+  }
+
+  pub fn is_string(&self) -> bool {
+    match &self.kind {
+      TokenKind::String(_) => true,
+      _ => false,
     }
   }
   pub fn is_comment(&self) -> bool {

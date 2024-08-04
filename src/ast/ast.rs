@@ -31,6 +31,7 @@ pub enum Statement {
   Block(BlockStatement),
   Empty(EmptyStatement),
   VariableDeclaration(VariableDeclaration),
+  TypeDeclaration(TypeDeclaration),
   Expression(Expression),
 }
 
@@ -58,6 +59,7 @@ pub struct FunctionStatement {
   pub local: bool,
   pub arguments: Vec<(Token, Option<Type>)>,
   pub return_type: Option<Type>,
+  pub generics: Vec<Type>,
   pub body: Box<Statement>,
   pub location: Location,
 }
@@ -66,12 +68,13 @@ impl FunctionStatement {
   pub fn new(
     name: Token,
     local: bool,
+    generics: Vec<Type>,
     arguments: Vec<(Token, Option<Type>)>,
     return_type: Option<Type>,
     body: Statement,
     location: Location,
   ) -> Self {
-    FunctionStatement { name, local, arguments, return_type, body: Box::new(body), location }
+    FunctionStatement { name, local, generics, arguments, return_type, body: Box::new(body), location }
   }
 }
 
@@ -190,6 +193,43 @@ pub struct EmptyStatement {}
 
 impl EmptyStatement {}
 
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub enum TypeInitializer {
+  Type(Type),
+  Function(TypeFunction),
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct TypeDeclaration {
+  pub name: Token,
+  pub initiizer: Type,
+  pub location: Location,
+  pub generis: Vec<String>,
+}
+
+impl TypeDeclaration {
+  pub fn new(name: Token, generis: Vec<String>, initiizer: Type, location: Location) -> Self {
+    TypeDeclaration { name, generis, initiizer, location }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct TypeFunction {
+  pub params: Vec<Type>,
+  pub return_type: Type,
+  pub location: Location,
+}
+
+impl TypeFunction {
+  pub fn new(params: Vec<Type>, return_type: Type, location: Location) -> Self {
+    TypeFunction { params, return_type, location }
+  }
+
+  pub fn get_location(&self) -> Location {
+    self.location.clone()
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VariableDeclaration {
   pub values: Vec<(Token, Option<Type>)>,
@@ -218,6 +258,7 @@ pub enum Expression {
   Grouped(GroupedExpression),
   Binary(BinaryExpression),
   Require(RequireExpression),
+  Function(FunctionExpression),
 }
 
 impl Expression {
@@ -241,6 +282,15 @@ impl Expression {
     Expression::Grouped(GroupedExpression::new(expressions, location))
   }
 
+  pub fn new_function(
+    arguments: Vec<(Token, Option<Type>)>,
+    return_type: Option<Type>,
+    body: Statement,
+    loc: Location,
+  ) -> Self {
+    Expression::Function(FunctionExpression::new(arguments, return_type, body, loc))
+  }
+
   pub fn get_location(&self) -> Location {
     match self {
       Expression::Literal(literal) => literal.get_location(),
@@ -250,6 +300,7 @@ impl Expression {
       Expression::Require(require) => require.get_location(),
       Expression::Grouped(grouped) => grouped.get_location(),
       Expression::Unary(unary) => unary.get_location(),
+      Expression::Function(function) => function.get_location(),
     }
   }
 }
@@ -339,6 +390,30 @@ impl UnaryExpression {
 
   pub fn get_operator_location(&self) -> Location {
     self.location.clone()
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FunctionExpression {
+  pub arguments: Vec<(Token, Option<Type>)>,
+  pub return_type: Option<Type>,
+  pub body: Box<Statement>,
+  pub location: Location,
+}
+
+impl FunctionExpression {
+  pub fn new(
+    arguments: Vec<(Token, Option<Type>)>,
+    return_type: Option<Type>,
+    body: Statement,
+    location: Location,
+  ) -> Self {
+    FunctionExpression { arguments, return_type, body: Box::new(body), location }
+  }
+
+  pub fn get_location(&self) -> Location {
+    let left_location = self.location.clone();
+    return left_location;
   }
 }
 
