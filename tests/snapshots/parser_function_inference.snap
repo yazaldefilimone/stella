@@ -53,6 +53,7 @@ Program(
         ), None),
       ],
       return_type: None,
+      generics: [],
       body: Block(BlockStatement(
         statements: [
           Return(ReturnStatement(

@@ -28,14 +28,8 @@ pub fn lexer_benchmark(c: &mut Criterion) {
         let checker = &mut stella::checker::Checker::new(file_name, source_code);
         let check = checker.check(&stella::parser::parser::Parser::new(source_code, file_name).parse_program());
         match check {
-          Ok(t) => {
-            println!("{:#?}", t);
-            black_box(t)
-          }
-          _ => {
-            println!("Error in file {}", file_name);
-            black_box(stella::types::Type::Unknown)
-          }
+          Ok(t) => black_box(t),
+          _ => black_box(stella::types::Type::Unknown),
         }
       });
     });

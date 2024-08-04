@@ -5,18 +5,14 @@ use crate::types::Type;
 
 impl<'a> Checker<'a> {
   pub fn check_variable_declaration(&mut self, declaration: &ast::VariableDeclaration) -> Result<Type, Diagnostic> {
-    let mut right_type = Type::Nil;
+    let right_type = if let Some(initializer) = &declaration.initializer {
+      self.check_expression(initializer)?
+    } else {
+      // unknown type or nil? and why?
+      Type::Unknown
+    };
 
-    if let Some(initializer) = &declaration.initializer {
-      right_type = self.check_expression(initializer)?;
-    }
-
-    self._declaration(&declaration.values, right_type, declaration.local, declaration.get_location())?;
-
-    let location = declaration.get_location();
-
-    let location = declaration.get_location();
-
+    self.declare_variables(&declaration.values, right_type, declaration.local, declaration.get_location())?;
     Ok(Type::Nil)
   }
 }

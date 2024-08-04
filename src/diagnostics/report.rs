@@ -1,15 +1,18 @@
-use crate::utils::{highlight_text_with_cyan, highlight_text_with_red, highlight_text_with_yellow, location::Location};
+use crate::utils::{
+  highlight_text_with_cyan, highlight_text_with_red, highlight_text_with_white, highlight_text_with_yellow,
+  location::Location,
+};
 
 use code_highlighter::{highlight_error, highlight_warning};
 
 pub fn report_error(message: &str, location: &mut Location, raw: &str, file_name: &str, warning: bool) {
   println!("");
   if !warning {
-    let message = format!("ERROR >>> {}", message);
-    println!("{}.", highlight_text_with_red(&message));
+    println!("{} {}.", highlight_text_with_red("ERROR >>>"), highlight_text_with_white(message));
   } else {
-    let warning = highlight_text_with_yellow("WARNING");
-    let message = format!("{} >>> {}", warning, message);
+    let warning = highlight_text_with_yellow("WARNING >>>");
+    let message = format!("{} {}", warning, highlight_text_with_white(message));
+
     println!("{}", message);
   }
 

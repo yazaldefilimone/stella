@@ -6,6 +6,7 @@ mod diagnostics;
 mod lexer;
 mod modules;
 mod parser;
+mod stdlib;
 mod types;
 mod utils;
 

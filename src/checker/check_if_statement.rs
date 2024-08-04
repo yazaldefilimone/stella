@@ -1,29 +1,21 @@
 use super::Checker;
-use crate::{
-  ast::ast,
-  diagnostics::{Diagnostic, TypeError},
-  types::Type,
-};
+use crate::{ast::ast, diagnostics::Diagnostic, types::Type};
 
 impl<'a> Checker<'a> {
-  pub fn check_if_statement(&mut self, if_: &ast::IfStatement) -> Result<Type, Diagnostic> {
-    let condition_t = self.check_expression(&if_.condition)?;
-    if !condition_t.check_match(&Type::Boolean) {
-      let left_location = if_.condition.get_location();
-      let diagnostic =
-        TypeError::MismatchedTypes(Type::new_boolean().to_string(), condition_t.to_string(), Some(left_location));
-
-      return Err(self.create_diagnostic(diagnostic));
+  pub fn check_if_statement(&mut self, if_stmt: &ast::IfStatement) -> Result<Type, Diagnostic> {
+    let condition_type = self.check_expression(&if_stmt.condition)?;
+    if !condition_type.check_match(&Type::Boolean) {
+      let condition_location = if_stmt.condition.get_location();
+      return Err(self.create_type_mismatch(Type::new_boolean(), condition_type, condition_location));
     }
 
-    let body_t = self.check_statement(&if_.then_body)?;
-    if let Some(else_body) = &if_.else_body {
-      let else_body_t = self.check_statement(else_body)?;
-
-      let union_t = Type::new_union(vec![body_t, else_body_t]);
-
-      return Ok(union_t);
+    let then_type = self.check_statement(&if_stmt.then_body)?;
+    if let Some(else_body) = &if_stmt.else_body {
+      let else_type = self.check_statement(else_body)?;
+      let union_type = Type::new_union(vec![then_type, else_type]);
+      return Ok(union_type);
     }
-    return Ok(body_t);
+
+    Ok(then_type)
   }
 }

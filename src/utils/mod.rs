@@ -34,7 +34,7 @@ pub fn highlight_text_with_cyan(text: &str) -> String {
 }
 
 pub fn highlight_text_with_white(text: &str) -> String {
-  format!("\x1b[37m{}\x1b[0m", text)
+  format!("\x1b[97m{}\x1b[0m", text)
 }
 
 pub fn highlight_text_with_gray(text: &str) -> String {

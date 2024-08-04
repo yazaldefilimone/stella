@@ -2,24 +2,37 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::ast::ast::BinaryOperator;
+use crate::{ast::ast::BinaryOperator, utils::location::Location};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Type {
-  Number,                 // number e.g. 10
-  String,                 // string e.g. "hello"
-  Boolean,                // boolean e.g. true
-  Table(TableType),       // table<number, string>  e.g. {1, "one"}
-  Function(FunctionType), // (left: number, right: number): number  e.g. function(a, b) return a + b end
-  Generic(GenericType),   // type Either<T, U> = {left: T, right: U}
-  Union(UnionType),       // number | string or union<number, string>  e.g. 1 | "one"
-  Optional(OptionalType), // optional<number>  e.g. number | nil
-  Unknown,                // unknown
-  Identifier(String),     // type
-  Nil,                    // nil
-  Grup(GrupType),         // return type
+  Number,                       // number e.g. 10
+  String,                       // string e.g. "hello"
+  Boolean,                      // boolean e.g. true
+  Table(TableType),             // table<number, string>  e.g. {1, "one"}
+  Function(FunctionType),       // (left: number, right: number): number  e.g. function(a, b) return a + b end
+  Generic(GenericType),         // type Either<T, U> = {left: T, right: U}
+  GenericCall(GenericCallType), // fn<number, string> = function(a, b) return a + b end
+  Union(UnionType),             // number | string or union<number, string>  e.g. 1 | "one"
+  Optional(OptionalType),       // optional<number>  e.g. number | nil
+  Unknown,                      // unknown
+  Identifier(IdentifierType),   // type
+  Nil,                          // nil
+  Grup(GrupType),               // return type
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IdentifierType {
+  pub name: String,
+  pub location: Location,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GenericCallType {
+  pub name: String,
+  pub types: Vec<Type>,
+  pub location: Location,
+}
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GrupType {
   pub types: Vec<Type>,
@@ -53,7 +66,14 @@ pub struct FunctionType {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GenericType {
   pub name: String,
-  pub types: Vec<Type>,
+  pub variables: Vec<String>,
+  pub value: Box<Type>,
+  pub location: Location,
+}
+impl GenericType {
+  pub fn new(name: String, variables: Vec<String>, value: Type, location: Location) -> Self {
+    GenericType { name, variables, value: Box::new(value), location }
+  }
 }
 
 impl Type {
@@ -87,6 +107,8 @@ impl Type {
       | (Type::Boolean, BinaryOperator::Equal)
       | (Type::Boolean, BinaryOperator::NotEqual)
       | (Type::Nil, BinaryOperator::Equal)
+      // support any operator for unknown type
+      | (Type::Unknown, _)
       | (Type::Nil, BinaryOperator::NotEqual) => true,
       _ => false,
     }
@@ -141,7 +163,17 @@ impl Type {
   pub fn can_replace(&self, replaced: &Type) -> bool {
     match (self, replaced) {
       (Type::Unknown, _) => true,
+      (Type::Nil, _) => true,
       _ => false,
+    }
+  }
+
+  pub fn replace_generic(&self, replaced: &Type) -> Type {
+    match (self, replaced) {
+      (Type::Identifier(identifier), _) => {
+        return replaced.clone();
+      }
+      _ => self.clone(),
     }
   }
 
@@ -150,15 +182,16 @@ impl Type {
       Type::Number => "number".to_string(),
       Type::String => "string".to_string(),
       Type::Boolean => "boolean".to_string(),
+      Type::Nil => "nil".to_string(),
+      Type::Unknown => "unknown".to_string(),
       Type::Table(table) => format_table_type(table),
       Type::Function(function) => format_function_type(function),
       Type::Generic(generic) => format_generic_type(generic),
       Type::Union(union) => format_union_type(union),
       Type::Optional(optional) => format_optional_type(optional),
-      Type::Unknown => "unknown".to_string(),
-      Type::Identifier(name) => name.clone(),
-      Type::Nil => "nil".to_string(),
+      Type::Identifier(identifier) => format_identifier_type(identifier),
       Type::Grup(grup_return) => format_grup_return_type(grup_return),
+      Type::GenericCall(generic_call) => format_generic_call_type(generic_call),
     }
   }
   pub fn is_grup(&self) -> bool {
@@ -176,14 +209,28 @@ impl Type {
   }
 
   // Helper functions to create instances of various types.
-  pub fn new_type(name: &str) -> Self {
+  pub fn new_type(name: &str, location: Location) -> Self {
     match name {
       "number" => Type::Number,
       "string" => Type::String,
       "boolean" => Type::Boolean,
       "nil" => Type::Nil,
       "unknown" => Type::Unknown,
-      _ => Type::Identifier(name.to_owned()),
+      _ => Type::new_identifier(name, location),
+    }
+  }
+
+  pub fn new_identifier(name: &str, location: Location) -> Self {
+    Type::Identifier(IdentifierType { name: name.to_owned(), location })
+  }
+  pub fn new_generic(name: &str, variables: Vec<String>, value: Type, location: Location) -> Self {
+    Type::Generic(GenericType { name: name.to_owned(), variables, value: Box::new(value), location })
+  }
+
+  pub fn eccept_generic(name: &str) -> bool {
+    match name {
+      "number" | "string" | "boolean" | "nil" | "unknown" => false,
+      _ => true,
     }
   }
 
@@ -207,10 +254,6 @@ impl Type {
     Type::Function(FunctionType { params, return_type: Box::new(return_type) })
   }
 
-  pub fn new_generic(name: String, types: Vec<Type>) -> Self {
-    Type::Generic(GenericType { name, types })
-  }
-
   pub fn new_union(types: Vec<Type>) -> Self {
     Type::Union(UnionType { types })
   }
@@ -221,6 +264,10 @@ impl Type {
 
   pub fn new_grup(types: Vec<Type>) -> Self {
     Type::Grup(GrupType { types })
+  }
+
+  pub fn new_generic_call(name: String, types: Vec<Type>, location: Location) -> Self {
+    Type::GenericCall(GenericCallType { name, types, location })
   }
 }
 
@@ -255,17 +302,22 @@ fn check_match_grup_return_with_single_type(left: &GrupType, right: &Type) -> bo
 
 fn check_match_generic(left: &GenericType, right: &GenericType) -> bool {
   left.name == right.name
-    && left.types.len() == right.types.len()
-    && left.types.iter().zip(&right.types).all(|(l, r)| l.check_match(r))
+    && left.variables.len() == right.variables.len()
+    && left.variables.iter().zip(&right.variables).all(|(l, r)| l == r)
+    && left.value.check_match(&right.value)
 }
 
 fn format_generic_type(generic: &GenericType) -> String {
-  let types_str = generic.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
-  format!("{}<{}>", generic.name, types_str)
+  let types_str = generic.variables.iter().map(|t| t.to_string()).collect::<Vec<String>>().join(", ");
+  if types_str.is_empty() {
+    format!("{}", generic.name)
+  } else {
+    format!("{}<{}>", generic.name, types_str)
+  }
 }
 
 fn format_function_type(function: &FunctionType) -> String {
-  let params_str = function.params.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
+  let params_str = function.params.iter().map(|t| t.to_string()).collect::<Vec<String>>().join(", ");
   format!("function({}): {}", params_str, function.return_type.to_string())
 }
 
@@ -281,10 +333,21 @@ fn format_union_type(union: &UnionType) -> String {
 fn format_optional_type(optional: &OptionalType) -> String {
   format!("optional<{}>", optional.inner_type.to_string())
 }
+fn format_identifier_type(identifier: &IdentifierType) -> String {
+  return format!("{}", identifier.name);
+}
 
 fn format_grup_return_type(grup_return: &GrupType) -> String {
+  if grup_return.types.len() == 1 {
+    return grup_return.types[0].to_string();
+  }
   let types_str = grup_return.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
   format!("({})", types_str)
+}
+
+fn format_generic_call_type(generic_call: &GenericCallType) -> String {
+  let types_str = generic_call.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
+  format!("{}<{}>", generic_call.name, types_str)
 }
 
 pub fn can_replace_grup_return_type(replaced: &GrupType, replaced_type: &GrupType) -> bool {

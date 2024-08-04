@@ -12,7 +12,7 @@ use std::fmt::{self, Debug};
 use format::{
   format_function_arity_mismatch, format_mismatched_types, format_missing_variable_declaration,
   format_module_not_exported, format_module_not_found, format_redeclared_in_same_scope,
-  format_type_mismatch_assignment, format_undeclared_variable, format_unsupported_operator,
+  format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable, format_unsupported_operator,
   format_warning_shadow_warning, format_warning_unused_variable,
 };
 
@@ -117,6 +117,7 @@ impl From<TypeWarning> for Diagnostic {
 pub enum TypeError {
   MismatchedTypes(String, String, Option<Location>),
   UndeclaredVariable(String, Option<Location>),
+  UndeclaredType(String, Option<Location>),
   ModuleNotFound(String, Option<Location>),
   ModuleNotExported(String, Option<Location>),
   TypeMismatchAssignment(String, String, Option<Location>),
@@ -140,6 +141,7 @@ impl From<TypeError> for Diagnostic {
       TypeError::TypeMismatchAssignment(expected, found, loc) => {
         (format_type_mismatch_assignment(&expected, &found), loc)
       }
+      TypeError::UndeclaredType(name, loc) => (format_undeclared_type(&name), loc),
     };
 
     Diagnostic::new(DiagnosticLevel::Error, message, location)

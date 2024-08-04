@@ -6,6 +6,10 @@ pub fn format_undeclared_variable(name: &str) -> String {
   format!("cannot find value `{}` in this scope", name)
 }
 
+pub fn format_undeclared_type(name: &str) -> String {
+  format!("cannot find type `{}` in this scope", name)
+}
+
 pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
   if expected > 1 {
     format!("expected `{}` arguments, found `{}`", expected, found)
@@ -23,22 +27,22 @@ pub fn format_redeclared_in_same_scope(name: &str) -> String {
 }
 
 pub fn format_module_not_found(name: &str) -> String {
-  format!("module not found: '{}.lua'", name)
+  format!("module not found: `{}.lua`", name)
 }
 
 pub fn format_module_not_exported(name: &str) -> String {
-  format!("module `{}` doesn't export", name)
+  format!("module `{}` doesn`t export", name)
 }
 
 pub fn format_type_mismatch_assignment(expected: &str, found: &str) -> String {
-  format!("can't assign `{}` to `{}`", expected, found)
+  format!("can`t assign `{}` to `{}`", expected, found)
 }
 
 pub fn format_missing_variable_declaration() -> String {
   format!("missing variable name in declaration or assignment")
 }
 pub fn format_warning_shadow_warning(name: &str) -> String {
-  format!("local variable '{}' shadows global variable", name)
+  format!("local variable `{}` shadows global variable", name)
 }
 
 pub fn format_missing_return_value() -> String {
@@ -46,7 +50,7 @@ pub fn format_missing_return_value() -> String {
 }
 
 pub fn format_nil_assignment(name: &str) -> String {
-  format!("can't assign 'nil' to `{}`", name)
+  format!("can`t assign `nil` to `{}`", name)
 }
 
 pub fn format_invalid_indexing(indexed: &str, index: &str) -> String {
@@ -66,7 +70,7 @@ pub fn format_recursive_function(name: &str) -> String {
 }
 
 pub fn format_invalid_use_of_varargs() -> String {
-  format!("invalid use of '...'")
+  format!("invalid use of `...`")
 }
 
 pub fn format_unreachable_code() -> String {
@@ -84,31 +88,31 @@ pub fn format_incorrect_table_structure(expected: &str, found: &str) -> String {
 // warning
 
 pub fn format_warning_unused_variable(name: &str) -> String {
-  format!("value '{}' is defined but never used", name)
+  format!("value `{}` is defined but never used", name)
 }
 
 pub fn format_warning_redeclaration(name: &str) -> String {
-  format!("redeclaration of local variable '{}'", name)
+  format!("redeclaration of local variable `{}`", name)
 }
 
 pub fn format_warning_uninitialized_variable(name: &str) -> String {
-  format!("value '{}' used before initialization", name)
+  format!("value `{}` used before initialization", name)
 }
 
 pub fn format_warning_undeclared_global(name: &str) -> String {
-  format!("usage of undeclared global variable '{}'", name)
+  format!("usage of undeclared global variable `{}`", name)
 }
 
 pub fn format_warning_execution_order(name: &str) -> String {
-  format!("usage of variable '{}' may depend on execution order", name)
+  format!("usage of variable `{}` may depend on execution order", name)
 }
 
 pub fn format_warning_variable_declared_not_initialized(name: &str) -> String {
-  format!("value '{}' declared but not initialized", name)
+  format!("value `{}` declared but not initialized", name)
 }
 
 pub fn format_warning_scope_end(name: &str) -> String {
-  format!("value '{}' used outside its valid scope", name)
+  format!("value `{}` used outside its valid scope", name)
 }
 
 pub fn format_warning_shadowed_variable(name: &str) -> String {

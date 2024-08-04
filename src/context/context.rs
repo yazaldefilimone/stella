@@ -60,6 +60,34 @@ impl Context {
     }
   }
 
+  pub fn declare_type(&mut self, name: &str, type_: Type) {
+    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
+      scope.types.insert(name.to_owned(), type_);
+      self.set_unused_variable(name);
+    }
+  }
+
+  pub fn get_type(&self, name: &str) -> Option<&Type> {
+    for scope in self.scopes.iter().rev() {
+      if let Some(ty) = scope.types.get(name) {
+        return Some(ty);
+      }
+    }
+    return None;
+  }
+
+  pub fn get_generics(&self, name: &str) -> Option<&Vec<Type>> {
+    for scope in self.scopes.iter().rev() {
+      if let Some(ty) = scope.types.get(name) {
+        match ty {
+          // Type::Generic(generic) => return Some(&generic.types),
+          _ => return None,
+        }
+      }
+    }
+    None
+  }
+
   pub fn declare_return_param_type(&mut self, type_: Type) {
     if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
       scope.variables.insert("return_param".to_owned(), type_);
@@ -321,6 +349,7 @@ impl Context {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
   pub variables: BTreeMap<String, Type>,
+  pub types: BTreeMap<String, Type>,
   pub local_variables: BTreeSet<String>,
   pub unused_variables: BTreeSet<String>,
   pub variables_location: BTreeMap<String, Location>,
@@ -331,6 +360,7 @@ impl Scope {
     Scope {
       local_variables: BTreeSet::new(),
       variables: BTreeMap::new(),
+      types: BTreeMap::new(),
       unused_variables: BTreeSet::new(),
       variables_location: BTreeMap::new(),
     }

@@ -7,6 +7,7 @@ pub mod check_call_expression;
 pub mod check_empty_statement;
 pub mod check_expression;
 pub mod check_for_statement;
+pub mod check_function_expression;
 pub mod check_function_statement;
 pub mod check_grouped_expression;
 pub mod check_identifier;
@@ -17,12 +18,12 @@ pub mod check_require_expression;
 pub mod check_return_statement;
 pub mod check_statement;
 pub mod check_type;
+pub mod check_type_declaration;
 pub mod check_unary_expression;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
-
+pub mod declare_variables;
 use crate::ast::ast;
-use crate::ast::tokens::Token;
 use crate::context::context::Context;
 use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError, TypeWarning};
 use crate::modules::loader::Loader;
@@ -86,69 +87,18 @@ impl<'a> Checker<'a> {
     self.diagnostics.emit_all(self.raw, &self.file_name);
   }
 
-  pub fn _declaration(
-    &mut self,
-    names: &Vec<(Token, Option<Type>)>,
-    ty: Type,
-    local: bool,
-    loc: Location,
-  ) -> Result<(), Diagnostic> {
-    if let Type::Grup(group) = ty {
-      for (index, token) in names.iter().enumerate() {
-        let tt = if index >= group.types.len() { Type::Nil } else { group.types[index].clone() };
-        self._declare_variable(token, tt, local)?;
-      }
-      return Ok(());
-    }
-    for (index, token) in names.iter().enumerate() {
-      if index == 0 {
-        self._declare_variable(token, ty.clone(), local)?;
-        continue;
-      }
-
-      self._declare_variable(token, Type::Nil, local)?;
-    }
-
-    Ok(())
+  pub fn create_type_mismatch(&self, expected: Type, found: Type, location: Location) -> Diagnostic {
+    let diagnostic = TypeError::TypeMismatchAssignment(expected.to_string(), found.to_string(), Some(location));
+    self.create_diagnostic(diagnostic)
   }
 
-  pub fn _declare_variable(&mut self, value: &(Token, Option<Type>), ty: Type, local: bool) -> Result<(), Diagnostic> {
-    let lexeme = value.0.lexeme();
+  pub fn create_redeclaration(&self, lexeme: &str, location: Location) -> Diagnostic {
+    let diagnostic = TypeError::RedeclaredInSameScope(lexeme.to_string(), Some(location));
+    self.create_diagnostic(diagnostic)
+  }
 
-    if let Some(value_type) = &value.1 {
-      if !value_type.check_match(&ty) {
-        let location = value.0.location.clone();
-        let diagnostic = TypeError::TypeMismatchAssignment(value_type.to_string(), ty.to_string(), Some(location));
-        return Err(self.create_diagnostic(diagnostic));
-      }
-    }
-
-    if local && self.ctx.defined_in_current_scope(lexeme) {
-      let location = value.0.location.clone();
-      if self.ctx.lookup_local_variable(lexeme) {
-        let diagnostic = TypeError::RedeclaredInSameScope(lexeme.to_string(), Some(location));
-        return Err(self.create_diagnostic(diagnostic));
-      }
-
-      let diagnostic = TypeWarning::ShadowedVariable(lexeme.to_string(), Some(location));
-      self.diagnostics.add(diagnostic.into());
-    }
-
-    if let Some(previous_type) = self.ctx.get_variable_in_global_scope(lexeme) {
-      let loc = value.0.location.clone();
-      if !ty.check_match(&previous_type) {
-        let diagnostic = TypeError::TypeMismatchAssignment(previous_type.to_string(), ty.to_string(), Some(loc));
-        return Err(self.create_diagnostic(diagnostic));
-      }
-      self.ctx.set_variable_location(lexeme, loc);
-    }
-
-    // if it's a local variable, then set it in the current scope
-    if local {
-      self.ctx.set_local_variable(lexeme);
-    }
-
-    self.ctx.declare_variable(lexeme, ty);
-    return Ok(());
+  pub fn create_function_arity_mismatch(&self, expected: usize, found: usize, location: Location) -> Diagnostic {
+    let diagnostic = TypeError::FunctionArityMismatch(expected, found, Some(location));
+    self.create_diagnostic(diagnostic)
   }
 }
