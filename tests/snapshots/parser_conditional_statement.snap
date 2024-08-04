@@ -38,6 +38,7 @@ Program(
         ), Some(Boolean)),
       ],
       return_type: None,
+      generics: [],
       body: Block(BlockStatement(
         statements: [
           If(IfStatement(

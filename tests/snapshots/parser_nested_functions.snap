@@ -38,6 +38,7 @@ Program(
         ), Some(Number)),
       ],
       return_type: Some(Number),
+      generics: [],
       body: Block(BlockStatement(
         statements: [
           Function(FunctionStatement(
@@ -75,6 +76,7 @@ Program(
               ), Some(Number)),
             ],
             return_type: Some(String),
+            generics: [],
             body: Block(BlockStatement(
               statements: [
                 Return(ReturnStatement(

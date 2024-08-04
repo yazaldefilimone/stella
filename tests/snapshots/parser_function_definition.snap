@@ -38,6 +38,7 @@ Program(
         ), Some(String)),
       ],
       return_type: Some(Number),
+      generics: [],
       body: Block(BlockStatement(
         statements: [
           Return(ReturnStatement(
