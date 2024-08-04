@@ -1,8 +1,12 @@
-name: Codspeed Benchmark
+name: codspeed-benchmarks
+
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - "main" # or "master"
+  pull_request:
+  # `workflow_dispatch` allows CodSpeed to trigger backtest
+  # performance analysis in order to generate initial data.
   workflow_dispatch:
 
 jobs:
@@ -10,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup rust toolchain, cache and cargo-codspeed binary
         uses: moonrepo/setup-rust@v0
         with:
@@ -23,9 +28,5 @@ jobs:
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v3
         with:
-          token: ${{ secrets.CODSPEED_TOKEN }}
           run: cargo codspeed run
-
-  # for file in ./tests/golden_tests/*.lua; do
-  #             codspeed bench "./target/release/stella check $file"
-  # done
+          token: ${{ secrets.CODSPEED_TOKEN }}
