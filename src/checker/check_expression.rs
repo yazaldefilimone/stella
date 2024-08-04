@@ -13,6 +13,7 @@ impl<'a> Checker<'a> {
       ast::Expression::Require(require) => self.check_require_expression(require),
       ast::Expression::Unary(unary_expr) => self.check_unary_expression(unary_expr),
       ast::Expression::Grouped(grup_expr) => self.check_grouped_expression(grup_expr),
+      ast::Expression::Function(function) => self.check_function_expression(function),
     }
   }
 }

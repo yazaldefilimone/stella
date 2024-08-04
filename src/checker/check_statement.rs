@@ -26,6 +26,7 @@ impl<'a> Checker<'a> {
         Ok(Type::Nil)
       }
       ast::Statement::Expression(expression) => self.check_expression(&expression),
+      ast::Statement::TypeDeclaration(declaration) => self.check_type_declaration(declaration),
       _ => todo!("Implement more statement checks: {:#?}", statement),
     }
   }

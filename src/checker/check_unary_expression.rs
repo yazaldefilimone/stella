@@ -1,45 +1,40 @@
 use crate::ast::ast;
-use crate::diagnostics::TypeError;
-use crate::{diagnostics::Diagnostic, types::Type};
+use crate::diagnostics::{Diagnostic, TypeError};
+use crate::types::Type;
 
 use super::Checker;
 
 impl<'a> Checker<'a> {
   pub fn check_unary_expression(&mut self, unary_expr: &ast::UnaryExpression) -> Result<Type, Diagnostic> {
-    let operand_t = self.check_expression(&unary_expr.operand)?;
-    self.check_unary_operator(&operand_t, &unary_expr)?;
-    Ok(operand_t)
+    let operand_type = self.check_expression(&unary_expr.operand)?;
+    self.check_unary_operator(&operand_type, unary_expr)
   }
 
-  fn check_unary_operator(&mut self, t: &Type, unary: &ast::UnaryExpression) -> Result<Type, Diagnostic> {
-    match unary.operator {
-      ast::UnaryOperator::Negate => {
-        if t.check_match(&Type::Number) {
-          return Ok(Type::Number);
-        }
-
-        let diagnostic = TypeError::UnsupportedOperator(
-          t.to_string(),
-          t.to_string(),
-          unary.operator.to_str().to_owned(),
-          Some(unary.get_operator_location()),
-        );
-
-        Err(self.create_diagnostic(diagnostic))
-      }
-
-      ast::UnaryOperator::Not => {
-        if t.check_match(&Type::Boolean) {
-          return Ok(Type::Boolean);
-        }
-        Err(self.create_diagnostic(TypeError::UnsupportedOperator(
-          t.to_string(),
-          t.to_string(),
-          unary.operator.to_str().to_owned(),
-          Some(unary.get_operator_location()),
-        )))
-      }
+  fn check_unary_operator(&self, operand_t: &Type, unary_expr: &ast::UnaryExpression) -> Result<Type, Diagnostic> {
+    match unary_expr.operator {
+      ast::UnaryOperator::Negate => self.validate_unary_operator(operand_t, &Type::Number, unary_expr),
+      ast::UnaryOperator::Not => self.validate_unary_operator(operand_t, &Type::Boolean, unary_expr),
       _ => todo!("Implement more unary operators"),
     }
+  }
+
+  fn validate_unary_operator(
+    &self,
+    operand_t: &Type,
+    expected_t: &Type,
+    unary_expr: &ast::UnaryExpression,
+  ) -> Result<Type, Diagnostic> {
+    if operand_t.check_match(expected_t) {
+      return Ok(expected_t.clone());
+    }
+
+    let diagnostic = TypeError::UnsupportedOperator(
+      operand_t.to_string(),
+      operand_t.to_string(),
+      unary_expr.operator.to_str().to_owned(),
+      Some(unary_expr.get_operator_location()),
+    );
+
+    Err(self.create_diagnostic(diagnostic))
   }
 }
