@@ -46,6 +46,39 @@ impl<'a> Checker<'a> {
     }
   }
 
+  pub fn bind_generic(&self, table: &HashMap<String, Type>, ty: Type) -> Type {
+    match ty {
+      Type::Identifier(ident) => table.get(&ident.name).cloned().unwrap_or(Type::Unknown),
+      Type::Function(mut f) => {
+        f.params = f.params.into_iter().map(|p| self.bind_generic(table, p)).collect();
+        f.return_type = Box::new(self.bind_generic(table, *f.return_type));
+        Type::Function(f)
+      }
+      Type::Table(mut t) => {
+        t.key_type = Box::new(self.bind_generic(table, *t.key_type));
+        t.value_type = Box::new(self.bind_generic(table, *t.value_type));
+        Type::Table(t)
+      }
+      Type::Generic(mut g) => {
+        g.value = Box::new(self.bind_generic(table, *g.value));
+        Type::Generic(g)
+      }
+      Type::Optional(mut o) => {
+        o.inner_type = Box::new(self.bind_generic(table, *o.inner_type));
+        Type::Optional(o)
+      }
+      Type::Union(mut u) => {
+        u.types = u.types.into_iter().map(|t| self.bind_generic(table, t)).collect();
+        Type::Union(u)
+      }
+      Type::Grup(mut g) => {
+        g.types = g.types.into_iter().map(|t| self.bind_generic(table, t)).collect();
+        Type::Grup(g)
+      }
+      _ => ty,
+    }
+  }
+
   pub fn create_generic_table(&self, types: &[Type], variables: &[String]) -> HashMap<String, Type> {
     variables.iter().cloned().zip(types.iter().cloned()).collect()
   }
@@ -81,6 +114,16 @@ impl<'a> Checker<'a> {
       Type::Grup(group) => {
         let types = group.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
         Ok(Type::Grup(GrupType { types }))
+      }
+      Type::GenericCall(generic_call) => {
+        let types =
+          generic_call.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
+
+        Ok(Type::GenericCall(GenericCallType {
+          name: generic_call.name.clone(),
+          types,
+          location: generic_call.location.clone(),
+        }))
       }
       _ => Ok(generic_value.clone()),
     }
