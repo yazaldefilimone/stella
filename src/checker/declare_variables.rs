@@ -55,9 +55,8 @@ impl<'a> Checker<'a> {
     if local {
       self.ctx.set_local_variable(lexeme);
     } else {
-      self.ctx.set_variable_location(lexeme, value.0.location.clone());
     }
-
+    self.ctx.set_variable_location(lexeme, value.0.location.clone());
     Ok(())
   }
 

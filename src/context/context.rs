@@ -15,7 +15,7 @@ fn create_global_scope() -> Scope {
   let mut global_scope = Scope::new();
   global_scope.variables.insert("nil".to_string(), Type::Nil);
   // stdlib (print, type, etc)
-  global_scope.variables.insert("print".to_string(), Type::new_function(vec![Type::String], Type::Nil));
+  global_scope.variables.insert("print".to_string(), Type::new_function(vec![Type::Unknown], Type::Nil));
   global_scope
 }
 

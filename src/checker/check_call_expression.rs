@@ -8,15 +8,14 @@ use crate::{
 impl<'a> Checker<'a> {
   pub fn check_call_expression(&mut self, call_expr: &ast::CallExpression) -> Result<Type, Diagnostic> {
     let name = call_expr.name.lexeme();
-    let (defined, scope_idx) = self.ctx.defined_in_any_scope(name);
 
+    let (defined, scope_idx) = self.ctx.defined_in_any_scope(name);
     if !defined {
       let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.location.clone()));
       return Err(self.create_diagnostic(diagnostic));
     }
 
     if let Some(call_t) = self.ctx.get_function_in_scope(name, scope_idx) {
-      // todo: improve this
       let return_t = *call_t.return_type.clone();
       self.check_call_arguments(&call_expr.args, &call_t.params.to_vec())?;
       return Ok(return_t);
@@ -34,6 +33,7 @@ impl<'a> Checker<'a> {
       }
 
       for (arg_expr, param_t) in expressions.iter().zip(params_tt.iter()) {
+        let param_t = self.check_type(param_t.clone())?;
         let arg_t = self.check_expression(arg_expr)?;
         if !arg_t.check_match(&param_t) {
           let location = arg_expr.get_location();
