@@ -29,7 +29,7 @@ use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError, TypeWarning};
 use crate::modules::loader::Loader;
 use crate::modules::resolver::Resolver;
 use crate::types::Type;
-use crate::utils::location::Location;
+use crate::utils::range::Range;
 
 pub struct Checker<'a> {
   pub ctx: Context,
@@ -73,11 +73,11 @@ impl<'a> Checker<'a> {
   pub fn check_used_variable_in_current_scope(&mut self) {
     let used_variables = self.ctx.check_unused_variables();
     for used_variable in used_variables {
-      let used_variable_location = self.ctx.get_variable_location(&used_variable);
-      if used_variable_location.is_none() {
+      let used_variable_range = self.ctx.get_variable_range(&used_variable);
+      if used_variable_range.is_none() {
         continue;
       }
-      let report = TypeWarning::UnusedVariable(used_variable.clone(), used_variable_location);
+      let report = TypeWarning::UnusedVariable(used_variable.clone(), used_variable_range);
       self.diagnostics.add(report.into());
     }
   }
@@ -87,18 +87,18 @@ impl<'a> Checker<'a> {
     self.diagnostics.emit_all(self.raw, &self.file_name);
   }
 
-  pub fn create_type_mismatch(&self, expected: Type, found: Type, location: Location) -> Diagnostic {
-    let diagnostic = TypeError::TypeMismatchAssignment(expected.to_string(), found.to_string(), Some(location));
+  pub fn create_type_mismatch(&self, expected: Type, found: Type, range: Range) -> Diagnostic {
+    let diagnostic = TypeError::TypeMismatchAssignment(expected.to_string(), found.to_string(), Some(range));
     self.create_diagnostic(diagnostic)
   }
 
-  pub fn create_redeclaration(&self, lexeme: &str, location: Location) -> Diagnostic {
-    let diagnostic = TypeError::RedeclaredInSameScope(lexeme.to_string(), Some(location));
+  pub fn create_redeclaration(&self, lexeme: &str, range: Range) -> Diagnostic {
+    let diagnostic = TypeError::RedeclaredInSameScope(lexeme.to_string(), Some(range));
     self.create_diagnostic(diagnostic)
   }
 
-  pub fn create_function_arity_mismatch(&self, expected: usize, found: usize, location: Location) -> Diagnostic {
-    let diagnostic = TypeError::FunctionArityMismatch(expected, found, Some(location));
+  pub fn create_function_arity_mismatch(&self, expected: usize, found: usize, range: Range) -> Diagnostic {
+    let diagnostic = TypeError::FunctionArityMismatch(expected, found, Some(range));
     self.create_diagnostic(diagnostic)
   }
 }

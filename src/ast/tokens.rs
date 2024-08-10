@@ -2,71 +2,71 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::utils::location::Location;
+use crate::utils::range::Range;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Token {
   pub kind: TokenKind,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl Token {
-  pub fn new(kind: TokenKind, location: Location) -> Token {
-    Token { kind, location }
+  pub fn new(kind: TokenKind, range: Range) -> Token {
+    Token { kind, range }
   }
 
-  pub fn new_end_of_file(location: Location) -> Token {
-    Token::new(TokenKind::EOF, location)
+  pub fn new_end_of_file(range: Range) -> Token {
+    Token::new(TokenKind::EOF, range)
   }
 
-  pub fn new_identifier(location: Location, identifier: String) -> Token {
-    Token::new(TokenKind::Identifier(identifier), location)
+  pub fn new_identifier(range: Range, identifier: String) -> Token {
+    Token::new(TokenKind::Identifier(identifier), range)
   }
 
-  pub fn new_number(location: Location, number: String) -> Token {
-    Token::new(TokenKind::Number(number), location)
+  pub fn new_number(range: Range, number: String) -> Token {
+    Token::new(TokenKind::Number(number), range)
   }
 
-  pub fn new_string(location: Location, string: String) -> Token {
-    Token::new(TokenKind::String(string), location)
+  pub fn new_string(range: Range, string: String) -> Token {
+    Token::new(TokenKind::String(string), range)
   }
 
-  pub fn new_comment(location: Location, comment: String) -> Token {
-    Token::new(TokenKind::Comment(comment), location)
+  pub fn new_comment(range: Range, comment: String) -> Token {
+    Token::new(TokenKind::Comment(comment), range)
   }
 
-  pub fn new_block_comment(location: Location, comment: String) -> Token {
-    Token::new(TokenKind::BlockComment(comment), location)
+  pub fn new_block_comment(range: Range, comment: String) -> Token {
+    Token::new(TokenKind::BlockComment(comment), range)
   }
 
-  pub fn new_keyword_or_identifier(location: Location, keyword: String) -> Token {
+  pub fn new_keyword_or_identifier(range: Range, keyword: String) -> Token {
     match keyword.as_str() {
-      "function" => Token::new(TokenKind::Function, location),
-      "local" => Token::new(TokenKind::Local, location),
-      "if" => Token::new(TokenKind::If, location),
-      "then" => Token::new(TokenKind::Then, location),
-      "else" => Token::new(TokenKind::Else, location),
-      "elseif" => Token::new(TokenKind::ElseIf, location),
-      "end" => Token::new(TokenKind::End, location),
-      "while" => Token::new(TokenKind::While, location),
-      "do" => Token::new(TokenKind::Do, location),
-      "for" => Token::new(TokenKind::For, location),
-      "in" => Token::new(TokenKind::In, location),
-      "repeat" => Token::new(TokenKind::Repeat, location),
-      "until" => Token::new(TokenKind::Until, location),
-      "return" => Token::new(TokenKind::Return, location),
-      "break" => Token::new(TokenKind::Break, location),
-      "true" => Token::new(TokenKind::True, location),
-      "false" => Token::new(TokenKind::False, location),
-      "nil" => Token::new(TokenKind::Nil, location),
-      "type" => Token::new(TokenKind::Type, location),
-      "enum" => Token::new(TokenKind::Enum, location),
-      "continue" => Token::new(TokenKind::Continue, location),
-      "and" => Token::new(TokenKind::And, location),
-      "or" => Token::new(TokenKind::Or, location),
-      "not" => Token::new(TokenKind::Not, location),
-      "require" => Token::new(TokenKind::Require, location),
-      _ => Token::new(TokenKind::Identifier(keyword), location),
+      "function" => Token::new(TokenKind::Function, range),
+      "local" => Token::new(TokenKind::Local, range),
+      "if" => Token::new(TokenKind::If, range),
+      "then" => Token::new(TokenKind::Then, range),
+      "else" => Token::new(TokenKind::Else, range),
+      "elseif" => Token::new(TokenKind::ElseIf, range),
+      "end" => Token::new(TokenKind::End, range),
+      "while" => Token::new(TokenKind::While, range),
+      "do" => Token::new(TokenKind::Do, range),
+      "for" => Token::new(TokenKind::For, range),
+      "in" => Token::new(TokenKind::In, range),
+      "repeat" => Token::new(TokenKind::Repeat, range),
+      "until" => Token::new(TokenKind::Until, range),
+      "return" => Token::new(TokenKind::Return, range),
+      "break" => Token::new(TokenKind::Break, range),
+      "true" => Token::new(TokenKind::True, range),
+      "false" => Token::new(TokenKind::False, range),
+      "nil" => Token::new(TokenKind::Nil, range),
+      "type" => Token::new(TokenKind::Type, range),
+      "enum" => Token::new(TokenKind::Enum, range),
+      "continue" => Token::new(TokenKind::Continue, range),
+      "and" => Token::new(TokenKind::And, range),
+      "or" => Token::new(TokenKind::Or, range),
+      "not" => Token::new(TokenKind::Not, range),
+      "require" => Token::new(TokenKind::Require, range),
+      _ => Token::new(TokenKind::Identifier(keyword), range),
     }
   }
 }

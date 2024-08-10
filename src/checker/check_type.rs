@@ -29,20 +29,19 @@ impl<'a> Checker<'a> {
 
   pub fn check_generic_call(&mut self, generic_call: &GenericCallType) -> Result<Type, Diagnostic> {
     let ty = self.ctx.get_type(generic_call.name.as_str()).ok_or_else(|| {
-      self.create_diagnostic(TypeError::UndeclaredType(
-        generic_call.name.to_string(),
-        Some(generic_call.location.clone()),
-      ))
+      self.create_diagnostic(TypeError::UndeclaredType(generic_call.name.to_string(), Some(generic_call.range.clone())))
     })?;
 
     if let Type::Generic(generic) = ty {
       let binds = self.create_generic_table(&generic_call.types, &generic.variables);
       self.apply_generic_binds(&generic.value, &binds)
     } else {
-      Err(self.create_diagnostic(TypeError::UndeclaredType(
-        generic_call.name.to_string(),
-        Some(generic_call.location.clone()),
-      )))
+      Err(
+        self.create_diagnostic(TypeError::UndeclaredType(
+          generic_call.name.to_string(),
+          Some(generic_call.range.clone()),
+        )),
+      )
     }
   }
 
@@ -122,7 +121,7 @@ impl<'a> Checker<'a> {
         Ok(Type::GenericCall(GenericCallType {
           name: generic_call.name.clone(),
           types,
-          location: generic_call.location.clone(),
+          range: generic_call.range.clone(),
         }))
       }
       _ => Ok(generic_value.clone()),
@@ -131,7 +130,7 @@ impl<'a> Checker<'a> {
 
   pub fn check_generic_type(&mut self, generic: &GenericType) -> Result<Type, Diagnostic> {
     let ty = self.ctx.get_type(generic.name.as_str()).ok_or_else(|| {
-      self.create_diagnostic(TypeError::UndeclaredType(generic.name.to_string(), Some(generic.location.clone())))
+      self.create_diagnostic(TypeError::UndeclaredType(generic.name.to_string(), Some(generic.range.clone())))
     })?;
 
     let binds = self.create_generic_table(&[generic.value.as_ref().clone()], &generic.variables);
@@ -140,7 +139,7 @@ impl<'a> Checker<'a> {
 
   pub fn check_type_identifier(&mut self, ident: &IdentifierType) -> Result<Type, Diagnostic> {
     self.ctx.get_type(ident.name.as_str()).cloned().ok_or_else(|| {
-      self.create_diagnostic(TypeError::UndeclaredVariable(ident.name.to_string(), Some(ident.location.clone())))
+      self.create_diagnostic(TypeError::UndeclaredVariable(ident.name.to_string(), Some(ident.range.clone())))
     })
   }
 

@@ -12,7 +12,7 @@ impl<'a> Checker<'a> {
       Type::Unknown
     };
 
-    self.declare_variables(&declaration.values, right_type, declaration.local, declaration.get_location())?;
+    self.declare_variables(&declaration.values, right_type, declaration.local, declaration.get_range())?;
     Ok(Type::Nil)
   }
 }

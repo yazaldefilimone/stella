@@ -4,287 +4,135 @@ source: tests/snapshot_tests.rs
 [
   Token(
     kind: Local,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 0,
-      ),
-      end: Position(
-        line: 1,
-        column: 5,
-      ),
-      rage_start: 0,
-      rage_end: 5,
+    range: Range(
+      start: 0,
+      end: 5,
     ),
   ),
   Token(
     kind: Identifier("name"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 6,
-      ),
-      end: Position(
-        line: 1,
-        column: 10,
-      ),
-      rage_start: 6,
-      rage_end: 10,
+    range: Range(
+      start: 6,
+      end: 10,
     ),
   ),
   Token(
     kind: Colon,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 10,
-      ),
-      end: Position(
-        line: 1,
-        column: 11,
-      ),
-      rage_start: 10,
-      rage_end: 11,
+    range: Range(
+      start: 10,
+      end: 11,
     ),
   ),
   Token(
     kind: Identifier("string"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 12,
-      ),
-      end: Position(
-        line: 1,
-        column: 18,
-      ),
-      rage_start: 12,
-      rage_end: 18,
+    range: Range(
+      start: 12,
+      end: 18,
     ),
   ),
   Token(
     kind: Assign,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 19,
-      ),
-      end: Position(
-        line: 1,
-        column: 20,
-      ),
-      rage_start: 19,
-      rage_end: 20,
+    range: Range(
+      start: 19,
+      end: 20,
     ),
   ),
   Token(
     kind: String("Stella"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 21,
-      ),
-      end: Position(
-        line: 1,
-        column: 29,
-      ),
-      rage_start: 21,
-      rage_end: 29,
+    range: Range(
+      start: 21,
+      end: 29,
     ),
   ),
   Token(
     kind: Local,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 0,
-      ),
-      end: Position(
-        line: 2,
-        column: 5,
-      ),
-      rage_start: 30,
-      rage_end: 35,
+    range: Range(
+      start: 30,
+      end: 35,
     ),
   ),
   Token(
     kind: Identifier("age"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 6,
-      ),
-      end: Position(
-        line: 2,
-        column: 9,
-      ),
-      rage_start: 36,
-      rage_end: 39,
+    range: Range(
+      start: 36,
+      end: 39,
     ),
   ),
   Token(
     kind: Colon,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 9,
-      ),
-      end: Position(
-        line: 2,
-        column: 10,
-      ),
-      rage_start: 39,
-      rage_end: 40,
+    range: Range(
+      start: 39,
+      end: 40,
     ),
   ),
   Token(
     kind: Identifier("number"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 11,
-      ),
-      end: Position(
-        line: 2,
-        column: 17,
-      ),
-      rage_start: 41,
-      rage_end: 47,
+    range: Range(
+      start: 41,
+      end: 47,
     ),
   ),
   Token(
     kind: Assign,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 18,
-      ),
-      end: Position(
-        line: 2,
-        column: 19,
-      ),
-      rage_start: 48,
-      rage_end: 49,
+    range: Range(
+      start: 48,
+      end: 49,
     ),
   ),
   Token(
     kind: Number("25"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 20,
-      ),
-      end: Position(
-        line: 2,
-        column: 22,
-      ),
-      rage_start: 50,
-      rage_end: 52,
+    range: Range(
+      start: 50,
+      end: 52,
     ),
   ),
   Token(
     kind: Local,
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 0,
-      ),
-      end: Position(
-        line: 3,
-        column: 5,
-      ),
-      rage_start: 53,
-      rage_end: 58,
+    range: Range(
+      start: 53,
+      end: 58,
     ),
   ),
   Token(
     kind: Identifier("is_student"),
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 6,
-      ),
-      end: Position(
-        line: 3,
-        column: 16,
-      ),
-      rage_start: 59,
-      rage_end: 69,
+    range: Range(
+      start: 59,
+      end: 69,
     ),
   ),
   Token(
     kind: Colon,
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 16,
-      ),
-      end: Position(
-        line: 3,
-        column: 17,
-      ),
-      rage_start: 69,
-      rage_end: 70,
+    range: Range(
+      start: 69,
+      end: 70,
     ),
   ),
   Token(
     kind: Identifier("boolean"),
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 18,
-      ),
-      end: Position(
-        line: 3,
-        column: 25,
-      ),
-      rage_start: 71,
-      rage_end: 78,
+    range: Range(
+      start: 71,
+      end: 78,
     ),
   ),
   Token(
     kind: Assign,
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 26,
-      ),
-      end: Position(
-        line: 3,
-        column: 27,
-      ),
-      rage_start: 79,
-      rage_end: 80,
+    range: Range(
+      start: 79,
+      end: 80,
     ),
   ),
   Token(
     kind: True,
-    location: Location(
-      start: Position(
-        line: 3,
-        column: 28,
-      ),
-      end: Position(
-        line: 3,
-        column: 32,
-      ),
-      rage_start: 81,
-      rage_end: 85,
+    range: Range(
+      start: 81,
+      end: 85,
     ),
   ),
   Token(
     kind: EOF,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 0,
-      ),
-      end: Position(
-        line: 4,
-        column: 0,
-      ),
-      rage_start: 86,
-      rage_end: 86,
+    range: Range(
+      start: 86,
+      end: 86,
     ),
   ),
 ]

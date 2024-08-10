@@ -2,7 +2,7 @@
 use super::tokens::Token;
 use crate::{
   types::Type,
-  utils::location::{get_middle_location, Location},
+  utils::range::{create_middle_range, Range},
 };
 use serde::{Deserialize, Serialize};
 
@@ -46,10 +46,10 @@ impl AssignStatement {
     AssignStatement { values, value }
   }
 
-  pub fn get_location(&self) -> Location {
-    let left_location = self.values.first().unwrap().0.location.clone();
-    let right_location = self.value.get_location();
-    get_middle_location(&left_location, &right_location)
+  pub fn get_range(&self) -> Range {
+    let left_range = self.values.first().unwrap().0.range.clone();
+    let right_range = self.value.get_range();
+    create_middle_range(&left_range, &right_range)
   }
 }
 
@@ -61,7 +61,7 @@ pub struct FunctionStatement {
   pub return_type: Option<Type>,
   pub generics: Vec<Type>,
   pub body: Box<Statement>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl FunctionStatement {
@@ -72,21 +72,21 @@ impl FunctionStatement {
     arguments: Vec<(Token, Option<Type>)>,
     return_type: Option<Type>,
     body: Statement,
-    location: Location,
+    range: Range,
   ) -> Self {
-    FunctionStatement { name, local, generics, arguments, return_type, body: Box::new(body), location }
+    FunctionStatement { name, local, generics, arguments, return_type, body: Box::new(body), range }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReturnStatement {
   pub values: Vec<Expression>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl ReturnStatement {
-  pub fn new(values: Vec<Expression>, location: Location) -> Self {
-    ReturnStatement { values, location }
+  pub fn new(values: Vec<Expression>, range: Range) -> Self {
+    ReturnStatement { values, range }
   }
 }
 
@@ -95,12 +95,12 @@ pub struct IfStatement {
   pub condition: Expression,
   pub then_body: Box<Statement>,
   pub else_body: Option<Box<Statement>>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl IfStatement {
-  pub fn new(condition: Expression, then_body: Statement, else_body: Option<Statement>, location: Location) -> Self {
-    IfStatement { condition, then_body: Box::new(then_body), else_body: else_body.map(Box::new), location }
+  pub fn new(condition: Expression, then_body: Statement, else_body: Option<Statement>, range: Range) -> Self {
+    IfStatement { condition, then_body: Box::new(then_body), else_body: else_body.map(Box::new), range }
   }
 }
 
@@ -108,12 +108,12 @@ impl IfStatement {
 pub struct WhileStatement {
   pub condition: Expression,
   pub body: Box<Statement>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl WhileStatement {
-  pub fn new(condition: Expression, body: Statement, location: Location) -> Self {
-    WhileStatement { condition, body: Box::new(body), location }
+  pub fn new(condition: Expression, body: Statement, range: Range) -> Self {
+    WhileStatement { condition, body: Box::new(body), range }
   }
 }
 
@@ -121,12 +121,12 @@ impl WhileStatement {
 pub struct RepeatStatement {
   pub body: Box<Statement>,
   pub condition: Expression,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl RepeatStatement {
-  pub fn new(body: Statement, condition: Expression, location: Location) -> Self {
-    RepeatStatement { body: Box::new(body), condition, location }
+  pub fn new(body: Statement, condition: Expression, range: Range) -> Self {
+    RepeatStatement { body: Box::new(body), condition, range }
   }
 }
 
@@ -137,7 +137,7 @@ pub struct ForStatement {
   pub limit: Expression,
   pub step: Option<Expression>,
   pub body: Box<Statement>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl ForStatement {
@@ -147,44 +147,44 @@ impl ForStatement {
     limit: Expression,
     step: Option<Expression>,
     body: Statement,
-    location: Location,
+    range: Range,
   ) -> Self {
-    ForStatement { variable, init, limit, step, body: Box::new(body), location }
+    ForStatement { variable, init, limit, step, body: Box::new(body), range }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BreakStatement {
-  pub location: Location,
+  pub range: Range,
 }
 
 impl BreakStatement {
-  pub fn new(location: Location) -> Self {
-    BreakStatement { location }
+  pub fn new(range: Range) -> Self {
+    BreakStatement { range }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GotoStatement {
   pub label: Option<String>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl GotoStatement {
-  pub fn new(label: Option<String>, location: Location) -> Self {
-    GotoStatement { label, location }
+  pub fn new(label: Option<String>, range: Range) -> Self {
+    GotoStatement { label, range }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BlockStatement {
   pub statements: Vec<Statement>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl BlockStatement {
-  pub fn new(statements: Vec<Statement>, location: Location) -> Self {
-    BlockStatement { statements, location }
+  pub fn new(statements: Vec<Statement>, range: Range) -> Self {
+    BlockStatement { statements, range }
   }
 }
 
@@ -203,13 +203,13 @@ pub enum TypeInitializer {
 pub struct TypeDeclaration {
   pub name: Token,
   pub initiizer: Type,
-  pub location: Location,
+  pub range: Range,
   pub generis: Vec<String>,
 }
 
 impl TypeDeclaration {
-  pub fn new(name: Token, generis: Vec<String>, initiizer: Type, location: Location) -> Self {
-    TypeDeclaration { name, generis, initiizer, location }
+  pub fn new(name: Token, generis: Vec<String>, initiizer: Type, range: Range) -> Self {
+    TypeDeclaration { name, generis, initiizer, range }
   }
 }
 
@@ -217,16 +217,16 @@ impl TypeDeclaration {
 pub struct TypeFunction {
   pub params: Vec<Type>,
   pub return_type: Type,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl TypeFunction {
-  pub fn new(params: Vec<Type>, return_type: Type, location: Location) -> Self {
-    TypeFunction { params, return_type, location }
+  pub fn new(params: Vec<Type>, return_type: Type, range: Range) -> Self {
+    TypeFunction { params, return_type, range }
   }
 
-  pub fn get_location(&self) -> Location {
-    self.location.clone()
+  pub fn get_range(&self) -> Range {
+    self.range.clone()
   }
 }
 
@@ -242,10 +242,10 @@ impl VariableDeclaration {
     VariableDeclaration { values, local, initializer }
   }
 
-  pub fn get_location(&self) -> Location {
-    let left_location = self.values.first().unwrap().0.location.clone();
-    let right_location = self.initializer.as_ref().unwrap().get_location();
-    get_middle_location(&left_location, &right_location)
+  pub fn get_range(&self) -> Range {
+    let left_range = self.values.first().unwrap().0.range.clone();
+    let right_range = self.initializer.as_ref().unwrap().get_range();
+    create_middle_range(&left_range, &right_range)
   }
 }
 
@@ -266,41 +266,41 @@ impl Expression {
     Expression::Literal(value)
   }
 
-  pub fn new_identifier(name: String, location: Location) -> Self {
-    Expression::Identifier(Identifier::new(name, location))
+  pub fn new_identifier(name: String, range: Range) -> Self {
+    Expression::Identifier(Identifier::new(name, range))
   }
 
-  pub fn new_call(name: Token, args: Expression, location: Location) -> Self {
-    Expression::Call(CallExpression::new(name, Box::new(args), location))
+  pub fn new_call(name: Token, args: Expression, range: Range) -> Self {
+    Expression::Call(CallExpression::new(name, Box::new(args), range))
   }
 
-  pub fn new_require(module_name: Token, location: Location) -> Self {
-    Expression::Require(RequireExpression::new(module_name, location))
+  pub fn new_require(module_name: Token, range: Range) -> Self {
+    Expression::Require(RequireExpression::new(module_name, range))
   }
 
-  pub fn new_grouped(expressions: Vec<Expression>, location: Location) -> Self {
-    Expression::Grouped(GroupedExpression::new(expressions, location))
+  pub fn new_grouped(expressions: Vec<Expression>, range: Range) -> Self {
+    Expression::Grouped(GroupedExpression::new(expressions, range))
   }
 
   pub fn new_function(
     arguments: Vec<(Token, Option<Type>)>,
     return_type: Option<Type>,
     body: Statement,
-    loc: Location,
+    loc: Range,
   ) -> Self {
     Expression::Function(FunctionExpression::new(arguments, return_type, body, loc))
   }
 
-  pub fn get_location(&self) -> Location {
+  pub fn get_range(&self) -> Range {
     match self {
-      Expression::Literal(literal) => literal.get_location(),
-      Expression::Identifier(identifier) => identifier.location.clone(),
-      Expression::Call(call) => call.get_location(),
-      Expression::Binary(binary) => binary.get_location(),
-      Expression::Require(require) => require.get_location(),
-      Expression::Grouped(grouped) => grouped.get_location(),
-      Expression::Unary(unary) => unary.get_location(),
-      Expression::Function(function) => function.get_location(),
+      Expression::Literal(literal) => literal.get_range(),
+      Expression::Identifier(identifier) => identifier.range.clone(),
+      Expression::Call(call) => call.get_range(),
+      Expression::Binary(binary) => binary.get_range(),
+      Expression::Require(require) => require.get_range(),
+      Expression::Grouped(grouped) => grouped.get_range(),
+      Expression::Unary(unary) => unary.get_range(),
+      Expression::Function(function) => function.get_range(),
     }
   }
 }
@@ -308,46 +308,46 @@ impl Expression {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RequireExpression {
   pub module_name: Token,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl RequireExpression {
-  pub fn new(module_name: Token, location: Location) -> Self {
-    RequireExpression { module_name, location }
+  pub fn new(module_name: Token, range: Range) -> Self {
+    RequireExpression { module_name, range }
   }
 
-  pub fn get_location(&self) -> Location {
-    let right_location = self.module_name.location.clone();
-    let left_location = self.location.clone();
-    get_middle_location(&left_location, &right_location)
+  pub fn get_range(&self) -> Range {
+    let right_range = self.module_name.range.clone();
+    let left_range = self.range.clone();
+    create_middle_range(&left_range, &right_range)
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GroupedExpression {
   pub expressions: Vec<Expression>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl GroupedExpression {
-  pub fn new(expressions: Vec<Expression>, location: Location) -> Self {
-    GroupedExpression { expressions, location }
+  pub fn new(expressions: Vec<Expression>, range: Range) -> Self {
+    GroupedExpression { expressions, range }
   }
 
-  pub fn get_location(&self) -> Location {
-    self.location.clone()
+  pub fn get_range(&self) -> Range {
+    self.range.clone()
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Identifier {
   pub name: String,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl Identifier {
-  pub fn new(name: String, location: Location) -> Self {
-    Identifier { name, location }
+  pub fn new(name: String, range: Range) -> Self {
+    Identifier { name, range }
   }
 }
 
@@ -355,41 +355,41 @@ impl Identifier {
 pub struct CallExpression {
   pub name: Token,
   pub args: Box<Expression>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl CallExpression {
-  pub fn new(name: Token, args: Box<Expression>, location: Location) -> Self {
-    CallExpression { name, args, location }
+  pub fn new(name: Token, args: Box<Expression>, range: Range) -> Self {
+    CallExpression { name, args, range }
   }
 
-  pub fn get_location(&self) -> Location {
-    let left_location = self.name.location.clone();
-    let right_location = self.args.get_location();
-    get_middle_location(&left_location, &right_location)
+  pub fn get_range(&self) -> Range {
+    let left_range = self.name.range.clone();
+    let right_range = self.args.get_range();
+    create_middle_range(&left_range, &right_range)
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UnaryExpression {
-  pub location: Location,
+  pub range: Range,
   pub operator: UnaryOperator,
   pub operand: Box<Expression>,
 }
 
 impl UnaryExpression {
-  pub fn new(operator: UnaryOperator, operand: Box<Expression>, location: Location) -> Self {
-    UnaryExpression { operator, operand, location }
+  pub fn new(operator: UnaryOperator, operand: Box<Expression>, range: Range) -> Self {
+    UnaryExpression { operator, operand, range }
   }
 
-  pub fn get_location(&self) -> Location {
-    let left_location = self.operand.get_location();
-    let right_location = self.get_operator_location();
-    get_middle_location(&left_location, &right_location)
+  pub fn get_range(&self) -> Range {
+    let left_range = self.operand.get_range();
+    let right_range = self.get_operator_range();
+    create_middle_range(&left_range, &right_range)
   }
 
-  pub fn get_operator_location(&self) -> Location {
-    self.location.clone()
+  pub fn get_operator_range(&self) -> Range {
+    self.range.clone()
   }
 }
 
@@ -398,22 +398,17 @@ pub struct FunctionExpression {
   pub arguments: Vec<(Token, Option<Type>)>,
   pub return_type: Option<Type>,
   pub body: Box<Statement>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl FunctionExpression {
-  pub fn new(
-    arguments: Vec<(Token, Option<Type>)>,
-    return_type: Option<Type>,
-    body: Statement,
-    location: Location,
-  ) -> Self {
-    FunctionExpression { arguments, return_type, body: Box::new(body), location }
+  pub fn new(arguments: Vec<(Token, Option<Type>)>, return_type: Option<Type>, body: Statement, range: Range) -> Self {
+    FunctionExpression { arguments, return_type, body: Box::new(body), range }
   }
 
-  pub fn get_location(&self) -> Location {
-    let left_location = self.location.clone();
-    return left_location;
+  pub fn get_range(&self) -> Range {
+    let left_range = self.range.clone();
+    return left_range;
   }
 }
 
@@ -422,17 +417,17 @@ pub struct BinaryExpression {
   pub operator: BinaryOperator,
   pub left: Box<Expression>,
   pub right: Box<Expression>,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl BinaryExpression {
-  pub fn new(operator: BinaryOperator, left: Box<Expression>, right: Box<Expression>, location: Location) -> Self {
-    BinaryExpression { operator, left, right, location }
+  pub fn new(operator: BinaryOperator, left: Box<Expression>, right: Box<Expression>, range: Range) -> Self {
+    BinaryExpression { operator, left, right, range }
   }
-  pub fn get_location(&self) -> Location {
-    let left_location = self.left.get_location();
-    let right_location = self.right.get_location();
-    get_middle_location(&left_location, &right_location)
+  pub fn get_range(&self) -> Range {
+    let left_range = self.left.get_range();
+    let right_range = self.right.get_range();
+    create_middle_range(&left_range, &right_range)
   }
 }
 
@@ -445,24 +440,24 @@ pub enum LiteralExpression {
 }
 
 impl LiteralExpression {
-  pub fn new_number(value: String, location: Location) -> Self {
-    LiteralExpression::Number(NumberLiteral::new(value, location))
+  pub fn new_number(value: String, range: Range) -> Self {
+    LiteralExpression::Number(NumberLiteral::new(value, range))
   }
 
-  pub fn new_string(value: String, location: Location) -> Self {
-    LiteralExpression::String(StringLiteral::new(value, location))
+  pub fn new_string(value: String, range: Range) -> Self {
+    LiteralExpression::String(StringLiteral::new(value, range))
   }
 
-  pub fn new_bool(value: bool, location: Location) -> Self {
-    LiteralExpression::Boolean(BooleanLiteral::new(value, location))
+  pub fn new_bool(value: bool, range: Range) -> Self {
+    LiteralExpression::Boolean(BooleanLiteral::new(value, range))
   }
 
-  pub fn get_location(&self) -> Location {
+  pub fn get_range(&self) -> Range {
     match self {
-      LiteralExpression::Number(number) => number.location.clone(),
-      LiteralExpression::String(string) => string.location.clone(),
-      LiteralExpression::Boolean(boolean) => boolean.location.clone(),
-      LiteralExpression::Nil => Location::new(),
+      LiteralExpression::Number(number) => number.range.clone(),
+      LiteralExpression::String(string) => string.range.clone(),
+      LiteralExpression::Boolean(boolean) => boolean.range.clone(),
+      LiteralExpression::Nil => Range::new(),
     }
   }
 }
@@ -470,36 +465,36 @@ impl LiteralExpression {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NumberLiteral {
   pub value: String,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl NumberLiteral {
-  pub fn new(value: String, location: Location) -> Self {
-    NumberLiteral { value, location }
+  pub fn new(value: String, range: Range) -> Self {
+    NumberLiteral { value, range }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StringLiteral {
   pub value: String,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl StringLiteral {
-  pub fn new(value: String, location: Location) -> Self {
-    StringLiteral { value, location }
+  pub fn new(value: String, range: Range) -> Self {
+    StringLiteral { value, range }
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BooleanLiteral {
   pub value: bool,
-  pub location: Location,
+  pub range: Range,
 }
 
 impl BooleanLiteral {
-  pub fn new(value: bool, location: Location) -> Self {
-    BooleanLiteral { value, location }
+  pub fn new(value: bool, range: Range) -> Self {
+    BooleanLiteral { value, range }
   }
 }
 
@@ -537,6 +532,11 @@ pub enum BinaryOperator {
   GreaterThanOrEqual, // >=
   DoubleDot,          // ..
   DoubleSlash,        // //
+}
+
+pub struct TypeExpression {
+  pub name: Type,
+  pub range: Range,
 }
 
 impl BinaryOperator {

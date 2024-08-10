@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use crate::types::{FunctionType, Type};
-use crate::utils::location::Location;
+use crate::utils::range::Range;
 use std::collections::{BTreeMap, BTreeSet};
 
 pub struct Context {
@@ -295,18 +295,18 @@ impl Context {
     }
   }
 
-  pub fn get_variable_location(&self, name: &str) -> Option<Location> {
+  pub fn get_variable_range(&self, name: &str) -> Option<Range> {
     for scope in self.scopes.iter().rev() {
-      if let Some(location) = scope.variables_location.get(name) {
-        return Some(location.clone());
+      if let Some(range) = scope.variables_range.get(name) {
+        return Some(range.clone());
       }
     }
     None
   }
 
-  pub fn set_variable_location(&mut self, name: &str, location: Location) {
+  pub fn set_variable_range(&mut self, name: &str, range: Range) {
     if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables_location.insert(name.to_owned(), location);
+      scope.variables_range.insert(name.to_owned(), range);
     }
   }
 
@@ -352,7 +352,7 @@ pub struct Scope {
   pub types: BTreeMap<String, Type>,
   pub local_variables: BTreeSet<String>,
   pub unused_variables: BTreeSet<String>,
-  pub variables_location: BTreeMap<String, Location>,
+  pub variables_range: BTreeMap<String, Range>,
 }
 
 impl Scope {
@@ -362,7 +362,7 @@ impl Scope {
       variables: BTreeMap::new(),
       types: BTreeMap::new(),
       unused_variables: BTreeSet::new(),
-      variables_location: BTreeMap::new(),
+      variables_range: BTreeMap::new(),
     }
   }
 }

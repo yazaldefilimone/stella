@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{ast::ast::BinaryOperator, utils::location::Location};
+use crate::{ast::ast::BinaryOperator, utils::range::Range};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Type {
@@ -24,14 +24,14 @@ pub enum Type {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IdentifierType {
   pub name: String,
-  pub location: Location,
+  pub range: Range,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GenericCallType {
   pub name: String,
   pub types: Vec<Type>,
-  pub location: Location,
+  pub range: Range,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GrupType {
@@ -68,11 +68,11 @@ pub struct GenericType {
   pub name: String,
   pub variables: Vec<String>,
   pub value: Box<Type>,
-  pub location: Location,
+  pub range: Range,
 }
 impl GenericType {
-  pub fn new(name: String, variables: Vec<String>, value: Type, location: Location) -> Self {
-    GenericType { name, variables, value: Box::new(value), location }
+  pub fn new(name: String, variables: Vec<String>, value: Type, range: Range) -> Self {
+    GenericType { name, variables, value: Box::new(value), range }
   }
 }
 
@@ -209,22 +209,22 @@ impl Type {
   }
 
   // Helper functions to create instances of various types.
-  pub fn new_type(name: &str, location: Location) -> Self {
+  pub fn new_type(name: &str, range: Range) -> Self {
     match name {
       "number" => Type::Number,
       "string" => Type::String,
       "boolean" => Type::Boolean,
       "nil" => Type::Nil,
       "unknown" => Type::Unknown,
-      _ => Type::new_identifier(name, location),
+      _ => Type::new_identifier(name, range),
     }
   }
 
-  pub fn new_identifier(name: &str, location: Location) -> Self {
-    Type::Identifier(IdentifierType { name: name.to_owned(), location })
+  pub fn new_identifier(name: &str, range: Range) -> Self {
+    Type::Identifier(IdentifierType { name: name.to_owned(), range })
   }
-  pub fn new_generic(name: &str, variables: Vec<String>, value: Type, location: Location) -> Self {
-    Type::Generic(GenericType { name: name.to_owned(), variables, value: Box::new(value), location })
+  pub fn new_generic(name: &str, variables: Vec<String>, value: Type, range: Range) -> Self {
+    Type::Generic(GenericType { name: name.to_owned(), variables, value: Box::new(value), range })
   }
 
   pub fn eccept_generic(name: &str) -> bool {
@@ -266,8 +266,8 @@ impl Type {
     Type::Grup(GrupType { types })
   }
 
-  pub fn new_generic_call(name: String, types: Vec<Type>, location: Location) -> Self {
-    Type::GenericCall(GenericCallType { name, types, location })
+  pub fn new_generic_call(name: String, types: Vec<Type>, range: Range) -> Self {
+    Type::GenericCall(GenericCallType { name, types, range })
   }
 }
 

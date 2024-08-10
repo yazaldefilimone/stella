@@ -8,7 +8,7 @@ impl<'a> Checker<'a> {
     if declaration.generis.len() > 0 {
       let init = declaration.initiizer.clone();
       let generics = declaration.generis.clone();
-      let new_generics = Type::new_generic(declaration.name.lexeme(), generics, init, declaration.location.clone());
+      let new_generics = Type::new_generic(declaration.name.lexeme(), generics, init, declaration.range.clone());
       self.ctx.declare_type(&declaration.name.lexeme(), new_generics);
       return Ok(Type::Nil);
     }

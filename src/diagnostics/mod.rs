@@ -5,7 +5,7 @@ mod format_awesome;
 pub mod report;
 
 use crate::utils::highlight_text_with_gray;
-use crate::utils::location::Location;
+use crate::utils::range::Range;
 use report::report_error;
 use std::fmt::{self, Debug};
 
@@ -27,7 +27,7 @@ pub enum DiagnosticLevel {
 pub struct Diagnostic {
   pub level: DiagnosticLevel,
   pub message: String,
-  pub location: Option<Location>,
+  pub range: Option<Range>,
 }
 
 impl Debug for Diagnostic {
@@ -37,16 +37,16 @@ impl Debug for Diagnostic {
 }
 
 impl Diagnostic {
-  pub fn new(level: DiagnosticLevel, message: String, location: Option<Location>) -> Self {
-    Diagnostic { level, message, location }
+  pub fn new(level: DiagnosticLevel, message: String, range: Option<Range>) -> Self {
+    Diagnostic { level, message, range }
   }
 
   pub fn emit(&self, raw: &str, file_name: &str) {
-    if let Some(mut location) = self.location.clone() {
+    if let Some(mut range) = self.range.clone() {
       let warning = self.level == DiagnosticLevel::Warning;
-      report_error(&self.message, &mut location, raw, file_name, warning);
+      report_error(&self.message, &mut range, raw, file_name, warning);
     } else {
-      // ignore if location is not provided
+      // ignore if range is not provided
     }
   }
 }
@@ -99,37 +99,37 @@ impl DiagnosticManager {
 
 #[derive(Debug, Clone)]
 pub enum TypeWarning {
-  UnusedVariable(String, Option<Location>),
-  ShadowedVariable(String, Option<Location>),
+  UnusedVariable(String, Option<Range>),
+  ShadowedVariable(String, Option<Range>),
 }
 
 impl From<TypeWarning> for Diagnostic {
   fn from(warning: TypeWarning) -> Self {
-    let (message, location) = match warning {
+    let (message, range) = match warning {
       TypeWarning::UnusedVariable(name, loc) => (format_warning_unused_variable(&name), loc),
       TypeWarning::ShadowedVariable(name, loc) => (format_warning_shadow_warning(&name), loc),
     };
-    Diagnostic::new(DiagnosticLevel::Warning, message, location)
+    Diagnostic::new(DiagnosticLevel::Warning, message, range)
   }
 }
 
 #[derive(Debug, Clone)]
 pub enum TypeError {
-  MismatchedTypes(String, String, Option<Location>),
-  UndeclaredVariable(String, Option<Location>),
-  UndeclaredType(String, Option<Location>),
-  ModuleNotFound(String, Option<Location>),
-  ModuleNotExported(String, Option<Location>),
-  TypeMismatchAssignment(String, String, Option<Location>),
-  RedeclaredInSameScope(String, Option<Location>),
-  FunctionArityMismatch(usize, usize, Option<Location>),
-  UnsupportedOperator(String, String, String, Option<Location>),
-  MissingVariableDeclaration(Option<Location>),
+  MismatchedTypes(String, String, Option<Range>),
+  UndeclaredVariable(String, Option<Range>),
+  UndeclaredType(String, Option<Range>),
+  ModuleNotFound(String, Option<Range>),
+  ModuleNotExported(String, Option<Range>),
+  TypeMismatchAssignment(String, String, Option<Range>),
+  RedeclaredInSameScope(String, Option<Range>),
+  FunctionArityMismatch(usize, usize, Option<Range>),
+  UnsupportedOperator(String, String, String, Option<Range>),
+  MissingVariableDeclaration(Option<Range>),
 }
 
 impl From<TypeError> for Diagnostic {
   fn from(error: TypeError) -> Self {
-    let (message, location) = match error {
+    let (message, range) = match error {
       TypeError::MismatchedTypes(expected, found, loc) => (format_mismatched_types(&expected, &found), loc),
       TypeError::UndeclaredVariable(name, loc) => (format_undeclared_variable(&name), loc),
       TypeError::FunctionArityMismatch(expected, found, loc) => (format_function_arity_mismatch(expected, found), loc),
@@ -144,6 +144,6 @@ impl From<TypeError> for Diagnostic {
       TypeError::UndeclaredType(name, loc) => (format_undeclared_type(&name), loc),
     };
 
-    Diagnostic::new(DiagnosticLevel::Error, message, location)
+    Diagnostic::new(DiagnosticLevel::Error, message, range)
   }
 }

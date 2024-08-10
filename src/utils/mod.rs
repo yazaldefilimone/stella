@@ -4,7 +4,7 @@ use std::{
   fs,
   path::{Path, PathBuf},
 };
-pub mod location;
+pub mod range;
 
 pub fn match_number(character: char) -> bool {
   "1234567890.".contains(character)

@@ -11,7 +11,7 @@ impl<'a> Checker<'a> {
 
     let (defined, scope_idx) = self.ctx.defined_in_any_scope(name);
     if !defined {
-      let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.location.clone()));
+      let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.range.clone()));
       return Err(self.create_diagnostic(diagnostic));
     }
 
@@ -21,14 +21,14 @@ impl<'a> Checker<'a> {
       return Ok(return_t);
     }
 
-    let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.location.clone()));
+    let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.range.clone()));
     Err(self.create_diagnostic(diagnostic))
   }
 
   pub fn check_call_arguments(&mut self, args_call: &ast::Expression, params_tt: &[Type]) -> Result<(), Diagnostic> {
-    if let ast::Expression::Grouped(ast::GroupedExpression { expressions, location }) = args_call {
+    if let ast::Expression::Grouped(ast::GroupedExpression { expressions, range }) = args_call {
       if expressions.len() != params_tt.len() {
-        let diagnostic = TypeError::FunctionArityMismatch(params_tt.len(), expressions.len(), Some(location.clone()));
+        let diagnostic = TypeError::FunctionArityMismatch(params_tt.len(), expressions.len(), Some(range.clone()));
         return Err(self.create_diagnostic(diagnostic));
       }
 
@@ -36,8 +36,8 @@ impl<'a> Checker<'a> {
         let param_t = self.check_type(param_t.clone())?;
         let arg_t = self.check_expression(arg_expr)?;
         if !arg_t.check_match(&param_t) {
-          let location = arg_expr.get_location();
-          let diagnostic = TypeError::MismatchedTypes(param_t.to_string(), arg_t.to_string(), Some(location.clone()));
+          let range = arg_expr.get_range();
+          let diagnostic = TypeError::MismatchedTypes(param_t.to_string(), arg_t.to_string(), Some(range.clone()));
           return Err(self.create_diagnostic(diagnostic));
         }
       }
@@ -47,8 +47,8 @@ impl<'a> Checker<'a> {
     let arg_t = self.check_expression(args_call)?;
 
     if params_tt.len() != 1 {
-      let location = args_call.get_location();
-      let diagnostic = TypeError::FunctionArityMismatch(params_tt.len(), 1, Some(location));
+      let range = args_call.get_range();
+      let diagnostic = TypeError::FunctionArityMismatch(params_tt.len(), 1, Some(range));
       return Err(self.create_diagnostic(diagnostic));
     }
 

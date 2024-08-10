@@ -3,7 +3,7 @@ use crate::{
   ast::ast,
   diagnostics::{Diagnostic, TypeError},
   types::{replace_type, Type},
-  utils::location::Location,
+  utils::range::Range,
 };
 
 impl<'a> Checker<'a> {
@@ -12,7 +12,7 @@ impl<'a> Checker<'a> {
     let mut grup_return_type = Type::new_grup(return_types);
 
     if let Some(expected_t) = self.ctx.get_return_param_type() {
-      if !self.validate_return_type(&grup_return_type, &expected_t, &return_stmt.location)? {
+      if !self.validate_return_type(&grup_return_type, &expected_t, &return_stmt.range)? {
         return Ok(Type::Unknown);
       }
 
@@ -32,14 +32,14 @@ impl<'a> Checker<'a> {
     values.iter().map(|value| self.check_expression(value)).collect()
   }
 
-  fn validate_return_type(&self, return_t: &Type, expected_t: &Type, location: &Location) -> Result<bool, Diagnostic> {
+  fn validate_return_type(&self, return_t: &Type, expected_t: &Type, range: &Range) -> Result<bool, Diagnostic> {
     if return_t.is_grup() && expected_t.is_grup() && !return_t.same_grup_length(expected_t) {
-      let diagnostic = TypeError::MismatchedTypes(expected_t.to_string(), return_t.to_string(), Some(location.clone()));
+      let diagnostic = TypeError::MismatchedTypes(expected_t.to_string(), return_t.to_string(), Some(range.clone()));
       return Err(self.create_diagnostic(diagnostic));
     }
 
     if !return_t.check_match(expected_t) {
-      let diagnostic = TypeError::MismatchedTypes(expected_t.to_string(), return_t.to_string(), Some(location.clone()));
+      let diagnostic = TypeError::MismatchedTypes(expected_t.to_string(), return_t.to_string(), Some(range.clone()));
       return Err(self.create_diagnostic(diagnostic));
     }
 

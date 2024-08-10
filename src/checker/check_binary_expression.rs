@@ -3,7 +3,7 @@ use crate::{
   ast::ast,
   diagnostics::{Diagnostic, TypeError},
   types::Type,
-  utils::location::Location,
+  utils::range::Range,
 };
 
 impl<'a> Checker<'a> {
@@ -14,19 +14,19 @@ impl<'a> Checker<'a> {
     if left_t.supports_operator(&binary_expr.operator) && right_t.supports_operator(&binary_expr.operator) {
       return Ok(left_t.get_operator_result_type(&right_t, &binary_expr.operator));
     }
-    let location = binary_expr.get_location();
+    let range = binary_expr.get_range();
 
     let diagnostic = TypeError::UnsupportedOperator(
       left_t.to_string(),
       right_t.to_string(),
       binary_expr.operator.to_str().to_owned(),
-      Some(location),
+      Some(range),
     );
 
     Err(self.create_diagnostic(diagnostic))
   }
 
-  pub fn check_add_expression(&mut self, left_t: Type, right_t: Type, loc: Location) -> Result<Type, Diagnostic> {
+  pub fn check_add_expression(&mut self, left_t: Type, right_t: Type, range: Range) -> Result<Type, Diagnostic> {
     if left_t.supports_operator(&ast::BinaryOperator::Add) && right_t.supports_operator(&ast::BinaryOperator::Add) {
       return Ok(Type::Number);
     }
@@ -35,7 +35,7 @@ impl<'a> Checker<'a> {
       left_t.to_string(),
       right_t.to_string(),
       ast::BinaryOperator::Add.to_str().to_owned(),
-      Some(loc),
+      Some(range),
     );
 
     Err(self.create_diagnostic(dignostic))

@@ -7,34 +7,18 @@ Program(
       values: [
         (Token(
           kind: Identifier("name"),
-          location: Location(
-            start: Position(
-              line: 1,
-              column: 6,
-            ),
-            end: Position(
-              line: 1,
-              column: 10,
-            ),
-            rage_start: 6,
-            rage_end: 10,
+          range: Range(
+            start: 6,
+            end: 10,
           ),
         ), Some(String)),
       ],
       local: true,
       initializer: Some(Literal(String(StringLiteral(
         value: "Stella",
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 21,
-          ),
-          end: Position(
-            line: 1,
-            column: 29,
-          ),
-          rage_start: 21,
-          rage_end: 29,
+        range: Range(
+          start: 21,
+          end: 29,
         ),
       )))),
     )),
