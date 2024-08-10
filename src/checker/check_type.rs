@@ -3,9 +3,7 @@ use std::collections::HashMap;
 use super::Checker;
 use crate::{
   diagnostics::{Diagnostic, TypeError},
-  types::{
-    FunctionType, GenericCallType, GenericType, GrupType, IdentifierType, OptionalType, TableType, Type, UnionType,
-  },
+  types::{self, Type},
 };
 
 impl<'a> Checker<'a> {
@@ -23,11 +21,12 @@ impl<'a> Checker<'a> {
       Type::Identifier(identifier) => self.check_type_identifier(&identifier),
       Type::Generic(generic) => self.check_generic_type(&generic),
       Type::GenericCall(generic_call) => self.check_generic_call(&generic_call),
+      Type::Function(function) => self.infer_function_type(function),
       _ => Ok(ty),
     }
   }
 
-  pub fn check_generic_call(&mut self, generic_call: &GenericCallType) -> Result<Type, Diagnostic> {
+  pub fn check_generic_call(&mut self, generic_call: &types::GenericCallType) -> Result<Type, Diagnostic> {
     let ty = self.ctx.get_type(generic_call.name.as_str()).ok_or_else(|| {
       self.create_diagnostic(TypeError::UndeclaredType(generic_call.name.to_string(), Some(generic_call.range.clone())))
     })?;
@@ -42,39 +41,6 @@ impl<'a> Checker<'a> {
           Some(generic_call.range.clone()),
         )),
       )
-    }
-  }
-
-  pub fn bind_generic(&self, table: &HashMap<String, Type>, ty: Type) -> Type {
-    match ty {
-      Type::Identifier(ident) => table.get(&ident.name).cloned().unwrap_or(Type::Unknown),
-      Type::Function(mut f) => {
-        f.params = f.params.into_iter().map(|p| self.bind_generic(table, p)).collect();
-        f.return_type = Box::new(self.bind_generic(table, *f.return_type));
-        Type::Function(f)
-      }
-      Type::Table(mut t) => {
-        t.key_type = Box::new(self.bind_generic(table, *t.key_type));
-        t.value_type = Box::new(self.bind_generic(table, *t.value_type));
-        Type::Table(t)
-      }
-      Type::Generic(mut g) => {
-        g.value = Box::new(self.bind_generic(table, *g.value));
-        Type::Generic(g)
-      }
-      Type::Optional(mut o) => {
-        o.inner_type = Box::new(self.bind_generic(table, *o.inner_type));
-        Type::Optional(o)
-      }
-      Type::Union(mut u) => {
-        u.types = u.types.into_iter().map(|t| self.bind_generic(table, t)).collect();
-        Type::Union(u)
-      }
-      Type::Grup(mut g) => {
-        g.types = g.types.into_iter().map(|t| self.bind_generic(table, t)).collect();
-        Type::Grup(g)
-      }
-      _ => ty,
     }
   }
 
@@ -95,30 +61,30 @@ impl<'a> Checker<'a> {
         let params =
           function.params.iter().map(|param| self.apply_generic_binds(param, binds)).collect::<Result<Vec<_>, _>>()?;
         let return_type = self.apply_generic_binds(&function.return_type, binds)?;
-        Ok(Type::Function(FunctionType { params, return_type: Box::new(return_type) }))
+        Ok(Type::Function(types::FunctionType { params, return_type: Box::new(return_type) }))
       }
       Type::Table(table) => {
         let key_type = self.apply_generic_binds(&table.key_type, binds)?;
         let value_type = self.apply_generic_binds(&table.value_type, binds)?;
-        Ok(Type::Table(TableType { key_type: Box::new(key_type), value_type: Box::new(value_type) }))
+        Ok(Type::Table(types::TableType { key_type: Box::new(key_type), value_type: Box::new(value_type) }))
       }
       Type::Union(union) => {
         let types = union.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
-        Ok(Type::Union(UnionType { types }))
+        Ok(Type::Union(types::UnionType { types }))
       }
       Type::Optional(optional) => {
         let inner_type = self.apply_generic_binds(&optional.inner_type, binds)?;
-        Ok(Type::Optional(OptionalType { inner_type: Box::new(inner_type) }))
+        Ok(Type::Optional(types::OptionalType { inner_type: Box::new(inner_type) }))
       }
       Type::Grup(group) => {
         let types = group.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
-        Ok(Type::Grup(GrupType { types }))
+        Ok(Type::Grup(types::GrupType { types }))
       }
       Type::GenericCall(generic_call) => {
         let types =
           generic_call.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
 
-        Ok(Type::GenericCall(GenericCallType {
+        Ok(Type::GenericCall(types::GenericCallType {
           name: generic_call.name.clone(),
           types,
           range: generic_call.range.clone(),
@@ -128,7 +94,7 @@ impl<'a> Checker<'a> {
     }
   }
 
-  pub fn check_generic_type(&mut self, generic: &GenericType) -> Result<Type, Diagnostic> {
+  pub fn check_generic_type(&mut self, generic: &types::GenericType) -> Result<Type, Diagnostic> {
     let ty = self.ctx.get_type(generic.name.as_str()).ok_or_else(|| {
       self.create_diagnostic(TypeError::UndeclaredType(generic.name.to_string(), Some(generic.range.clone())))
     })?;
@@ -137,7 +103,7 @@ impl<'a> Checker<'a> {
     self.apply_generic_binds(&ty, &binds)
   }
 
-  pub fn check_type_identifier(&mut self, ident: &IdentifierType) -> Result<Type, Diagnostic> {
+  pub fn check_type_identifier(&mut self, ident: &types::IdentifierType) -> Result<types::Type, Diagnostic> {
     self.ctx.get_type(ident.name.as_str()).cloned().ok_or_else(|| {
       self.create_diagnostic(TypeError::UndeclaredVariable(ident.name.to_string(), Some(ident.range.clone())))
     })
@@ -145,5 +111,30 @@ impl<'a> Checker<'a> {
 
   pub fn create_generic_table_type(&self, generics: &[String], inferred: &[Type]) -> HashMap<String, Type> {
     generics.iter().cloned().zip(inferred.iter().cloned()).collect()
+  }
+
+  pub fn infer_function_type(&mut self, function: types::FunctionType) -> Result<Type, Diagnostic> {
+    let inferred_params: Vec<Type> = function
+      .params
+      .iter()
+      .map(|param| if let Type::Unknown = param { self.infer_type_from_context(param) } else { Ok(param.clone()) })
+      .collect::<Result<Vec<_>, _>>()?;
+    let inferred_return_type = if let Type::Unknown = *function.return_type {
+      self.infer_return_type(&function)
+    } else {
+      Ok(*function.return_type.clone())
+    }?;
+
+    Ok(Type::Function(types::FunctionType { params: inferred_params, return_type: Box::new(inferred_return_type) }))
+  }
+
+  fn infer_type_from_context(&self, _param: &Type) -> Result<Type, Diagnostic> {
+    // Aqui você poderia tentar inferir o tipo a partir do contexto em que a função é usada
+    Ok(Type::Unknown) // Placeholder: Substitua isso com a inferência real
+  }
+
+  fn infer_return_type(&self, function: &types::FunctionType) -> Result<Type, Diagnostic> {
+    // Aqui você pode analisar o corpo da função para inferir o tipo de retorno
+    Ok(Type::Unknown) // Placeholder: Substitua isso com a inferência real
   }
 }

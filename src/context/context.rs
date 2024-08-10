@@ -1,136 +1,91 @@
 #![allow(dead_code)]
-use crate::types::{FunctionType, Type};
-use crate::utils::range::Range;
+
+use crate::{stdlib::create_stdlib, types::Type, utils::range::Range};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub struct Context {
   pub scope_pointer: usize,
   pub scopes: Vec<Scope>,
-  pub exports: BTreeMap<String, Type>,
-  pub modules: BTreeMap<String, Type>,
   pub return_decl_name: String,
 }
 
-fn create_global_scope() -> Scope {
-  let mut global_scope = Scope::new();
-  global_scope.variables.insert("nil".to_string(), Type::Nil);
-  // stdlib (print, type, etc)
-  global_scope.variables.insert("print".to_string(), Type::new_function(vec![Type::Unknown], Type::Nil));
-  global_scope
-}
-
-fn create_anonymous_function() -> Type {
-  Type::new_function(vec![], Type::Unknown)
-}
 impl Context {
-  pub fn new() -> Context {
-    let scopes = vec![create_global_scope()];
-    let exports = BTreeMap::new();
-    let return_decl_name = "return".to_string();
-    let modules = BTreeMap::new();
-    Context { scopes, scope_pointer: 0, exports, return_decl_name, modules }
+  pub fn new() -> Self {
+    Context { scopes: vec![Self::create_global_scope()], scope_pointer: 0, return_decl_name: "return".to_string() }
   }
 
-  pub fn lookup_local_variable(&mut self, name: &str) -> bool {
-    return self.lookup_local_variable_in_scope(name, self.scope_pointer);
+  fn create_global_scope() -> Scope {
+    let mut global_scope = Scope::new();
+    let stdlib = create_stdlib();
+    global_scope.variables.extend(stdlib);
+    global_scope
   }
 
-  pub fn lookup_local_variable_in_scope(&mut self, name: &str, scope_pointer: usize) -> bool {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      if scope.local_variables.contains(name) {
-        return true;
-      }
+  fn extend_global_scope(&mut self, table: BTreeMap<String, Type>, table_type: BTreeMap<String, Type>) {
+    self.scopes.get_mut(0).unwrap().variables.extend(table);
+    self.scopes.get_mut(0).unwrap().types.extend(table_type);
+  }
+
+  fn current_scope(&self) -> Option<&Scope> {
+    self.scopes.get(self.scope_pointer)
+  }
+
+  fn current_scope_mut(&mut self) -> Option<&mut Scope> {
+    self.scopes.get_mut(self.scope_pointer)
+  }
+
+  fn global_scope_mut(&mut self) -> Option<&mut Scope> {
+    self.scopes.get_mut(0)
+  }
+
+  fn get_scope(&self, scope_pointer: usize) -> Option<&Scope> {
+    self.scopes.get(scope_pointer)
+  }
+
+  fn get_scope_mut(&mut self, scope_pointer: usize) -> Option<&mut Scope> {
+    self.scopes.get_mut(scope_pointer)
+  }
+
+  // Scope Management
+  pub fn enter_scope(&mut self) {
+    self.scopes.push(Scope::new());
+    self.scope_pointer = self.scopes.len() - 1;
+  }
+
+  pub fn leave_scope(&mut self) {
+    if !self.scopes.is_empty() {
+      self.scopes.pop();
     }
-    return false;
+    self.scope_pointer = self.scopes.len().saturating_sub(1);
   }
 
-  pub fn set_local_variable(&mut self, name: &str) {
-    self.set_local_variable_in_scope(name, self.scope_pointer);
-  }
-  pub fn set_local_variable_in_scope(&mut self, name: &str, scope_pointer: usize) {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      scope.local_variables.insert(name.to_owned());
-    }
-  }
-
-  pub fn declare_variable(&mut self, name: &str, type_: Type) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.insert(name.to_owned(), type_);
-      self.set_unused_variable(name);
-    }
+  // Variable Management
+  pub fn declare_variable(&mut self, name: &str, tyy: Type, scope_pointer: Option<usize>) -> usize {
+    let (scope, scope_pointer) = match scope_pointer {
+      Some(pointer) => (self.get_scope_mut(pointer), pointer as i32),
+      None => (self.current_scope_mut(), -1),
+    };
+    if let Some(scope) = scope {
+      scope.variables.insert(name.to_owned(), tyy);
+      scope.unused_variables.insert(name.to_owned());
+    };
+    return if scope_pointer < 0 { self.scope_pointer } else { scope_pointer as usize };
   }
 
-  pub fn declare_type(&mut self, name: &str, type_: Type) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.types.insert(name.to_owned(), type_);
-      self.set_unused_variable(name);
-    }
-  }
-
-  pub fn get_type(&self, name: &str) -> Option<&Type> {
-    for scope in self.scopes.iter().rev() {
-      if let Some(ty) = scope.types.get(name) {
-        return Some(ty);
-      }
-    }
-    return None;
-  }
-
-  pub fn get_generics(&self, name: &str) -> Option<&Vec<Type>> {
-    for scope in self.scopes.iter().rev() {
-      if let Some(ty) = scope.types.get(name) {
-        match ty {
-          // Type::Generic(generic) => return Some(&generic.types),
-          _ => return None,
+  pub fn redeclare_variable(&mut self, name: &str, tyy: Type, scope_pointer: Option<usize>) -> bool {
+    if let Some(pointer) = scope_pointer {
+      if let Some(scope) = self.get_scope_mut(pointer) {
+        if scope.variables.contains_key(name) {
+          scope.variables.insert(name.to_owned(), tyy);
+          return true;
         }
       }
+      return false;
     }
-    None
-  }
-
-  pub fn declare_return_param_type(&mut self, type_: Type) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.insert("return_param".to_owned(), type_);
-    }
-  }
-  pub fn get_last_return(&self) -> Option<&Type> {
-    if let Some(scope) = self.scopes.get(self.scope_pointer) {
-      return scope.variables.get("return");
-    }
-    None
-  }
-
-  pub fn set_last_return(&mut self, type_: Type) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.insert("return".to_owned(), type_);
-    }
-  }
-
-  pub fn get_return_param_type(&self) -> Option<&Type> {
-    if let Some(scope) = self.scopes.get(self.scope_pointer) {
-      return scope.variables.get("return_param");
-    }
-    None
-  }
-
-  pub fn set_remove_return_param_type(&mut self) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.remove("return_param");
-    }
-  }
-
-  pub fn declare_variable_in_scope(&mut self, name: &str, type_: Type, scope_pointer: usize) {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      scope.variables.insert(name.to_owned(), type_);
-      self.set_unused_variable_in_scope(name, scope_pointer);
-    }
-  }
-
-  pub fn redeclare_variable(&mut self, name: &str, type_: Type) -> bool {
     for scope_pointer in (0..=self.scope_pointer).rev() {
-      if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-        if let Some(ty) = scope.variables.get_mut(name) {
-          *ty = type_;
+      if let Some(scope) = self.get_scope_mut(scope_pointer) {
+        if scope.variables.contains_key(name) {
+          scope.variables.insert(name.to_owned(), tyy);
           return true;
         }
       }
@@ -138,123 +93,29 @@ impl Context {
     return false;
   }
 
-  pub fn redeclare_in_scope(&mut self, name: &str, type_: Type, scope_pointer: usize) -> bool {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      if let Some(ty) = scope.variables.get_mut(name) {
-        *ty = type_;
-        return true;
+  pub fn get_variable(&self, name: &str, scope_pointer: Option<usize>) -> Option<&Type> {
+    if let Some(pointer) = scope_pointer {
+      if let Some(scope) = self.get_scope(pointer) {
+        if let Some(ty) = scope.variables.get(name) {
+          return Some(ty);
+        }
       }
+      return None;
     }
-    return false;
-  }
-
-  pub fn declare_function(&mut self, name: &str, params: Vec<Type>, return_type: Type) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables.insert(name.to_owned(), Type::new_function(params, return_type));
-    }
-  }
-
-  pub fn get_function(&self, name: &str) -> Option<&FunctionType> {
-    for scope in self.scopes.iter().rev() {
-      if let Some(function_type) = self.get_function_helper(scope, name) {
-        return Some(function_type);
-      }
-    }
-    None
-  }
-
-  pub fn get_function_helper<'a>(&'a self, scope: &'a Scope, name: &str) -> Option<&'a FunctionType> {
-    if let Some(function_type) = scope.variables.get(name) {
-      match function_type {
-        Type::Function(function_type) => return Some(function_type),
-        _ => return None,
-      }
-    }
-    return None;
-  }
-
-  pub fn get_function_in_scope(&self, name: &str, scope_pointer: usize) -> Option<&FunctionType> {
-    if let Some(scope) = self.scopes.get(scope_pointer) {
-      return self.get_function_helper(scope, name);
-    }
-    None
-  }
-  pub fn set_function_in_scope(&mut self, name: &str, scope_pointer: usize, function_type: Type) {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      scope.variables.insert(name.to_owned(), function_type);
-    }
-  }
-
-  pub fn declare_global_variable(&mut self, name: &str, type_: Type) {
-    if let Some(scope) = self.scopes.get_mut(0) {
-      scope.variables.insert(name.to_owned(), type_);
-      self.set_unused_variable(name);
-    }
-  }
-
-  pub fn remove_global_variable(&mut self, name: &str) {
-    if let Some(scope) = self.scopes.get_mut(0) {
-      scope.variables.remove(name);
-    }
-  }
-
-  pub fn enter_scope(&mut self) {
-    let scope = Scope::new();
-    self.scopes.push(scope);
-    self.scope_pointer = self.scopes.len() - 1;
-  }
-
-  pub fn leave_scope(&mut self) {
-    self.scopes.pop();
-    self.scope_pointer = self.scopes.len() - 1;
-  }
-
-  pub fn get_variable(&self, name: &str) -> Option<&Type> {
     for scope in self.scopes.iter().rev() {
       if let Some(ty) = scope.variables.get(name) {
         return Some(ty);
       }
     }
-    return None;
-  }
-
-  pub fn get_variable_in_scope(&self, name: &str, scope_pointer: usize) -> Option<&Type> {
-    if let Some(scope) = self.scopes.get(scope_pointer) {
-      return scope.variables.get(name);
-    }
     None
   }
-  fn contains(&self, name: &str, scope: &Option<&Scope>) -> bool {
-    if scope.is_none() {
-      return false;
-    }
-    scope.unwrap().variables.contains_key(name)
-  }
-
   pub fn defined_in_current_scope(&self, name: &str) -> bool {
-    self.contains(name, &self.scopes.get(self.scope_pointer))
-  }
-
-  pub fn defined_in_global_scope(&self, name: &str) -> bool {
-    self.contains(name, &self.scopes.get(0))
-  }
-
-  pub fn get_variable_in_global_scope(&self, name: &str) -> Option<&Type> {
-    if let Some(scope) = self.scopes.get(0) {
-      return scope.variables.get(name);
-    }
-    None
-  }
-
-  pub fn set_variable_in_global_scope(&mut self, name: &str, type_: Type) {
-    if let Some(scope) = self.scopes.get_mut(0) {
-      scope.variables.insert(name.to_owned(), type_);
-    }
+    self.current_scope().map_or(false, |scope| scope.variables.contains_key(name))
   }
 
   pub fn defined_in_any_scope(&self, name: &str) -> (bool, usize) {
     for (scope_pointer, scope) in self.scopes.iter().enumerate().rev() {
-      if self.contains(name, &Some(scope)) {
+      if scope.variables.contains_key(name) {
         return (true, scope_pointer);
       }
     }
@@ -262,87 +123,104 @@ impl Context {
   }
 
   pub fn check_unused_variables(&self) -> Vec<String> {
-    let mut unused = Vec::new();
-    for scope in &self.scopes {
-      for var in &scope.unused_variables {
-        if var != &self.return_decl_name {
-          unused.push(var.clone());
-        }
-      }
-    }
-    unused
+    self
+      .scopes
+      .iter()
+      .flat_map(|scope| scope.unused_variables.iter().filter(|var| *var != &self.return_decl_name).cloned())
+      .collect()
   }
 
-  pub fn use_variable(&mut self, name: &str) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
+  pub fn use_variable(&mut self, name: &str, scope_pointer: Option<usize>) {
+    let scope = match scope_pointer {
+      Some(pointer) => self.get_scope_mut(pointer),
+      None => self.current_scope_mut(),
+    };
+
+    if let Some(scope) = scope {
       scope.unused_variables.remove(name);
     }
   }
 
-  pub fn use_variable_in_scope(&mut self, name: &str, scope_pointer: usize) {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      scope.unused_variables.remove(name);
-    }
-  }
-  pub fn set_unused_variable(&mut self, name: &str) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.unused_variables.insert(name.to_owned());
-    }
-  }
-  pub fn set_unused_variable_in_scope(&mut self, name: &str, scope_pointer: usize) {
-    if let Some(scope) = self.scopes.get_mut(scope_pointer) {
-      scope.unused_variables.insert(name.to_owned());
+  // local declarations
+  pub fn set_local_declaration(&mut self, name: &str) {
+    if let Some(scope) = self.current_scope_mut() {
+      scope.local_declarations.insert(name.to_owned(), true);
     }
   }
 
+  pub fn is_local_declaration(&self, name: &str) -> bool {
+    self.current_scope().and_then(|scope| scope.local_declarations.get(name)).cloned().unwrap_or(false)
+  }
+
+  pub fn create_anonymous_function(&self) -> Type {
+    Type::new_function(vec![], Type::Unknown)
+  }
+
+  // Module Management
+  // pub fn get_module(&self, name: &str) -> Option<&Type> {
+  //   self.modules.get(name)
+  // }
+
+  // pub fn set_module(&mut self, name: &str, module: Type) {
+  //   self.modules.insert(name.to_owned(), module);
+  // }
+
+  // pub fn get_exports(&self) -> Vec<&Type> {
+  //   self.exports.values().collect()
+  // }
+
+  // Return Parameter Management
+  pub fn declare_return_param_type(&mut self, type_: Type) {
+    if let Some(scope) = self.current_scope_mut() {
+      scope.variables.insert("return_param".to_owned(), type_);
+    }
+  }
+
+  pub fn get_return_param_type(&self) -> Option<&Type> {
+    self.current_scope().and_then(|scope| scope.variables.get("return_param"))
+  }
+
+  pub fn set_remove_return_param_type(&mut self) {
+    if let Some(scope) = self.current_scope_mut() {
+      scope.variables.remove("return_param");
+    }
+  }
+
+  pub fn get_last_return(&self) -> Option<&Type> {
+    self.current_scope().and_then(|scope| scope.variables.get("return"))
+  }
+
+  pub fn set_last_return(&mut self, type_: Type) {
+    if let Some(scope) = self.current_scope_mut() {
+      scope.variables.insert("return".to_owned(), type_);
+    }
+  }
+
+  // Type Management
+  pub fn declare_type(&mut self, name: &str, type_: Type) {
+    if let Some(scope) = self.current_scope_mut() {
+      scope.types.insert(name.to_owned(), type_);
+    }
+  }
+  pub fn get_type(&self, name: &str) -> Option<&Type> {
+    self.current_scope().and_then(|scope| scope.types.get(name))
+  }
+
+  // Range Management
+  pub fn declare_variable_range(&mut self, name: &str, range: Range) {
+    if let Some(scope) = self.current_scope_mut() {
+      scope.ranges.insert(name.to_owned(), range);
+    }
+  }
   pub fn get_variable_range(&self, name: &str) -> Option<Range> {
-    for scope in self.scopes.iter().rev() {
-      if let Some(range) = scope.variables_range.get(name) {
-        return Some(range.clone());
-      }
-    }
-    None
+    self.current_scope().and_then(|scope| scope.ranges.get(name).cloned())
   }
 
-  pub fn set_variable_range(&mut self, name: &str, range: Range) {
-    if let Some(scope) = self.scopes.get_mut(self.scope_pointer) {
-      scope.variables_range.insert(name.to_owned(), range);
-    }
-  }
-
-  pub fn declare_function_placeholder(&mut self, name: &str) -> usize {
-    let function = create_anonymous_function();
-    self.declare_variable(name, function);
-    return self.scope_pointer;
-  }
-
-  pub fn update_function_placeholder(&mut self, name: &str, params: Vec<Type>, return_type: Type, scope: usize) {
-    if let Some(scope) = self.scopes.get_mut(scope) {
-      if let Some(function) = scope.variables.get_mut(name) {
-        *function = Type::new_function(params, return_type);
-      }
-    }
-  }
   pub fn is_global_scope(&self) -> bool {
     if self.scope_pointer == 0 && self.scopes.len() == 1 {
       return true;
     }
     return false;
-  }
-
-  pub fn get_module(&self, name: &str) -> Option<&Type> {
-    if self.modules.contains_key(name) {
-      return Some(self.modules.get(name).unwrap());
-    }
-    return None;
-  }
-  pub fn set_module(&mut self, name: &str, module: Type) {
-    self.modules.insert(name.to_owned(), module);
-  }
-
-  pub fn get_exports(&self) -> Vec<&Type> {
-    let values = self.exports.values().collect::<Vec<&Type>>();
-    return values.to_vec();
   }
 }
 
@@ -350,19 +228,19 @@ impl Context {
 pub struct Scope {
   pub variables: BTreeMap<String, Type>,
   pub types: BTreeMap<String, Type>,
-  pub local_variables: BTreeSet<String>,
   pub unused_variables: BTreeSet<String>,
-  pub variables_range: BTreeMap<String, Range>,
+  pub ranges: BTreeMap<String, Range>,
+  pub local_declarations: BTreeMap<String, bool>,
 }
 
 impl Scope {
-  pub fn new() -> Scope {
+  pub fn new() -> Self {
     Scope {
-      local_variables: BTreeSet::new(),
+      local_declarations: BTreeMap::new(),
       variables: BTreeMap::new(),
       types: BTreeMap::new(),
       unused_variables: BTreeSet::new(),
-      variables_range: BTreeMap::new(),
+      ranges: BTreeMap::new(),
     }
   }
 }

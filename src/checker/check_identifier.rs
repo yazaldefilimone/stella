@@ -11,8 +11,8 @@ impl<'a> Checker<'a> {
       let diagnostic = TypeError::UndeclaredVariable(ident.name.to_string(), Some(ident.range.clone()));
       return Err(self.create_diagnostic(diagnostic));
     }
-    self.ctx.use_variable_in_scope(&ident.name, scope_idx);
-    let t = self.ctx.get_variable_in_scope(&ident.name, scope_idx);
+    self.ctx.use_variable(&ident.name, Some(scope_idx));
+    let t = self.ctx.get_variable(&ident.name, Some(scope_idx));
     Ok(t.unwrap().clone())
   }
 }

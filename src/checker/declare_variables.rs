@@ -5,6 +5,7 @@ use crate::types::{FunctionType, Type};
 use crate::utils::range::Range;
 
 type NameType<'a> = &'a Vec<(Token, Option<Type>)>;
+type ValueType<'a> = &'a (Token, Option<Type>);
 
 impl<'a> Checker<'a> {
   pub fn declare_variables(&mut self, names: NameType, ty: Type, local: bool, range: Range) -> Result<(), Diagnostic> {
@@ -25,13 +26,7 @@ impl<'a> Checker<'a> {
     Ok(())
   }
 
-  pub fn declare_variable(
-    &mut self,
-    value: &(Token, Option<Type>),
-    ty: Type,
-    local: bool,
-    range: &Range,
-  ) -> Result<(), Diagnostic> {
+  pub fn declare_variable(&mut self, value: ValueType, ty: Type, local: bool, range: &Range) -> Result<(), Diagnostic> {
     let lexeme = value.0.lexeme();
     let mut checked_type = self.check_type(ty)?;
     if let Some(value_type) = &value.1 {
@@ -51,47 +46,37 @@ impl<'a> Checker<'a> {
 
     self.emmit_shadowing_and_redeclaration(lexeme, local, &value.0.range)?;
 
-    self.ctx.declare_variable(lexeme, checked_type);
+    self.ctx.declare_variable(lexeme, checked_type, None);
     if local {
-      self.ctx.set_local_variable(lexeme);
+      self.ctx.set_local_declaration(lexeme);
     } else {
     }
-    self.ctx.set_variable_range(lexeme, value.0.range.clone());
+    self.ctx.declare_variable_range(lexeme, value.0.range.clone());
     Ok(())
   }
 
-  pub fn emmit_shadowing_and_redeclaration(
-    &mut self,
-    lexeme: &str,
-    local: bool,
-    range: &Range,
-  ) -> Result<(), Diagnostic> {
+  pub fn emmit_shadowing_and_redeclaration(&mut self, lexeme: &str, local: bool, rg: &Range) -> Result<(), Diagnostic> {
     if local {
       if self.ctx.defined_in_current_scope(lexeme) {
-        if self.ctx.lookup_local_variable(lexeme) {
-          return Err(self.create_redeclaration(lexeme, range.clone()));
+        if self.ctx.is_local_declaration(lexeme) {
+          return Err(self.create_redeclaration(lexeme, rg.clone()));
         } else {
-          let diagnostic = TypeWarning::ShadowedVariable(lexeme.to_string(), Some(range.clone()));
+          let diagnostic = TypeWarning::ShadowedVariable(lexeme.to_string(), Some(rg.clone()));
           self.diagnostics.add(diagnostic.into());
         }
       }
-    } else if let Some(previous_type) = self.ctx.get_variable_in_global_scope(lexeme) {
-      let current_type = self.ctx.get_variable(lexeme).unwrap_or_else(|| &Type::Unknown);
+    } else if let Some(previous_type) = self.ctx.get_variable(lexeme, Some(0)) {
+      let current_type = self.ctx.get_variable(lexeme, None).unwrap_or_else(|| &Type::Unknown);
       if !previous_type.check_match(&current_type) {
-        return Err(self.create_type_mismatch(previous_type.to_owned(), current_type.to_owned(), range.clone()));
+        return Err(self.create_type_mismatch(previous_type.to_owned(), current_type.to_owned(), rg.clone()));
       }
     }
     Ok(())
   }
 
-  pub fn bind_function(
-    &mut self,
-    expected: &FunctionType,
-    found: &FunctionType,
-    range: &Range,
-  ) -> Result<(), Diagnostic> {
+  pub fn bind_function(&mut self, expected: &FunctionType, found: &FunctionType, rg: &Range) -> Result<(), Diagnostic> {
     if expected.params.len() != found.params.len() {
-      return Err(self.create_function_arity_mismatch(expected.params.len(), found.params.len(), range.clone()));
+      return Err(self.create_function_arity_mismatch(expected.params.len(), found.params.len(), rg.clone()));
     }
 
     for (expected_param, found_param) in expected.params.iter().zip(found.params.iter()) {
@@ -100,7 +85,7 @@ impl<'a> Checker<'a> {
       }
 
       if !expected_param.check_match(found_param) {
-        return Err(self.create_type_mismatch(expected_param.to_owned(), found_param.to_owned(), range.clone()));
+        return Err(self.create_type_mismatch(expected_param.to_owned(), found_param.to_owned(), rg.clone()));
       }
     }
 
@@ -112,7 +97,7 @@ impl<'a> Checker<'a> {
     }
 
     if !expected_return_type.check_match(&found_return_type) {
-      return Err(self.create_type_mismatch(expected_return_type, found_return_type, range.clone()));
+      return Err(self.create_type_mismatch(expected_return_type, found_return_type, rg.clone()));
     }
     return Ok(());
   }

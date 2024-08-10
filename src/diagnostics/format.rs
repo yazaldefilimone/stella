@@ -1,5 +1,9 @@
 pub fn format_mismatched_types(expected: &str, found: &str) -> String {
-  format!("expected type `{}`, found `{}`", expected, found)
+  format!("expected `{}`, found `{}`", expected, found)
+}
+
+pub fn format_expected_function(name: &str) -> String {
+  format!("expected function, found `{}`", name)
 }
 
 pub fn format_undeclared_variable(name: &str) -> String {
@@ -88,7 +92,7 @@ pub fn format_incorrect_table_structure(expected: &str, found: &str) -> String {
 // warning
 
 pub fn format_warning_unused_variable(name: &str) -> String {
-  format!("value `{}` is defined but never used", name)
+  format!("unused value `{}`", name)
 }
 
 pub fn format_warning_redeclaration(name: &str) -> String {

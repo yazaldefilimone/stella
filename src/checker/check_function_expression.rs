@@ -16,6 +16,11 @@ impl<'a> Checker<'a> {
 
     let last_type = self.check_statement(&function.body)?;
 
+    if !return_type.check_match(&last_type) {
+      let range = function.range_return_type.clone().unwrap_or(function.range.clone());
+      let diagnostic = self.create_type_mismatch(return_type, last_type, range);
+      return Err(diagnostic);
+    }
     if return_type.can_replace(&last_type) {
       return_type = replace_type(&return_type, &last_type);
     }

@@ -15,14 +15,26 @@ impl<'a> Checker<'a> {
       return Err(self.create_diagnostic(diagnostic));
     }
 
-    if let Some(call_t) = self.ctx.get_function_in_scope(name, scope_idx) {
-      let return_t = *call_t.return_type.clone();
-      self.check_call_arguments(&call_expr.args, &call_t.params.to_vec())?;
-      return Ok(return_t);
-    }
+    let call_type = self.ctx.get_variable(name, Some(scope_idx));
 
-    let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.range.clone()));
-    Err(self.create_diagnostic(diagnostic))
+    if call_type.is_none() {
+      let diagnostic = TypeError::UndeclaredVariable(name.to_string(), Some(call_expr.name.range.clone()));
+      return Err(self.create_diagnostic(diagnostic));
+    }
+    match call_type.unwrap() {
+      Type::Function(call_type) => {
+        let return_t = *call_type.return_type.clone();
+        self.check_call_arguments(&call_expr.args, &call_type.params.to_vec())?;
+        return Ok(return_t);
+      }
+      Type::Unknown => {
+        return Ok(Type::Unknown);
+      }
+      _ => {
+        let diagnostic = TypeError::ExpectedFunction(name.to_string(), Some(call_expr.name.range.clone()));
+        return Err(self.create_diagnostic(diagnostic));
+      }
+    }
   }
 
   pub fn check_call_arguments(&mut self, args_call: &ast::Expression, params_tt: &[Type]) -> Result<(), Diagnostic> {

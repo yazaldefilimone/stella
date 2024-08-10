@@ -10,10 +10,10 @@ use report::report_error;
 use std::fmt::{self, Debug};
 
 use format::{
-  format_function_arity_mismatch, format_mismatched_types, format_missing_variable_declaration,
-  format_module_not_exported, format_module_not_found, format_redeclared_in_same_scope,
-  format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable, format_unsupported_operator,
-  format_warning_shadow_warning, format_warning_unused_variable,
+  format_expected_function, format_function_arity_mismatch, format_mismatched_types,
+  format_missing_variable_declaration, format_module_not_exported, format_module_not_found,
+  format_redeclared_in_same_scope, format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable,
+  format_unsupported_operator, format_warning_shadow_warning, format_warning_unused_variable,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -117,6 +117,7 @@ impl From<TypeWarning> for Diagnostic {
 pub enum TypeError {
   MismatchedTypes(String, String, Option<Range>),
   UndeclaredVariable(String, Option<Range>),
+  ExpectedFunction(String, Option<Range>),
   UndeclaredType(String, Option<Range>),
   ModuleNotFound(String, Option<Range>),
   ModuleNotExported(String, Option<Range>),
@@ -130,18 +131,19 @@ pub enum TypeError {
 impl From<TypeError> for Diagnostic {
   fn from(error: TypeError) -> Self {
     let (message, range) = match error {
-      TypeError::MismatchedTypes(expected, found, loc) => (format_mismatched_types(&expected, &found), loc),
-      TypeError::UndeclaredVariable(name, loc) => (format_undeclared_variable(&name), loc),
-      TypeError::FunctionArityMismatch(expected, found, loc) => (format_function_arity_mismatch(expected, found), loc),
-      TypeError::UnsupportedOperator(left, right, op, loc) => (format_unsupported_operator(&left, &right, &op), loc),
-      TypeError::RedeclaredInSameScope(name, loc) => (format_redeclared_in_same_scope(&name), loc),
-      TypeError::ModuleNotFound(name, loc) => (format_module_not_found(&name), loc),
-      TypeError::ModuleNotExported(name, loc) => (format_module_not_exported(&name), loc),
-      TypeError::MissingVariableDeclaration(loc) => (format_missing_variable_declaration(), loc),
-      TypeError::TypeMismatchAssignment(expected, found, loc) => {
-        (format_type_mismatch_assignment(&expected, &found), loc)
+      TypeError::MismatchedTypes(expected, found, rg) => (format_mismatched_types(&expected, &found), rg),
+      TypeError::UndeclaredVariable(name, rg) => (format_undeclared_variable(&name), rg),
+      TypeError::FunctionArityMismatch(expected, found, rg) => (format_function_arity_mismatch(expected, found), rg),
+      TypeError::UnsupportedOperator(left, right, op, rg) => (format_unsupported_operator(&left, &right, &op), rg),
+      TypeError::RedeclaredInSameScope(name, rg) => (format_redeclared_in_same_scope(&name), rg),
+      TypeError::ModuleNotFound(name, rg) => (format_module_not_found(&name), rg),
+      TypeError::ModuleNotExported(name, rg) => (format_module_not_exported(&name), rg),
+      TypeError::MissingVariableDeclaration(rg) => (format_missing_variable_declaration(), rg),
+      TypeError::TypeMismatchAssignment(expected, found, rg) => {
+        (format_type_mismatch_assignment(&expected, &found), rg)
       }
-      TypeError::UndeclaredType(name, loc) => (format_undeclared_type(&name), loc),
+      TypeError::UndeclaredType(name, rg) => (format_undeclared_type(&name), rg),
+      TypeError::ExpectedFunction(name, rg) => (format_expected_function(&name), rg),
     };
 
     Diagnostic::new(DiagnosticLevel::Error, message, range)
