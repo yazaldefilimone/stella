@@ -13,6 +13,12 @@ pub struct Range {
   pub end: usize,
 }
 
+impl Range {
+  pub fn new() -> Self {
+    Range { start: 0, end: 0 }
+  }
+}
+
 impl Location {
   pub fn new() -> Self {
     Location {
@@ -61,8 +67,6 @@ pub struct Position {
   pub column: usize,
 }
 
-pub fn get_middle_location(left: &Location, right: &Location) -> Location {
-  let start = Position { line: left.start.line, column: left.start.column };
-  let end = Position { line: right.end.line, column: right.end.column };
-  Location { start, end, rage_start: left.rage_start, rage_end: right.rage_end }
+pub fn create_middle_range(left: &Range, right: &Range) -> Range {
+  return Range { start: left.start, end: right.end };
 }

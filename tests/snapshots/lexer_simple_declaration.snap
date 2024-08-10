@@ -4,107 +4,51 @@ source: tests/snapshot_tests.rs
 [
   Token(
     kind: Local,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 0,
-      ),
-      end: Position(
-        line: 1,
-        column: 5,
-      ),
-      rage_start: 0,
-      rage_end: 5,
+    range: Range(
+      start: 0,
+      end: 5,
     ),
   ),
   Token(
     kind: Identifier("name"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 6,
-      ),
-      end: Position(
-        line: 1,
-        column: 10,
-      ),
-      rage_start: 6,
-      rage_end: 10,
+    range: Range(
+      start: 6,
+      end: 10,
     ),
   ),
   Token(
     kind: Colon,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 10,
-      ),
-      end: Position(
-        line: 1,
-        column: 11,
-      ),
-      rage_start: 10,
-      rage_end: 11,
+    range: Range(
+      start: 10,
+      end: 11,
     ),
   ),
   Token(
     kind: Identifier("string"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 12,
-      ),
-      end: Position(
-        line: 1,
-        column: 18,
-      ),
-      rage_start: 12,
-      rage_end: 18,
+    range: Range(
+      start: 12,
+      end: 18,
     ),
   ),
   Token(
     kind: Assign,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 19,
-      ),
-      end: Position(
-        line: 1,
-        column: 20,
-      ),
-      rage_start: 19,
-      rage_end: 20,
+    range: Range(
+      start: 19,
+      end: 20,
     ),
   ),
   Token(
     kind: String("Stella"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 21,
-      ),
-      end: Position(
-        line: 1,
-        column: 29,
-      ),
-      rage_start: 21,
-      rage_end: 29,
+    range: Range(
+      start: 21,
+      end: 29,
     ),
   ),
   Token(
     kind: EOF,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 0,
-      ),
-      end: Position(
-        line: 2,
-        column: 0,
-      ),
-      rage_start: 30,
-      rage_end: 30,
+    range: Range(
+      start: 30,
+      end: 30,
     ),
   ),
 ]

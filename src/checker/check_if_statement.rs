@@ -5,8 +5,8 @@ impl<'a> Checker<'a> {
   pub fn check_if_statement(&mut self, if_stmt: &ast::IfStatement) -> Result<Type, Diagnostic> {
     let condition_type = self.check_expression(&if_stmt.condition)?;
     if !condition_type.check_match(&Type::Boolean) {
-      let condition_location = if_stmt.condition.get_location();
-      return Err(self.create_type_mismatch(Type::new_boolean(), condition_type, condition_location));
+      let condition_range = if_stmt.condition.get_range();
+      return Err(self.create_type_mismatch(Type::new_boolean(), condition_type, condition_range));
     }
 
     let then_type = self.check_statement(&if_stmt.then_body)?;

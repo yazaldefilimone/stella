@@ -1,11 +1,11 @@
 use crate::utils::{
   highlight_text_with_cyan, highlight_text_with_red, highlight_text_with_white, highlight_text_with_yellow,
-  location::Location,
+  range::Range,
 };
 
 use code_highlighter::{highlight_error, highlight_warning};
 
-pub fn report_error(message: &str, location: &mut Location, raw: &str, file_name: &str, warning: bool) {
+pub fn report_error(message: &str, range: &mut Range, raw: &str, file_name: &str, warning: bool) {
   println!("");
   if !warning {
     println!("{} {}.", highlight_text_with_red("ERROR >>>"), highlight_text_with_white(message));
@@ -15,23 +15,21 @@ pub fn report_error(message: &str, location: &mut Location, raw: &str, file_name
 
     println!("{}", message);
   }
-
   let file_highlight = highlight_text_with_cyan(&file_name);
-  let line_highlight = highlight_text_with_yellow(&format!(" {}:{}", location.start.line, location.end.column));
-  println!("{}{}", file_highlight, line_highlight);
+  println!("{}", file_highlight);
   println!("");
   if warning {
-    let code_highliter = format!("{}", highlight_warning(location.rage_start, location.rage_end, raw));
+    let code_highliter = format!("{}", highlight_warning(range.start, range.end, raw));
     println!("{}", code_highliter);
   } else {
-    let code_highliter = format!("{}", highlight_error(location.rage_start, location.rage_end, raw));
+    let code_highliter = format!("{}", highlight_error(range.start, range.end, raw));
     println!("{}", code_highliter);
   }
   println!();
 }
 
-pub fn report_and_exit(message: &str, location: &mut Location, raw: &str, file_name: &str) -> ! {
-  report_error(message, location, raw, file_name, false);
+pub fn report_and_exit(message: &str, range: &mut Range, raw: &str, file_name: &str) -> ! {
+  report_error(message, range, raw, file_name, false);
   std::process::exit(1);
 }
 

@@ -39,7 +39,7 @@ impl<'a> Checker<'a> {
     for (param, ty) in arguments.iter() {
       let arg_type = ty.clone().unwrap_or(Type::Unknown);
       self.ctx.declare_variable(param.lexeme(), arg_type.clone());
-      self.ctx.set_variable_location(param.lexeme(), param.location.clone());
+      self.ctx.set_variable_range(param.lexeme(), param.range.clone());
       params.push(arg_type);
     }
     Ok(params)

@@ -7,34 +7,18 @@ Program(
       values: [
         (Token(
           kind: Identifier("name"),
-          location: Location(
-            start: Position(
-              line: 1,
-              column: 6,
-            ),
-            end: Position(
-              line: 1,
-              column: 10,
-            ),
-            rage_start: 6,
-            rage_end: 10,
+          range: Range(
+            start: 6,
+            end: 10,
           ),
         ), Some(String)),
       ],
       local: true,
       initializer: Some(Literal(String(StringLiteral(
         value: "Stella",
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 21,
-          ),
-          end: Position(
-            line: 1,
-            column: 29,
-          ),
-          rage_start: 21,
-          rage_end: 29,
+        range: Range(
+          start: 21,
+          end: 29,
         ),
       )))),
     )),
@@ -42,34 +26,18 @@ Program(
       values: [
         (Token(
           kind: Identifier("age"),
-          location: Location(
-            start: Position(
-              line: 2,
-              column: 6,
-            ),
-            end: Position(
-              line: 2,
-              column: 9,
-            ),
-            rage_start: 36,
-            rage_end: 39,
+          range: Range(
+            start: 36,
+            end: 39,
           ),
         ), Some(Number)),
       ],
       local: true,
       initializer: Some(Literal(Number(NumberLiteral(
         value: "25",
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 20,
-          ),
-          end: Position(
-            line: 2,
-            column: 22,
-          ),
-          rage_start: 50,
-          rage_end: 52,
+        range: Range(
+          start: 50,
+          end: 52,
         ),
       )))),
     )),
@@ -77,34 +45,18 @@ Program(
       values: [
         (Token(
           kind: Identifier("is_student"),
-          location: Location(
-            start: Position(
-              line: 3,
-              column: 6,
-            ),
-            end: Position(
-              line: 3,
-              column: 16,
-            ),
-            rage_start: 59,
-            rage_end: 69,
+          range: Range(
+            start: 59,
+            end: 69,
           ),
         ), Some(Boolean)),
       ],
       local: true,
       initializer: Some(Literal(Boolean(BooleanLiteral(
         value: true,
-        location: Location(
-          start: Position(
-            line: 3,
-            column: 28,
-          ),
-          end: Position(
-            line: 3,
-            column: 32,
-          ),
-          rage_start: 81,
-          rage_end: 85,
+        range: Range(
+          start: 81,
+          end: 85,
         ),
       )))),
     )),

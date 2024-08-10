@@ -6,34 +6,18 @@ Program(
     Function(FunctionStatement(
       name: Token(
         kind: Identifier("outer"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 9,
-          ),
-          end: Position(
-            line: 1,
-            column: 14,
-          ),
-          rage_start: 9,
-          rage_end: 14,
+        range: Range(
+          start: 9,
+          end: 14,
         ),
       ),
       local: false,
       arguments: [
         (Token(
           kind: Identifier("x"),
-          location: Location(
-            start: Position(
-              line: 1,
-              column: 15,
-            ),
-            end: Position(
-              line: 1,
-              column: 16,
-            ),
-            rage_start: 15,
-            rage_end: 16,
+          range: Range(
+            start: 15,
+            end: 16,
           ),
         ), Some(Number)),
       ],
@@ -44,34 +28,18 @@ Program(
           Function(FunctionStatement(
             name: Token(
               kind: Identifier("inner"),
-              location: Location(
-                start: Position(
-                  line: 2,
-                  column: 13,
-                ),
-                end: Position(
-                  line: 2,
-                  column: 18,
-                ),
-                rage_start: 47,
-                rage_end: 52,
+              range: Range(
+                start: 47,
+                end: 52,
               ),
             ),
             local: false,
             arguments: [
               (Token(
                 kind: Identifier("y"),
-                location: Location(
-                  start: Position(
-                    line: 2,
-                    column: 19,
-                  ),
-                  end: Position(
-                    line: 2,
-                    column: 20,
-                  ),
-                  rage_start: 53,
-                  rage_end: 54,
+                range: Range(
+                  start: 53,
+                  end: 54,
                 ),
               ), Some(Number)),
             ],
@@ -85,86 +53,38 @@ Program(
                       operator: DoubleDot,
                       left: Literal(String(StringLiteral(
                         value: "Hello, ",
-                        location: Location(
-                          start: Position(
-                            line: 3,
-                            column: 15,
-                          ),
-                          end: Position(
-                            line: 3,
-                            column: 24,
-                          ),
-                          rage_start: 87,
-                          rage_end: 96,
+                        range: Range(
+                          start: 87,
+                          end: 96,
                         ),
                       ))),
                       right: Literal(String(StringLiteral(
                         value: "World",
-                        location: Location(
-                          start: Position(
-                            line: 3,
-                            column: 28,
-                          ),
-                          end: Position(
-                            line: 3,
-                            column: 35,
-                          ),
-                          rage_start: 100,
-                          rage_end: 107,
+                        range: Range(
+                          start: 100,
+                          end: 107,
                         ),
                       ))),
-                      location: Location(
-                        start: Position(
-                          line: 3,
-                          column: 25,
-                        ),
-                        end: Position(
-                          line: 3,
-                          column: 27,
-                        ),
-                        rage_start: 97,
-                        rage_end: 99,
+                      range: Range(
+                        start: 97,
+                        end: 99,
                       ),
                     )),
                   ],
-                  location: Location(
-                    start: Position(
-                      line: 3,
-                      column: 8,
-                    ),
-                    end: Position(
-                      line: 3,
-                      column: 14,
-                    ),
-                    rage_start: 80,
-                    rage_end: 86,
+                  range: Range(
+                    start: 80,
+                    end: 86,
                   ),
                 )),
               ],
-              location: Location(
-                start: Position(
-                  line: 3,
-                  column: 8,
-                ),
-                end: Position(
-                  line: 3,
-                  column: 14,
-                ),
-                rage_start: 80,
-                rage_end: 86,
+              range: Range(
+                start: 80,
+                end: 86,
               ),
             )),
-            location: Location(
-              start: Position(
-                line: 2,
-                column: 13,
-              ),
-              end: Position(
-                line: 2,
-                column: 18,
-              ),
-              rage_start: 47,
-              rage_end: 52,
+            range: Range(
+              start: 47,
+              end: 52,
             ),
           )),
           Return(ReturnStatement(
@@ -172,17 +92,9 @@ Program(
               Call(CallExpression(
                 name: Token(
                   kind: Identifier("inner"),
-                  location: Location(
-                    start: Position(
-                      line: 5,
-                      column: 11,
-                    ),
-                    end: Position(
-                      line: 5,
-                      column: 16,
-                    ),
-                    rage_start: 127,
-                    rage_end: 132,
+                  range: Range(
+                    start: 127,
+                    end: 132,
                   ),
                 ),
                 args: Grouped(GroupedExpression(
@@ -191,130 +103,58 @@ Program(
                       operator: Multiply,
                       left: Identifier(Identifier(
                         name: "x",
-                        location: Location(
-                          start: Position(
-                            line: 5,
-                            column: 17,
-                          ),
-                          end: Position(
-                            line: 5,
-                            column: 18,
-                          ),
-                          rage_start: 133,
-                          rage_end: 134,
+                        range: Range(
+                          start: 133,
+                          end: 134,
                         ),
                       )),
                       right: Literal(Number(NumberLiteral(
                         value: "2",
-                        location: Location(
-                          start: Position(
-                            line: 5,
-                            column: 21,
-                          ),
-                          end: Position(
-                            line: 5,
-                            column: 22,
-                          ),
-                          rage_start: 137,
-                          rage_end: 138,
+                        range: Range(
+                          start: 137,
+                          end: 138,
                         ),
                       ))),
-                      location: Location(
-                        start: Position(
-                          line: 5,
-                          column: 19,
-                        ),
-                        end: Position(
-                          line: 5,
-                          column: 20,
-                        ),
-                        rage_start: 135,
-                        rage_end: 136,
+                      range: Range(
+                        start: 135,
+                        end: 136,
                       ),
                     )),
                   ],
-                  location: Location(
-                    start: Position(
-                      line: 5,
-                      column: 16,
-                    ),
-                    end: Position(
-                      line: 5,
-                      column: 23,
-                    ),
-                    rage_start: 132,
-                    rage_end: 139,
+                  range: Range(
+                    start: 132,
+                    end: 139,
                   ),
                 )),
-                location: Location(
-                  start: Position(
-                    line: 5,
-                    column: 11,
-                  ),
-                  end: Position(
-                    line: 5,
-                    column: 16,
-                  ),
-                  rage_start: 127,
-                  rage_end: 132,
+                range: Range(
+                  start: 127,
+                  end: 132,
                 ),
               )),
             ],
-            location: Location(
-              start: Position(
-                line: 5,
-                column: 4,
-              ),
-              end: Position(
-                line: 5,
-                column: 10,
-              ),
-              rage_start: 120,
-              rage_end: 126,
+            range: Range(
+              start: 120,
+              end: 126,
             ),
           )),
         ],
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 4,
-          ),
-          end: Position(
-            line: 2,
-            column: 12,
-          ),
-          rage_start: 38,
-          rage_end: 46,
+        range: Range(
+          start: 38,
+          end: 46,
         ),
       )),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 9,
-        ),
-        end: Position(
-          line: 1,
-          column: 14,
-        ),
-        rage_start: 9,
-        rage_end: 14,
+      range: Range(
+        start: 9,
+        end: 14,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
         (Token(
           kind: Identifier("result"),
-          location: Location(
-            start: Position(
-              line: 8,
-              column: 6,
-            ),
-            end: Position(
-              line: 8,
-              column: 12,
-            ),
-            rage_start: 151,
-            rage_end: 157,
+          range: Range(
+            start: 151,
+            end: 157,
           ),
         ), Some(Number)),
       ],
@@ -322,61 +162,29 @@ Program(
       initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("outer"),
-          location: Location(
-            start: Position(
-              line: 8,
-              column: 23,
-            ),
-            end: Position(
-              line: 8,
-              column: 28,
-            ),
-            rage_start: 168,
-            rage_end: 173,
+          range: Range(
+            start: 168,
+            end: 173,
           ),
         ),
         args: Grouped(GroupedExpression(
           expressions: [
             Literal(Number(NumberLiteral(
               value: "10",
-              location: Location(
-                start: Position(
-                  line: 8,
-                  column: 29,
-                ),
-                end: Position(
-                  line: 8,
-                  column: 31,
-                ),
-                rage_start: 174,
-                rage_end: 176,
+              range: Range(
+                start: 174,
+                end: 176,
               ),
             ))),
           ],
-          location: Location(
-            start: Position(
-              line: 8,
-              column: 28,
-            ),
-            end: Position(
-              line: 8,
-              column: 32,
-            ),
-            rage_start: 173,
-            rage_end: 177,
+          range: Range(
+            start: 173,
+            end: 177,
           ),
         )),
-        location: Location(
-          start: Position(
-            line: 8,
-            column: 23,
-          ),
-          end: Position(
-            line: 8,
-            column: 28,
-          ),
-          rage_start: 168,
-          rage_end: 173,
+        range: Range(
+          start: 168,
+          end: 173,
         ),
       ))),
     )),

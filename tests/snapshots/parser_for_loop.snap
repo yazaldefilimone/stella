@@ -6,47 +6,23 @@ Program(
     For(ForStatement(
       variable: Identifier(Identifier(
         name: "i",
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 4,
-          ),
-          end: Position(
-            line: 1,
-            column: 5,
-          ),
-          rage_start: 4,
-          rage_end: 5,
+        range: Range(
+          start: 4,
+          end: 5,
         ),
       )),
       init: Literal(Number(NumberLiteral(
         value: "1",
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 7,
-          ),
-          end: Position(
-            line: 1,
-            column: 8,
-          ),
-          rage_start: 7,
-          rage_end: 8,
+        range: Range(
+          start: 7,
+          end: 8,
         ),
       ))),
       limit: Literal(Number(NumberLiteral(
         value: "10",
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 10,
-          ),
-          end: Position(
-            line: 1,
-            column: 12,
-          ),
-          rage_start: 10,
-          rage_end: 12,
+        range: Range(
+          start: 10,
+          end: 12,
         ),
       ))),
       step: None,
@@ -55,88 +31,40 @@ Program(
           Expression(Call(CallExpression(
             name: Token(
               kind: Identifier("print"),
-              location: Location(
-                start: Position(
-                  line: 2,
-                  column: 4,
-                ),
-                end: Position(
-                  line: 2,
-                  column: 9,
-                ),
-                rage_start: 20,
-                rage_end: 25,
+              range: Range(
+                start: 20,
+                end: 25,
               ),
             ),
             args: Grouped(GroupedExpression(
               expressions: [
                 Identifier(Identifier(
                   name: "i",
-                  location: Location(
-                    start: Position(
-                      line: 2,
-                      column: 10,
-                    ),
-                    end: Position(
-                      line: 2,
-                      column: 11,
-                    ),
-                    rage_start: 26,
-                    rage_end: 27,
+                  range: Range(
+                    start: 26,
+                    end: 27,
                   ),
                 )),
               ],
-              location: Location(
-                start: Position(
-                  line: 2,
-                  column: 9,
-                ),
-                end: Position(
-                  line: 2,
-                  column: 12,
-                ),
-                rage_start: 25,
-                rage_end: 28,
+              range: Range(
+                start: 25,
+                end: 28,
               ),
             )),
-            location: Location(
-              start: Position(
-                line: 2,
-                column: 4,
-              ),
-              end: Position(
-                line: 2,
-                column: 9,
-              ),
-              rage_start: 20,
-              rage_end: 25,
+            range: Range(
+              start: 20,
+              end: 25,
             ),
           ))),
         ],
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 4,
-          ),
-          end: Position(
-            line: 2,
-            column: 9,
-          ),
-          rage_start: 20,
-          rage_end: 25,
+        range: Range(
+          start: 20,
+          end: 25,
         ),
       )),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 0,
-        ),
-        end: Position(
-          line: 1,
-          column: 3,
-        ),
-        rage_start: 0,
-        rage_end: 3,
+      range: Range(
+        start: 0,
+        end: 3,
       ),
     )),
   ],

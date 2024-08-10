@@ -6,49 +6,25 @@ Program(
     Function(FunctionStatement(
       name: Token(
         kind: Identifier("add"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 9,
-          ),
-          end: Position(
-            line: 1,
-            column: 12,
-          ),
-          rage_start: 9,
-          rage_end: 12,
+        range: Range(
+          start: 9,
+          end: 12,
         ),
       ),
       local: false,
       arguments: [
         (Token(
           kind: Identifier("a"),
-          location: Location(
-            start: Position(
-              line: 1,
-              column: 13,
-            ),
-            end: Position(
-              line: 1,
-              column: 14,
-            ),
-            rage_start: 13,
-            rage_end: 14,
+          range: Range(
+            start: 13,
+            end: 14,
           ),
         ), None),
         (Token(
           kind: Identifier("b"),
-          location: Location(
-            start: Position(
-              line: 1,
-              column: 16,
-            ),
-            end: Position(
-              line: 1,
-              column: 17,
-            ),
-            rage_start: 16,
-            rage_end: 17,
+          range: Range(
+            start: 16,
+            end: 17,
           ),
         ), None),
       ],
@@ -62,103 +38,47 @@ Program(
                 operator: Add,
                 left: Identifier(Identifier(
                   name: "a",
-                  location: Location(
-                    start: Position(
-                      line: 2,
-                      column: 11,
-                    ),
-                    end: Position(
-                      line: 2,
-                      column: 12,
-                    ),
-                    rage_start: 30,
-                    rage_end: 31,
+                  range: Range(
+                    start: 30,
+                    end: 31,
                   ),
                 )),
                 right: Identifier(Identifier(
                   name: "b",
-                  location: Location(
-                    start: Position(
-                      line: 2,
-                      column: 15,
-                    ),
-                    end: Position(
-                      line: 2,
-                      column: 16,
-                    ),
-                    rage_start: 34,
-                    rage_end: 35,
+                  range: Range(
+                    start: 34,
+                    end: 35,
                   ),
                 )),
-                location: Location(
-                  start: Position(
-                    line: 2,
-                    column: 13,
-                  ),
-                  end: Position(
-                    line: 2,
-                    column: 14,
-                  ),
-                  rage_start: 32,
-                  rage_end: 33,
+                range: Range(
+                  start: 32,
+                  end: 33,
                 ),
               )),
             ],
-            location: Location(
-              start: Position(
-                line: 2,
-                column: 4,
-              ),
-              end: Position(
-                line: 2,
-                column: 10,
-              ),
-              rage_start: 23,
-              rage_end: 29,
+            range: Range(
+              start: 23,
+              end: 29,
             ),
           )),
         ],
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 4,
-          ),
-          end: Position(
-            line: 2,
-            column: 10,
-          ),
-          rage_start: 23,
-          rage_end: 29,
+        range: Range(
+          start: 23,
+          end: 29,
         ),
       )),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 9,
-        ),
-        end: Position(
-          line: 1,
-          column: 12,
-        ),
-        rage_start: 9,
-        rage_end: 12,
+      range: Range(
+        start: 9,
+        end: 12,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
         (Token(
           kind: Identifier("result"),
-          location: Location(
-            start: Position(
-              line: 5,
-              column: 6,
-            ),
-            end: Position(
-              line: 5,
-              column: 12,
-            ),
-            rage_start: 47,
-            rage_end: 53,
+          range: Range(
+            start: 47,
+            end: 53,
           ),
         ), None),
       ],
@@ -166,76 +86,36 @@ Program(
       initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("add"),
-          location: Location(
-            start: Position(
-              line: 5,
-              column: 15,
-            ),
-            end: Position(
-              line: 5,
-              column: 18,
-            ),
-            rage_start: 56,
-            rage_end: 59,
+          range: Range(
+            start: 56,
+            end: 59,
           ),
         ),
         args: Grouped(GroupedExpression(
           expressions: [
             Literal(Number(NumberLiteral(
               value: "5",
-              location: Location(
-                start: Position(
-                  line: 5,
-                  column: 19,
-                ),
-                end: Position(
-                  line: 5,
-                  column: 20,
-                ),
-                rage_start: 60,
-                rage_end: 61,
+              range: Range(
+                start: 60,
+                end: 61,
               ),
             ))),
             Literal(Number(NumberLiteral(
               value: "10",
-              location: Location(
-                start: Position(
-                  line: 5,
-                  column: 22,
-                ),
-                end: Position(
-                  line: 5,
-                  column: 24,
-                ),
-                rage_start: 63,
-                rage_end: 65,
+              range: Range(
+                start: 63,
+                end: 65,
               ),
             ))),
           ],
-          location: Location(
-            start: Position(
-              line: 5,
-              column: 18,
-            ),
-            end: Position(
-              line: 5,
-              column: 25,
-            ),
-            rage_start: 59,
-            rage_end: 66,
+          range: Range(
+            start: 59,
+            end: 66,
           ),
         )),
-        location: Location(
-          start: Position(
-            line: 5,
-            column: 15,
-          ),
-          end: Position(
-            line: 5,
-            column: 18,
-          ),
-          rage_start: 56,
-          rage_end: 59,
+        range: Range(
+          start: 56,
+          end: 59,
         ),
       ))),
     )),

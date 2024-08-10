@@ -1,18 +1,14 @@
-#![allow(dead_code)]
-
 use crate::ast::ast;
 use crate::ast::tokens::{Token, TokenKind};
 use crate::diagnostics::report::report_and_exit;
 use crate::lexer::Lexer;
 use crate::types::Type;
-use crate::utils::location::{get_middle_location, Location};
+use crate::utils::range::{create_middle_range, Range};
 
 pub struct Parser<'a> {
   lexer: Lexer<'a>,
   raw: &'a str,
 }
-
-type ParseExpression = fn(&mut Parser) -> ast::Expression;
 
 impl<'a> Parser<'a> {
   pub fn new(raw: &'a str, file_name: &'a str) -> Self {
@@ -76,16 +72,16 @@ impl<'a> Parser<'a> {
 
   fn parse_binary_expression(&mut self, parse_sub_expression: fn(&mut Self) -> ast::Expression) -> ast::Expression {
     let mut expression = parse_sub_expression(self);
-    while let Some((operator, location)) = self.parse_operator() {
+    while let Some((operator, range)) = self.parse_operator() {
       let right_expression = parse_sub_expression(self);
-      let binary_exp = ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression), location);
+      let binary_exp = ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression), range);
       expression = ast::Expression::Binary(binary_exp);
     }
     expression
   }
 
   fn parse_function_expression(&mut self) -> ast::Expression {
-    let location = self.consume_expect_token(TokenKind::Function).location.clone();
+    let range = self.consume_expect_token(TokenKind::Function).range.clone();
     self.consume_expect_token(TokenKind::LeftParen);
     let arguments = self.parse_arguments_with_option_type();
     self.consume_expect_token(TokenKind::RightParen);
@@ -98,9 +94,9 @@ impl<'a> Parser<'a> {
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
 
-    ast::Expression::new_function(arguments, return_type, body, location)
+    ast::Expression::new_function(arguments, return_type, body, range)
   }
-  fn parse_operator(&mut self) -> Option<(ast::BinaryOperator, Location)> {
+  fn parse_operator(&mut self) -> Option<(ast::BinaryOperator, Range)> {
     let token = self.lexer.peek_token();
     let operator = match token.kind {
       TokenKind::Plus => ast::BinaryOperator::Add,
@@ -121,14 +117,14 @@ impl<'a> Parser<'a> {
       _ => return None,
     };
     self.lexer.next_token();
-    return Some((operator, token.location));
+    return Some((operator, token.range));
   }
 
   fn parse_unary_expression(&mut self) -> ast::Expression {
-    let unary_location = self.lexer.peek_token().location.clone();
+    let unary_range = self.lexer.peek_token().range.clone();
     if let Some(operator) = self.parse_unary_operator() {
       let expression = self.parse_expression_statement();
-      let unary_expression = ast::UnaryExpression::new(operator, Box::new(expression), unary_location);
+      let unary_expression = ast::UnaryExpression::new(operator, Box::new(expression), unary_range);
       ast::Expression::Unary(unary_expression)
     } else {
       self.parse_primary_expression()
@@ -163,14 +159,10 @@ impl<'a> Parser<'a> {
   fn parse_literal_expression(&mut self) -> ast::Expression {
     let token = self.lexer.next_token();
     match token.kind {
-      TokenKind::Number(value) => {
-        ast::Expression::new_literal(ast::LiteralExpression::new_number(value, token.location))
-      }
-      TokenKind::String(value) => {
-        ast::Expression::new_literal(ast::LiteralExpression::new_string(value, token.location))
-      }
-      TokenKind::True => ast::Expression::new_literal(ast::LiteralExpression::new_bool(true, token.location)),
-      TokenKind::False => ast::Expression::new_literal(ast::LiteralExpression::new_bool(false, token.location)),
+      TokenKind::Number(value) => ast::Expression::new_literal(ast::LiteralExpression::new_number(value, token.range)),
+      TokenKind::String(value) => ast::Expression::new_literal(ast::LiteralExpression::new_string(value, token.range)),
+      TokenKind::True => ast::Expression::new_literal(ast::LiteralExpression::new_bool(true, token.range)),
+      TokenKind::False => ast::Expression::new_literal(ast::LiteralExpression::new_bool(false, token.range)),
       _ => self.report_unexpected_token(token),
     }
   }
@@ -181,17 +173,17 @@ impl<'a> Parser<'a> {
       return self.parse_call_expression(token);
     }
     match token.kind {
-      TokenKind::Identifier(name) => ast::Expression::new_identifier(name, token.location),
+      TokenKind::Identifier(name) => ast::Expression::new_identifier(name, token.range),
       _ => self.report_unexpected_token(token),
     }
   }
 
   fn parse_grouped_expression(&mut self) -> ast::Expression {
-    let left_location = self.consume_expect_token(TokenKind::LeftParen).location;
+    let left_range = self.consume_expect_token(TokenKind::LeftParen).range;
     let mut expressions = vec![];
 
     if self.match_token_and_consume(TokenKind::RightParen).is_some() {
-      return ast::Expression::new_grouped(expressions, left_location);
+      return ast::Expression::new_grouped(expressions, left_range);
     }
 
     expressions.push(self.parse_expression_statement());
@@ -200,17 +192,17 @@ impl<'a> Parser<'a> {
       self.consume_expect_token(TokenKind::Comma);
       expressions.push(self.parse_expression_statement());
     }
-    let right_location = self.consume_expect_token(TokenKind::RightParen).location;
+    let right_range = self.consume_expect_token(TokenKind::RightParen).range;
 
-    let location = get_middle_location(&left_location, &right_location);
-    return ast::Expression::new_grouped(expressions, location);
+    let range = create_middle_range(&left_range, &right_range);
+    return ast::Expression::new_grouped(expressions, range);
   }
 
   fn parse_require_expression(&mut self) -> ast::Expression {
     let require_token = self.consume_expect_token(TokenKind::Require);
     let module_name = self.consume_token();
-    let location = require_token.location;
-    ast::Expression::new_require(module_name, location)
+    let range = require_token.range;
+    ast::Expression::new_require(module_name, range)
   }
 
   fn parse_assign_or_call(&mut self) -> ast::Statement {
@@ -234,10 +226,10 @@ impl<'a> Parser<'a> {
       let peeked = self.lexer.peek_token();
       if ident_token.kind == TokenKind::Identifier("print".to_string()) && peeked.is_string() {
         let args = self.parse_expression_statement();
-        let location = args.get_location();
-        let args = ast::Expression::new_grouped(vec![args], location);
-        let location = ident_token.location.clone();
-        let expression = ast::Expression::new_call(ident_token, args, location);
+        let range = args.get_range();
+        let args = ast::Expression::new_grouped(vec![args], range);
+        let range = ident_token.range.clone();
+        let expression = ast::Expression::new_call(ident_token, args, range);
         ast::Statement::Expression(expression)
       } else {
         self.report_unexpected_token(ident_token)
@@ -273,9 +265,9 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_call_expression(&mut self, ident: Token) -> ast::Expression {
-    let location = ident.location.clone();
+    let range = ident.range.clone();
     let args = self.parse_grouped_expression();
-    ast::Expression::new_call(ident, args, location)
+    ast::Expression::new_call(ident, args, range)
   }
 
   fn parse_function_statement(&mut self, local: bool) -> ast::Statement {
@@ -295,9 +287,9 @@ impl<'a> Parser<'a> {
 
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
-    let location = name.location.clone();
+    let range = name.range.clone();
 
-    ast::Statement::Function(ast::FunctionStatement::new(name, local, generics, arguments, return_type, body, location))
+    ast::Statement::Function(ast::FunctionStatement::new(name, local, generics, arguments, return_type, body, range))
   }
 
   fn parse_type(&mut self, excepted_paren: bool) -> Type {
@@ -316,12 +308,12 @@ impl<'a> Parser<'a> {
             types.push(ty);
             self.match_token_and_consume(TokenKind::Comma);
           }
-          let right_location = self.consume_expect_token(TokenKind::Greater).location;
-          let location = get_middle_location(&token.location, &right_location);
-          return Type::new_generic_call(name, types, location);
+          let right_range = self.consume_expect_token(TokenKind::Greater).range;
+          let range = create_middle_range(&token.range, &right_range);
+          return Type::new_generic_call(name, types, range);
         }
 
-        Type::new_type(&name, token.location)
+        Type::new_type(&name, token.range)
       }
       TokenKind::LeftParen => self.parse_grup_return_type(),
       TokenKind::Function => self.parse_function_type(),
@@ -410,13 +402,13 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_type_declaration(&mut self) -> ast::Statement {
-    let location = self.consume_expect_token(TokenKind::Type).location.clone();
+    let range = self.consume_expect_token(TokenKind::Type).range.clone();
     let name = self.consume_token();
     let generics = self.parse_simple_generic_str();
     self.consume_expect_token(TokenKind::Assign);
     // we can accept function type
     let initilizer = self.parse_type(false);
-    ast::Statement::TypeDeclaration(ast::TypeDeclaration::new(name, generics, initilizer, location))
+    ast::Statement::TypeDeclaration(ast::TypeDeclaration::new(name, generics, initilizer, range))
   }
   fn parse_variable_declaration(&mut self, local: bool) -> ast::Statement {
     let valyes = self.parse_variable_and_type(None);
@@ -429,11 +421,11 @@ impl<'a> Parser<'a> {
 
   fn parse_block_statement(&mut self, end_tokens: &[TokenKind]) -> ast::Statement {
     let mut statements = Vec::new();
-    let location = self.lexer.peek_token().location.clone();
+    let range = self.lexer.peek_token().range.clone();
     while !self.contains_token(end_tokens) {
       statements.push(self.parse_statement());
     }
-    ast::Statement::Block(ast::BlockStatement::new(statements, location))
+    ast::Statement::Block(ast::BlockStatement::new(statements, range))
   }
 
   fn parse_if_statement(&mut self) -> ast::Statement {
@@ -447,7 +439,7 @@ impl<'a> Parser<'a> {
       None
     };
     self.consume_expect_token(TokenKind::End);
-    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_body, if_token.location))
+    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_body, if_token.range))
   }
 
   fn parse_while_statement(&mut self) -> ast::Statement {
@@ -456,7 +448,7 @@ impl<'a> Parser<'a> {
     self.consume_expect_token(TokenKind::Do);
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
-    ast::Statement::While(ast::WhileStatement::new(condition, body, while_token.location))
+    ast::Statement::While(ast::WhileStatement::new(condition, body, while_token.range))
   }
 
   fn parse_repeat_statement(&mut self) -> ast::Statement {
@@ -464,7 +456,7 @@ impl<'a> Parser<'a> {
     let body = self.parse_block_statement(&[TokenKind::Until]);
     self.consume_expect_token(TokenKind::Until);
     let condition = self.parse_expression_statement();
-    ast::Statement::Repeat(ast::RepeatStatement::new(body, condition, repeat_token.location))
+    ast::Statement::Repeat(ast::RepeatStatement::new(body, condition, repeat_token.range))
   }
 
   fn parse_for_statement(&mut self) -> ast::Statement {
@@ -482,12 +474,12 @@ impl<'a> Parser<'a> {
     self.consume_expect_token(TokenKind::Do);
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
-    ast::Statement::For(ast::ForStatement::new(variable, init, limit, step, body, for_token.location))
+    ast::Statement::For(ast::ForStatement::new(variable, init, limit, step, body, for_token.range))
   }
 
   fn parse_break_statement(&mut self) -> ast::Statement {
     let break_token = self.consume_expect_token(TokenKind::Break);
-    ast::Statement::Break(ast::BreakStatement::new(break_token.location))
+    ast::Statement::Break(ast::BreakStatement::new(break_token.range))
   }
 
   fn parse_continue_statement(&mut self) -> ast::Statement {
@@ -498,7 +490,7 @@ impl<'a> Parser<'a> {
   fn parse_return_statement(&mut self) -> ast::Statement {
     let return_token = self.consume_expect_token(TokenKind::Return);
     let values = self.parse_return_value();
-    ast::Statement::Return(ast::ReturnStatement::new(values, return_token.location))
+    ast::Statement::Return(ast::ReturnStatement::new(values, return_token.range))
   }
 
   fn parse_return_value(&mut self) -> Vec<ast::Expression> {
@@ -562,6 +554,6 @@ impl<'a> Parser<'a> {
   }
 
   fn report_error(&self, message: String, token: Token) -> ! {
-    report_and_exit(&message, &mut token.location.clone(), &self.raw, &self.lexer.file_name)
+    report_and_exit(&message, &mut token.range.clone(), &self.raw, &self.lexer.file_name)
   }
 }

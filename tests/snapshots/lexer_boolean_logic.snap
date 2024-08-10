@@ -4,362 +4,170 @@ source: tests/snapshot_tests.rs
 [
   Token(
     kind: Local,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 0,
-      ),
-      end: Position(
-        line: 1,
-        column: 5,
-      ),
-      rage_start: 0,
-      rage_end: 5,
+    range: Range(
+      start: 0,
+      end: 5,
     ),
   ),
   Token(
     kind: Identifier("a"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 6,
-      ),
-      end: Position(
-        line: 1,
-        column: 7,
-      ),
-      rage_start: 6,
-      rage_end: 7,
+    range: Range(
+      start: 6,
+      end: 7,
     ),
   ),
   Token(
     kind: Colon,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 7,
-      ),
-      end: Position(
-        line: 1,
-        column: 8,
-      ),
-      rage_start: 7,
-      rage_end: 8,
+    range: Range(
+      start: 7,
+      end: 8,
     ),
   ),
   Token(
     kind: Identifier("boolean"),
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 9,
-      ),
-      end: Position(
-        line: 1,
-        column: 16,
-      ),
-      rage_start: 9,
-      rage_end: 16,
+    range: Range(
+      start: 9,
+      end: 16,
     ),
   ),
   Token(
     kind: Assign,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 17,
-      ),
-      end: Position(
-        line: 1,
-        column: 18,
-      ),
-      rage_start: 17,
-      rage_end: 18,
+    range: Range(
+      start: 17,
+      end: 18,
     ),
   ),
   Token(
     kind: True,
-    location: Location(
-      start: Position(
-        line: 1,
-        column: 19,
-      ),
-      end: Position(
-        line: 1,
-        column: 23,
-      ),
-      rage_start: 19,
-      rage_end: 23,
+    range: Range(
+      start: 19,
+      end: 23,
     ),
   ),
   Token(
     kind: Local,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 0,
-      ),
-      end: Position(
-        line: 2,
-        column: 5,
-      ),
-      rage_start: 24,
-      rage_end: 29,
+    range: Range(
+      start: 24,
+      end: 29,
     ),
   ),
   Token(
     kind: Identifier("b"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 6,
-      ),
-      end: Position(
-        line: 2,
-        column: 7,
-      ),
-      rage_start: 30,
-      rage_end: 31,
+    range: Range(
+      start: 30,
+      end: 31,
     ),
   ),
   Token(
     kind: Colon,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 7,
-      ),
-      end: Position(
-        line: 2,
-        column: 8,
-      ),
-      rage_start: 31,
-      rage_end: 32,
+    range: Range(
+      start: 31,
+      end: 32,
     ),
   ),
   Token(
     kind: Identifier("boolean"),
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 9,
-      ),
-      end: Position(
-        line: 2,
-        column: 16,
-      ),
-      rage_start: 33,
-      rage_end: 40,
+    range: Range(
+      start: 33,
+      end: 40,
     ),
   ),
   Token(
     kind: Assign,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 17,
-      ),
-      end: Position(
-        line: 2,
-        column: 18,
-      ),
-      rage_start: 41,
-      rage_end: 42,
+    range: Range(
+      start: 41,
+      end: 42,
     ),
   ),
   Token(
     kind: False,
-    location: Location(
-      start: Position(
-        line: 2,
-        column: 19,
-      ),
-      end: Position(
-        line: 2,
-        column: 24,
-      ),
-      rage_start: 43,
-      rage_end: 48,
+    range: Range(
+      start: 43,
+      end: 48,
     ),
   ),
   Token(
     kind: If,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 0,
-      ),
-      end: Position(
-        line: 4,
-        column: 2,
-      ),
-      rage_start: 50,
-      rage_end: 52,
+    range: Range(
+      start: 50,
+      end: 52,
     ),
   ),
   Token(
     kind: Identifier("a"),
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 3,
-      ),
-      end: Position(
-        line: 4,
-        column: 4,
-      ),
-      rage_start: 53,
-      rage_end: 54,
+    range: Range(
+      start: 53,
+      end: 54,
     ),
   ),
   Token(
     kind: And,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 5,
-      ),
-      end: Position(
-        line: 4,
-        column: 8,
-      ),
-      rage_start: 55,
-      rage_end: 58,
+    range: Range(
+      start: 55,
+      end: 58,
     ),
   ),
   Token(
     kind: Not,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 9,
-      ),
-      end: Position(
-        line: 4,
-        column: 12,
-      ),
-      rage_start: 59,
-      rage_end: 62,
+    range: Range(
+      start: 59,
+      end: 62,
     ),
   ),
   Token(
     kind: Identifier("b"),
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 13,
-      ),
-      end: Position(
-        line: 4,
-        column: 14,
-      ),
-      rage_start: 63,
-      rage_end: 64,
+    range: Range(
+      start: 63,
+      end: 64,
     ),
   ),
   Token(
     kind: Then,
-    location: Location(
-      start: Position(
-        line: 4,
-        column: 15,
-      ),
-      end: Position(
-        line: 4,
-        column: 19,
-      ),
-      rage_start: 65,
-      rage_end: 69,
+    range: Range(
+      start: 65,
+      end: 69,
     ),
   ),
   Token(
     kind: Identifier("print"),
-    location: Location(
-      start: Position(
-        line: 5,
-        column: 4,
-      ),
-      end: Position(
-        line: 5,
-        column: 9,
-      ),
-      rage_start: 74,
-      rage_end: 79,
+    range: Range(
+      start: 74,
+      end: 79,
     ),
   ),
   Token(
     kind: LeftParen,
-    location: Location(
-      start: Position(
-        line: 5,
-        column: 9,
-      ),
-      end: Position(
-        line: 5,
-        column: 10,
-      ),
-      rage_start: 79,
-      rage_end: 80,
+    range: Range(
+      start: 79,
+      end: 80,
     ),
   ),
   Token(
     kind: String("a is true and b is false"),
-    location: Location(
-      start: Position(
-        line: 5,
-        column: 10,
-      ),
-      end: Position(
-        line: 5,
-        column: 36,
-      ),
-      rage_start: 80,
-      rage_end: 106,
+    range: Range(
+      start: 80,
+      end: 106,
     ),
   ),
   Token(
     kind: RightParen,
-    location: Location(
-      start: Position(
-        line: 5,
-        column: 36,
-      ),
-      end: Position(
-        line: 5,
-        column: 37,
-      ),
-      rage_start: 106,
-      rage_end: 107,
+    range: Range(
+      start: 106,
+      end: 107,
     ),
   ),
   Token(
     kind: End,
-    location: Location(
-      start: Position(
-        line: 6,
-        column: 0,
-      ),
-      end: Position(
-        line: 6,
-        column: 3,
-      ),
-      rage_start: 108,
-      rage_end: 111,
+    range: Range(
+      start: 108,
+      end: 111,
     ),
   ),
   Token(
     kind: EOF,
-    location: Location(
-      start: Position(
-        line: 7,
-        column: 0,
-      ),
-      end: Position(
-        line: 7,
-        column: 0,
-      ),
-      rage_start: 112,
-      rage_end: 112,
+    range: Range(
+      start: 112,
+      end: 112,
     ),
   ),
 ]

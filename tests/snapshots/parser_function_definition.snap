@@ -6,34 +6,18 @@ Program(
     Function(FunctionStatement(
       name: Token(
         kind: Identifier("greet"),
-        location: Location(
-          start: Position(
-            line: 1,
-            column: 9,
-          ),
-          end: Position(
-            line: 1,
-            column: 14,
-          ),
-          rage_start: 9,
-          rage_end: 14,
+        range: Range(
+          start: 9,
+          end: 14,
         ),
       ),
       local: false,
       arguments: [
         (Token(
           kind: Identifier("name"),
-          location: Location(
-            start: Position(
-              line: 1,
-              column: 15,
-            ),
-            end: Position(
-              line: 1,
-              column: 19,
-            ),
-            rage_start: 15,
-            rage_end: 19,
+          range: Range(
+            start: 15,
+            end: 19,
           ),
         ), Some(String)),
       ],
@@ -47,103 +31,47 @@ Program(
                 operator: DoubleDot,
                 left: Literal(String(StringLiteral(
                   value: "Hello, ",
-                  location: Location(
-                    start: Position(
-                      line: 2,
-                      column: 11,
-                    ),
-                    end: Position(
-                      line: 2,
-                      column: 20,
-                    ),
-                    rage_start: 48,
-                    rage_end: 57,
+                  range: Range(
+                    start: 48,
+                    end: 57,
                   ),
                 ))),
                 right: Identifier(Identifier(
                   name: "name",
-                  location: Location(
-                    start: Position(
-                      line: 2,
-                      column: 24,
-                    ),
-                    end: Position(
-                      line: 2,
-                      column: 28,
-                    ),
-                    rage_start: 61,
-                    rage_end: 65,
+                  range: Range(
+                    start: 61,
+                    end: 65,
                   ),
                 )),
-                location: Location(
-                  start: Position(
-                    line: 2,
-                    column: 21,
-                  ),
-                  end: Position(
-                    line: 2,
-                    column: 23,
-                  ),
-                  rage_start: 58,
-                  rage_end: 60,
+                range: Range(
+                  start: 58,
+                  end: 60,
                 ),
               )),
             ],
-            location: Location(
-              start: Position(
-                line: 2,
-                column: 4,
-              ),
-              end: Position(
-                line: 2,
-                column: 10,
-              ),
-              rage_start: 41,
-              rage_end: 47,
+            range: Range(
+              start: 41,
+              end: 47,
             ),
           )),
         ],
-        location: Location(
-          start: Position(
-            line: 2,
-            column: 4,
-          ),
-          end: Position(
-            line: 2,
-            column: 10,
-          ),
-          rage_start: 41,
-          rage_end: 47,
+        range: Range(
+          start: 41,
+          end: 47,
         ),
       )),
-      location: Location(
-        start: Position(
-          line: 1,
-          column: 9,
-        ),
-        end: Position(
-          line: 1,
-          column: 14,
-        ),
-        rage_start: 9,
-        rage_end: 14,
+      range: Range(
+        start: 9,
+        end: 14,
       ),
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
         (Token(
           kind: Identifier("result"),
-          location: Location(
-            start: Position(
-              line: 4,
-              column: 6,
-            ),
-            end: Position(
-              line: 4,
-              column: 12,
-            ),
-            rage_start: 76,
-            rage_end: 82,
+          range: Range(
+            start: 76,
+            end: 82,
           ),
         ), Some(Number)),
       ],
@@ -151,61 +79,29 @@ Program(
       initializer: Some(Call(CallExpression(
         name: Token(
           kind: Identifier("greet"),
-          location: Location(
-            start: Position(
-              line: 4,
-              column: 23,
-            ),
-            end: Position(
-              line: 4,
-              column: 28,
-            ),
-            rage_start: 93,
-            rage_end: 98,
+          range: Range(
+            start: 93,
+            end: 98,
           ),
         ),
         args: Grouped(GroupedExpression(
           expressions: [
             Literal(String(StringLiteral(
               value: "Stella",
-              location: Location(
-                start: Position(
-                  line: 4,
-                  column: 29,
-                ),
-                end: Position(
-                  line: 4,
-                  column: 37,
-                ),
-                rage_start: 99,
-                rage_end: 107,
+              range: Range(
+                start: 99,
+                end: 107,
               ),
             ))),
           ],
-          location: Location(
-            start: Position(
-              line: 4,
-              column: 28,
-            ),
-            end: Position(
-              line: 4,
-              column: 38,
-            ),
-            rage_start: 98,
-            rage_end: 108,
+          range: Range(
+            start: 98,
+            end: 108,
           ),
         )),
-        location: Location(
-          start: Position(
-            line: 4,
-            column: 23,
-          ),
-          end: Position(
-            line: 4,
-            column: 28,
-          ),
-          rage_start: 93,
-          rage_end: 98,
+        range: Range(
+          start: 93,
+          end: 98,
         ),
       ))),
     )),

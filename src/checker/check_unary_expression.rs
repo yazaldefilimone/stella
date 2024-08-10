@@ -32,7 +32,7 @@ impl<'a> Checker<'a> {
       operand_t.to_string(),
       operand_t.to_string(),
       unary_expr.operator.to_str().to_owned(),
-      Some(unary_expr.get_operator_location()),
+      Some(unary_expr.get_operator_range()),
     );
 
     Err(self.create_diagnostic(diagnostic))
