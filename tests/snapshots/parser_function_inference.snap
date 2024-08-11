@@ -62,15 +62,12 @@ Program(
             ),
           )),
         ],
-        range: Range(
-          start: 23,
-          end: 29,
-        ),
       )),
       range: Range(
-        start: 9,
-        end: 12,
+        start: 0,
+        end: 39,
       ),
+      range_return_type: None,
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
@@ -113,10 +110,6 @@ Program(
             end: 66,
           ),
         )),
-        range: Range(
-          start: 56,
-          end: 59,
-        ),
       ))),
     )),
   ],

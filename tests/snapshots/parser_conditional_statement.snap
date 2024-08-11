@@ -51,10 +51,6 @@ Program(
                   ),
                 )),
               ],
-              range: Range(
-                start: 174,
-                end: 180,
-              ),
             )),
             else_body: Some(Block(BlockStatement(
               statements: [
@@ -74,26 +70,19 @@ Program(
                   ),
                 )),
               ],
-              range: Range(
-                start: 195,
-                end: 201,
-              ),
             ))),
             range: Range(
               start: 160,
-              end: 162,
+              end: 215,
             ),
           )),
         ],
-        range: Range(
-          start: 160,
-          end: 162,
-        ),
       )),
       range: Range(
-        start: 141,
-        end: 145,
+        start: 132,
+        end: 219,
       ),
+      range_return_type: None,
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
@@ -129,10 +118,6 @@ Program(
             end: 255,
           ),
         )),
-        range: Range(
-          start: 245,
-          end: 249,
-        ),
       ))),
     )),
     VariableDeclaration(VariableDeclaration(
@@ -169,10 +154,6 @@ Program(
             end: 285,
           ),
         )),
-        range: Range(
-          start: 274,
-          end: 278,
-        ),
       ))),
     )),
   ],

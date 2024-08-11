@@ -65,15 +65,11 @@ Program(
                   ),
                 )),
               ],
-              range: Range(
-                start: 64,
-                end: 70,
-              ),
             )),
             else_body: None,
             range: Range(
               start: 42,
-              end: 44,
+              end: 80,
             ),
           )),
           Return(ReturnStatement(
@@ -117,10 +113,6 @@ Program(
                       end: 108,
                     ),
                   )),
-                  range: Range(
-                    start: 92,
-                    end: 101,
-                  ),
                 )),
                 right: Call(CallExpression(
                   name: Token(
@@ -159,10 +151,6 @@ Program(
                       end: 127,
                     ),
                   )),
-                  range: Range(
-                    start: 111,
-                    end: 120,
-                  ),
                 )),
                 range: Range(
                   start: 109,
@@ -176,15 +164,15 @@ Program(
             ),
           )),
         ],
-        range: Range(
-          start: 42,
-          end: 44,
-        ),
       )),
       range: Range(
-        start: 9,
-        end: 18,
+        start: 0,
+        end: 131,
       ),
+      range_return_type: Some(Range(
+        start: 31,
+        end: 37,
+      )),
     )),
   ],
 )
