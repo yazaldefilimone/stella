@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
+use std::collections::BTreeMap;
+
 use crate::{ast::ast::BinaryOperator, utils::range::Range};
 use serde::{Deserialize, Serialize};
 
@@ -26,6 +28,18 @@ impl Type {
   }
   pub fn is_nil(&self) -> bool {
     matches!(self, Type::Nil)
+  }
+
+  pub fn is_string(&self) -> bool {
+    matches!(self, Type::String)
+  }
+
+  pub fn is_number(&self) -> bool {
+    matches!(self, Type::Number)
+  }
+
+  pub fn is_boolean(&self) -> bool {
+    matches!(self, Type::Boolean)
   }
 }
 
@@ -59,8 +73,80 @@ pub struct OptionalType {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TableType {
-  pub key_type: Box<Type>,
-  pub value_type: Box<Type>,
+  pub array: Option<Vec<Type>>,
+  pub map: Option<BTreeMap<String, Type>>,
+}
+
+impl TableType {
+  pub fn new(array: Option<Vec<Type>>, map: Option<BTreeMap<String, Type>>) -> Self {
+    TableType { array, map }
+  }
+
+  pub fn new_array(array: Vec<Type>) -> Self {
+    TableType { array: Some(array), map: None }
+  }
+
+  pub fn new_map(map: BTreeMap<String, Type>) -> Self {
+    TableType { array: None, map: Some(map) }
+  }
+
+  pub fn is_array(&self) -> bool {
+    self.array.is_some()
+  }
+
+  pub fn is_map(&self) -> bool {
+    self.map.is_some()
+  }
+
+  pub fn get_type(&self, key: &str) -> Option<&Type> {
+    if let Some(map) = &self.map {
+      map.get(key)
+    } else {
+      None
+    }
+  }
+  pub fn get_array_len(&self) -> Option<usize> {
+    self.array.as_ref().map(|array| array.len())
+  }
+
+  pub fn get_array_type(&self, index: usize) -> Option<&Type> {
+    self.array.as_ref().and_then(|array| array.get(index))
+  }
+
+  pub fn get_array(&self) -> Option<&Vec<Type>> {
+    self.array.as_ref()
+  }
+
+  pub fn get_map(&self) -> Option<&BTreeMap<String, Type>> {
+    self.map.as_ref()
+  }
+
+  pub fn to_string(&self) -> String {
+    let mut map_str = String::new();
+    if let Some(map) = &self.map {
+      map_str = format!(
+        "<{}>",
+        map.iter().map(|(k, v)| format!("{}: {}", k, v.to_string())).collect::<Vec<String>>().join(", ")
+      );
+    }
+
+    if let Some(array) = &self.array {
+      map_str = format!("<{}>", array.iter().map(Type::to_string).collect::<Vec<String>>().join(", "));
+    }
+
+    format!(
+      "table{}",
+      format!(
+        "{}{}",
+        map_str,
+        self
+          .array
+          .as_ref()
+          .map(|array| format!("<{}>", array.iter().map(Type::to_string).collect::<Vec<String>>().join(", ")))
+          .unwrap_or(String::new())
+      )
+    )
+  }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -243,8 +329,8 @@ impl Type {
     Type::Boolean
   }
 
-  pub fn new_table(key_type: Type, value_type: Type) -> Self {
-    Type::Table(TableType { key_type: Box::new(key_type), value_type: Box::new(value_type) })
+  pub fn new_table(array: Option<Vec<Type>>, map: Option<BTreeMap<String, Type>>) -> Self {
+    Type::Table(TableType { array, map })
   }
 
   pub fn new_function(params: Vec<Type>, return_type: Type) -> Type {
@@ -273,7 +359,13 @@ fn check_match_union(left: &Vec<Type>, right: &Vec<Type>) -> bool {
 }
 
 fn check_match_table(left: &TableType, right: &TableType) -> bool {
-  left.key_type.check_match(&right.key_type) && left.value_type.check_match(&right.value_type)
+  if let (Some(left_array), Some(right_array)) = (&left.array, &right.array) {
+    left_array.len() == right_array.len() && left_array.iter().zip(right_array).all(|(l, r)| l.check_match(r))
+  } else if let (Some(left_map), Some(right_map)) = (&left.map, &right.map) {
+    left_map.len() == right_map.len() && left_map.iter().zip(right_map).all(|(l, r)| l.1.check_match(&r.1))
+  } else {
+    false
+  }
 }
 
 fn check_match_function(left: &FunctionType, right: &FunctionType) -> bool {
@@ -312,7 +404,19 @@ fn format_function_type(function: &FunctionType) -> String {
 }
 
 fn format_table_type(table: &TableType) -> String {
-  format!("table<{}, {}>", table.key_type.to_string(), table.value_type.to_string())
+  let mut array_str = String::new();
+  let mut map_str = String::new();
+
+  if let Some(array) = &table.array {
+    array_str = format!("<{}>", array.iter().map(Type::to_string).collect::<Vec<String>>().join(", "));
+  }
+
+  if let Some(map) = &table.map {
+    map_str =
+      format!("<{}>", map.iter().map(|(k, v)| format!("{}: {}", k, v.to_string())).collect::<Vec<String>>().join(", "));
+  }
+
+  format!("table{}", format!("{}{}", array_str, map_str))
 }
 
 fn format_union_type(union: &UnionType) -> String {

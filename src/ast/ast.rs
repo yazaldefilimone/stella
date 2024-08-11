@@ -326,6 +326,9 @@ pub enum Expression {
   Binary(BinaryExpression),
   Require(RequireExpression),
   Function(FunctionExpression),
+  Table(TableExpression),
+  Member(MemberExpression),
+  Index(IndexExpression),
 }
 
 impl Expression {
@@ -349,6 +352,18 @@ impl Expression {
     Expression::Grouped(GroupedExpression::new(expressions, range))
   }
 
+  pub fn new_table(values: Vec<(Expression, Option<Expression>)>, range: Range) -> Self {
+    Expression::Table(TableExpression::new(values, range))
+  }
+
+  pub fn new_member(base: Expression, member: Expression) -> Self {
+    Expression::Member(MemberExpression::new(Box::new(base), Box::new(member)))
+  }
+
+  pub fn new_index(base: Expression, index: Expression, bracket_range: Range) -> Self {
+    Expression::Index(IndexExpression::new(Box::new(base), Box::new(index), bracket_range))
+  }
+
   pub fn new_function(
     arguments: Vec<(Token, Option<Type>)>,
     return_type: Option<Type>,
@@ -369,6 +384,9 @@ impl Expression {
       Expression::Grouped(grouped) => grouped.get_range(),
       Expression::Unary(unary) => unary.get_range(),
       Expression::Function(function) => function.get_range(),
+      Expression::Table(table) => table.get_range(),
+      Expression::Member(member) => member.get_range(),
+      Expression::Index(index) => index.get_range(),
     }
   }
 
@@ -464,6 +482,56 @@ impl UnaryExpression {
   }
 
   pub fn get_operator_range(&self) -> Range {
+    self.range.clone()
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MemberExpression {
+  pub base: Box<Expression>,
+  pub member: Box<Expression>,
+}
+impl MemberExpression {
+  pub fn new(base: Box<Expression>, member: Box<Expression>) -> Self {
+    MemberExpression { base, member }
+  }
+
+  pub fn get_range(&self) -> Range {
+    let left_range = self.base.get_range();
+    let right_range = self.member.get_range();
+    create_middle_range(&left_range, &right_range)
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct IndexExpression {
+  pub base: Box<Expression>,
+  pub index: Box<Expression>,
+  pub bracket_range: Range,
+}
+impl IndexExpression {
+  pub fn new(base: Box<Expression>, index: Box<Expression>, bracket_range: Range) -> Self {
+    IndexExpression { base, index, bracket_range }
+  }
+
+  pub fn get_range(&self) -> Range {
+    let left_range = self.base.get_range();
+    let right_range = self.index.get_range();
+    create_middle_range(&left_range, &right_range)
+  }
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TableExpression {
+  pub values: Vec<(Expression, Option<Expression>)>,
+  pub range: Range,
+}
+
+impl TableExpression {
+  pub fn new(values: Vec<(Expression, Option<Expression>)>, range: Range) -> Self {
+    TableExpression { values, range }
+  }
+
+  pub fn get_range(&self) -> Range {
     self.range.clone()
   }
 }

@@ -14,6 +14,9 @@ impl<'a> Checker<'a> {
       ast::Expression::Unary(unary_expr) => self.check_unary_expression(unary_expr),
       ast::Expression::Grouped(grup_expr) => self.check_grouped_expression(grup_expr),
       ast::Expression::Function(function) => self.check_function_expression(function),
+      ast::Expression::Table(table) => self.check_table_expression(table),
+      ast::Expression::Member(member) => self.check_member_expression(member),
+      ast::Expression::Index(index) => self.check_index_expression(index),
     }
   }
 }

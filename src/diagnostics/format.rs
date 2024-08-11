@@ -5,6 +5,9 @@ pub fn format_mismatched_types(expected: &str, found: &str) -> String {
 pub fn format_expected_function(name: &str) -> String {
   format!("expected function, found `{}`", name)
 }
+pub fn format_expected_table(message: &str) -> String {
+  format!("expected table, found `{}`", message)
+}
 
 pub fn format_undeclared_variable(name: &str) -> String {
   format!("cannot find value `{}` in this scope", name)
@@ -14,12 +17,31 @@ pub fn format_undeclared_type(name: &str) -> String {
   format!("cannot find type `{}` in this scope", name)
 }
 
+pub fn format_mismatched_key_type(key: &str) -> String {
+  format!("expected `string` key, but found `{}`", key)
+}
+
+pub fn format_mismatched_accessor_type(index: &str) -> String {
+  format!("expected `number` or `string`, but found `{}`", index)
+}
+pub fn format_no_field(base: &str, member: &str) -> String {
+  format!("no field `{}` on type `{}`", member, base)
+}
+
 pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
   if expected > 1 {
     format!("expected `{}` arguments, found `{}`", expected, found)
   } else {
     format!("expected `{}` argument, found `{}`", expected, found)
   }
+}
+
+pub fn format_cannot_index_non_array(type_name: &str) -> String {
+  format!("cannot index into non-array type `{}`", type_name)
+}
+
+pub fn format_key_not_found_in_table(key: &str, table: &str) -> String {
+  format!("key `{}` not found in table `{}`", key, table)
 }
 
 pub fn format_unsupported_operator(left: &str, right: &str, oper: &str) -> String {
