@@ -7,12 +7,12 @@ use crate::{
 };
 
 impl<'a> Checker<'a> {
-  pub fn check_optional_type(&mut self, ty: &Option<Type>) -> Result<Type, Diagnostic> {
+  pub fn check_optional_type(&mut self, ty: &Option<Type>, assume_nil: bool) -> Result<Type, Diagnostic> {
     match ty {
       Some(Type::Identifier(identifier)) => self.check_type_identifier(identifier),
       Some(Type::Generic(generic)) => self.check_generic_type(generic),
       Some(t) => Ok(t.clone()),
-      None => Ok(Type::Unknown),
+      None => Ok(if assume_nil { Type::Nil } else { Type::Unknown }),
     }
   }
 
@@ -21,7 +21,6 @@ impl<'a> Checker<'a> {
       Type::Identifier(identifier) => self.check_type_identifier(&identifier),
       Type::Generic(generic) => self.check_generic_type(&generic),
       Type::GenericCall(generic_call) => self.check_generic_call(&generic_call),
-      Type::Function(function) => self.infer_function_type(function),
       _ => Ok(ty),
     }
   }
@@ -111,30 +110,5 @@ impl<'a> Checker<'a> {
 
   pub fn create_generic_table_type(&self, generics: &[String], inferred: &[Type]) -> HashMap<String, Type> {
     generics.iter().cloned().zip(inferred.iter().cloned()).collect()
-  }
-
-  pub fn infer_function_type(&mut self, function: types::FunctionType) -> Result<Type, Diagnostic> {
-    let inferred_params: Vec<Type> = function
-      .params
-      .iter()
-      .map(|param| if let Type::Unknown = param { self.infer_type_from_context(param) } else { Ok(param.clone()) })
-      .collect::<Result<Vec<_>, _>>()?;
-    let inferred_return_type = if let Type::Unknown = *function.return_type {
-      self.infer_return_type(&function)
-    } else {
-      Ok(*function.return_type.clone())
-    }?;
-
-    Ok(Type::Function(types::FunctionType { params: inferred_params, return_type: Box::new(inferred_return_type) }))
-  }
-
-  fn infer_type_from_context(&self, _param: &Type) -> Result<Type, Diagnostic> {
-    // Aqui você poderia tentar inferir o tipo a partir do contexto em que a função é usada
-    Ok(Type::Unknown) // Placeholder: Substitua isso com a inferência real
-  }
-
-  fn infer_return_type(&self, function: &types::FunctionType) -> Result<Type, Diagnostic> {
-    // Aqui você pode analisar o corpo da função para inferir o tipo de retorno
-    Ok(Type::Unknown) // Placeholder: Substitua isso com a inferência real
   }
 }

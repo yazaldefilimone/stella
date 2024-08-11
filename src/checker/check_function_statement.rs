@@ -8,11 +8,11 @@ use crate::{
 impl<'a> Checker<'a> {
   pub fn check_function_statement(&mut self, function: &ast::FunctionStatement) -> Result<Type, Diagnostic> {
     let function_name = function.name.lexeme();
-    let mut return_type = self.check_optional_type(&function.return_type)?;
+    let mut return_type = self.check_optional_type(&function.return_type, false)?;
 
     // declare function placeholder
     let anonymous_function = self.ctx.create_anonymous_function();
-    let scope_idx = self.ctx.declare_variable(function_name, anonymous_function, None);
+    let scope_pointer = self.ctx.declare_variable(function_name, anonymous_function, None);
 
     self.ctx.enter_scope();
 
@@ -21,7 +21,7 @@ impl<'a> Checker<'a> {
     self.ctx.declare_return_param_type(return_type.clone());
 
     let function_type = Type::new_function(params, return_type.clone());
-    self.ctx.redeclare_variable(function_name, function_type, Some(scope_idx));
+    self.ctx.redeclare_variable(function_name, function_type, Some(scope_pointer));
 
     let last_type = self.check_statement(&function.body)?;
 

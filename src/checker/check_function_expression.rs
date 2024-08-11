@@ -7,7 +7,7 @@ use crate::{
 
 impl<'a> Checker<'a> {
   pub fn check_function_expression(&mut self, function: &ast::FunctionExpression) -> Result<Type, Diagnostic> {
-    let mut return_type = self.check_optional_type(&function.return_type)?;
+    let mut return_type = self.check_optional_type(&function.return_type, false)?;
     self.ctx.enter_scope();
 
     let params = self.declare_function_params(&function.arguments)?;
