@@ -3,7 +3,6 @@ use crate::{
   ast::ast,
   diagnostics::{Diagnostic, TypeError},
   types::Type,
-  utils::range::Range,
 };
 
 impl<'a> Checker<'a> {
@@ -24,20 +23,5 @@ impl<'a> Checker<'a> {
     );
 
     Err(self.create_diagnostic(diagnostic))
-  }
-
-  pub fn check_add_expression(&mut self, left_t: Type, right_t: Type, range: Range) -> Result<Type, Diagnostic> {
-    if left_t.supports_operator(&ast::BinaryOperator::Add) && right_t.supports_operator(&ast::BinaryOperator::Add) {
-      return Ok(Type::Number);
-    }
-
-    let dignostic = TypeError::UnsupportedOperator(
-      left_t.to_string(),
-      right_t.to_string(),
-      ast::BinaryOperator::Add.to_str().to_owned(),
-      Some(range),
-    );
-
-    Err(self.create_diagnostic(dignostic))
   }
 }

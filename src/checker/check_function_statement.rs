@@ -8,17 +8,20 @@ use crate::{
 impl<'a> Checker<'a> {
   pub fn check_function_statement(&mut self, function: &ast::FunctionStatement) -> Result<Type, Diagnostic> {
     let function_name = function.name.lexeme();
-    let mut return_type = self.check_optional_type(&function.return_type)?;
+    let mut return_type = self.check_optional_type(&function.return_type, false)?;
 
     // declare function placeholder
-    let scope_idx = self.ctx.declare_function_placeholder(function_name);
+    let anonymous_function = self.ctx.create_anonymous_function();
+    let scope_pointer = self.ctx.declare_variable(function_name, anonymous_function, None);
 
     self.ctx.enter_scope();
 
     let params = self.declare_function_params(&function.arguments)?;
 
     self.ctx.declare_return_param_type(return_type.clone());
-    self.ctx.update_function_placeholder(function_name, params.clone(), return_type.clone(), scope_idx);
+
+    let function_type = Type::new_function(params, return_type.clone());
+    self.ctx.redeclare_variable(function_name, function_type, Some(scope_pointer));
 
     let last_type = self.check_statement(&function.body)?;
 
@@ -37,9 +40,10 @@ impl<'a> Checker<'a> {
   pub fn declare_function_params(&mut self, arguments: &[(Token, Option<Type>)]) -> Result<Vec<Type>, Diagnostic> {
     let mut params = Vec::with_capacity(arguments.len());
     for (param, ty) in arguments.iter() {
-      let arg_type = ty.clone().unwrap_or(Type::Unknown);
-      self.ctx.declare_variable(param.lexeme(), arg_type.clone());
-      self.ctx.set_variable_range(param.lexeme(), param.range.clone());
+      let arg_type = if let Some(ty) = ty { ty.clone() } else { Type::Unknown };
+      let lexeme = param.lexeme();
+      self.ctx.declare_variable(lexeme, arg_type.clone(), None);
+      self.ctx.declare_variable_range(lexeme, param.range.clone());
       params.push(arg_type);
     }
     Ok(params)

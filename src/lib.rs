@@ -6,5 +6,6 @@ pub mod diagnostics;
 pub mod lexer;
 pub mod modules;
 pub mod parser;
+pub mod stdlib;
 pub mod types;
 pub mod utils;

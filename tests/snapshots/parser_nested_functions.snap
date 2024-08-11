@@ -77,15 +77,15 @@ Program(
                   ),
                 )),
               ],
-              range: Range(
-                start: 80,
-                end: 86,
-              ),
             )),
             range: Range(
-              start: 47,
-              end: 52,
+              start: 38,
+              end: 115,
             ),
+            range_return_type: Some(Range(
+              start: 65,
+              end: 71,
+            )),
           )),
           Return(ReturnStatement(
             values: [
@@ -126,10 +126,6 @@ Program(
                     end: 139,
                   ),
                 )),
-                range: Range(
-                  start: 127,
-                  end: 132,
-                ),
               )),
             ],
             range: Range(
@@ -138,15 +134,15 @@ Program(
             ),
           )),
         ],
-        range: Range(
-          start: 38,
-          end: 46,
-        ),
       )),
       range: Range(
-        start: 9,
-        end: 14,
+        start: 0,
+        end: 143,
       ),
+      range_return_type: Some(Range(
+        start: 27,
+        end: 33,
+      )),
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
@@ -182,10 +178,6 @@ Program(
             end: 177,
           ),
         )),
-        range: Range(
-          start: 168,
-          end: 173,
-        ),
       ))),
     )),
   ],

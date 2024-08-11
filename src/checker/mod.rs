@@ -23,6 +23,7 @@ pub mod check_unary_expression;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
 pub mod declare_variables;
+
 use crate::ast::ast;
 use crate::context::context::Context;
 use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError, TypeWarning};
@@ -37,6 +38,7 @@ pub struct Checker<'a> {
   pub diagnostics: DiagnosticManager,
   pub loader: Loader,
   pub resolver: Resolver,
+  pub expect: Option<Type>,
   pub raw: &'a str,
 }
 
@@ -47,8 +49,9 @@ impl<'a> Checker<'a> {
     let mut resolver = Resolver::new();
     resolver.add_search_path(file_name);
     let diagnostics = DiagnosticManager::new();
-    Checker { ctx, file_name: file_name.to_string(), diagnostics, loader, resolver, raw }
+    Checker { ctx, file_name: file_name.to_string(), diagnostics, loader, resolver, raw, expect: None }
   }
+
   pub fn check(&mut self, program: &ast::Program) -> Result<Type, Diagnostic> {
     let mut last_t = Type::Nil;
     for statement in &program.statements {
@@ -62,9 +65,9 @@ impl<'a> Checker<'a> {
     return Ok(last_t);
   }
 
-  pub fn check_break_statement(&mut self, break_: &ast::BreakStatement) {
-    // Empty statements don't change the type context
-  }
+  // pub fn check_break_statement(&mut self, break_: &ast::BreakStatement) {
+  //   // Empty statements don't change the type context
+  // }
 
   pub fn create_diagnostic(&self, error: TypeError) -> Diagnostic {
     error.into()
@@ -88,7 +91,7 @@ impl<'a> Checker<'a> {
   }
 
   pub fn create_type_mismatch(&self, expected: Type, found: Type, range: Range) -> Diagnostic {
-    let diagnostic = TypeError::TypeMismatchAssignment(expected.to_string(), found.to_string(), Some(range));
+    let diagnostic = TypeError::MismatchedTypes(expected.to_string(), found.to_string(), Some(range));
     self.create_diagnostic(diagnostic)
   }
 

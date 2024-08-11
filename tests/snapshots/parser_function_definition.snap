@@ -55,15 +55,15 @@ Program(
             ),
           )),
         ],
-        range: Range(
-          start: 41,
-          end: 47,
-        ),
       )),
       range: Range(
-        start: 9,
-        end: 14,
+        start: 0,
+        end: 69,
       ),
+      range_return_type: Some(Range(
+        start: 30,
+        end: 36,
+      )),
     )),
     VariableDeclaration(VariableDeclaration(
       values: [
@@ -99,10 +99,6 @@ Program(
             end: 108,
           ),
         )),
-        range: Range(
-          start: 93,
-          end: 98,
-        ),
       ))),
     )),
   ],

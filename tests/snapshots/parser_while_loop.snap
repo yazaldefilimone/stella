@@ -69,10 +69,6 @@ Program(
                 end: 61,
               ),
             )),
-            range: Range(
-              start: 49,
-              end: 54,
-            ),
           ))),
           Assign(AssignStatement(
             values: [
@@ -107,10 +103,6 @@ Program(
             )),
           )),
         ],
-        range: Range(
-          start: 49,
-          end: 54,
-        ),
       )),
       range: Range(
         start: 25,

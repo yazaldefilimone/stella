@@ -8,7 +8,7 @@ use code_highlighter::{highlight_error, highlight_warning};
 pub fn report_error(message: &str, range: &mut Range, raw: &str, file_name: &str, warning: bool) {
   println!("");
   if !warning {
-    println!("{} {}.", highlight_text_with_red("ERROR >>>"), highlight_text_with_white(message));
+    println!("{} {}", highlight_text_with_red("ERROR >>>"), highlight_text_with_white(message));
   } else {
     let warning = highlight_text_with_yellow("WARNING >>>");
     let message = format!("{} {}", warning, highlight_text_with_white(message));

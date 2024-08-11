@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::ast::ast;
 use crate::ast::tokens::{Token, TokenKind};
 use crate::diagnostics::report::report_and_exit;
@@ -9,6 +11,8 @@ pub struct Parser<'a> {
   lexer: Lexer<'a>,
   raw: &'a str,
 }
+
+type ParseExpression = fn(&mut Parser) -> ast::Expression;
 
 impl<'a> Parser<'a> {
   pub fn new(raw: &'a str, file_name: &'a str) -> Self {
@@ -81,20 +85,23 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_function_expression(&mut self) -> ast::Expression {
-    let range = self.consume_expect_token(TokenKind::Function).range.clone();
+    let start_range = self.consume_expect_token(TokenKind::Function).range;
     self.consume_expect_token(TokenKind::LeftParen);
     let arguments = self.parse_arguments_with_option_type();
     self.consume_expect_token(TokenKind::RightParen);
 
     let mut return_type = None;
+    let mut range_return_type = None;
     if self.match_token_and_consume(TokenKind::Colon).is_some() {
+      range_return_type = Some(self.lexer.peek_token().range.clone());
       return_type = Some(self.parse_type(false));
     }
 
     let body = self.parse_block_statement(&[TokenKind::End]);
-    self.consume_expect_token(TokenKind::End);
+    let end_range = self.consume_expect_token(TokenKind::End).range;
+    let range = create_middle_range(&start_range, &end_range);
 
-    ast::Expression::new_function(arguments, return_type, body, range)
+    ast::Expression::new_function(arguments, return_type, body, range, range_return_type)
   }
   fn parse_operator(&mut self) -> Option<(ast::BinaryOperator, Range)> {
     let token = self.lexer.peek_token();
@@ -228,8 +235,7 @@ impl<'a> Parser<'a> {
         let args = self.parse_expression_statement();
         let range = args.get_range();
         let args = ast::Expression::new_grouped(vec![args], range);
-        let range = ident_token.range.clone();
-        let expression = ast::Expression::new_call(ident_token, args, range);
+        let expression = ast::Expression::new_call(ident_token, args);
         ast::Statement::Expression(expression)
       } else {
         self.report_unexpected_token(ident_token)
@@ -265,13 +271,12 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_call_expression(&mut self, ident: Token) -> ast::Expression {
-    let range = ident.range.clone();
     let args = self.parse_grouped_expression();
-    ast::Expression::new_call(ident, args, range)
+    ast::Expression::new_call(ident, args)
   }
 
   fn parse_function_statement(&mut self, local: bool) -> ast::Statement {
-    self.consume_expect_token(TokenKind::Function);
+    let start = self.consume_expect_token(TokenKind::Function).range;
     let name = self.consume_token();
     let generics = self.parse_generic_type();
     self.consume_expect_token(TokenKind::LeftParen);
@@ -280,16 +285,25 @@ impl<'a> Parser<'a> {
 
     let mut return_type = None;
 
+    let mut range_return_type = None;
     if self.match_token(&TokenKind::Colon) {
       self.consume_expect_token(TokenKind::Colon);
+      range_return_type = Some(self.lexer.peek_token().range.clone());
       return_type = Some(self.parse_type(true))
     }
-
     let body = self.parse_block_statement(&[TokenKind::End]);
-    self.consume_expect_token(TokenKind::End);
-    let range = name.range.clone();
-
-    ast::Statement::Function(ast::FunctionStatement::new(name, local, generics, arguments, return_type, body, range))
+    let end_range = self.consume_expect_token(TokenKind::End).range;
+    let range = create_middle_range(&start, &end_range);
+    ast::Statement::Function(ast::FunctionStatement::new(
+      name,
+      local,
+      generics,
+      arguments,
+      return_type,
+      body,
+      range,
+      range_return_type,
+    ))
   }
 
   fn parse_type(&mut self, excepted_paren: bool) -> Type {
@@ -421,15 +435,18 @@ impl<'a> Parser<'a> {
 
   fn parse_block_statement(&mut self, end_tokens: &[TokenKind]) -> ast::Statement {
     let mut statements = Vec::new();
-    let range = self.lexer.peek_token().range.clone();
+    // skip block comments
+    self.skip_comments();
     while !self.contains_token(end_tokens) {
       statements.push(self.parse_statement());
+      // skip block comments
+      self.skip_comments();
     }
-    ast::Statement::Block(ast::BlockStatement::new(statements, range))
+    ast::Statement::Block(ast::BlockStatement::new(statements))
   }
 
   fn parse_if_statement(&mut self) -> ast::Statement {
-    let if_token = self.consume_expect_token(TokenKind::If);
+    let start_range = self.consume_expect_token(TokenKind::If).range;
     let condition = self.parse_expression_statement();
     self.consume_expect_token(TokenKind::Then);
     let then_body = self.parse_block_statement(&[TokenKind::Else, TokenKind::End]);
@@ -438,8 +455,9 @@ impl<'a> Parser<'a> {
     } else {
       None
     };
-    self.consume_expect_token(TokenKind::End);
-    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_body, if_token.range))
+    let end_range = self.consume_expect_token(TokenKind::End).range;
+    let range = create_middle_range(&start_range, &end_range);
+    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_body, range))
   }
 
   fn parse_while_statement(&mut self) -> ast::Statement {
@@ -460,7 +478,7 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_for_statement(&mut self) -> ast::Statement {
-    let for_token = self.consume_expect_token(TokenKind::For);
+    let start_range = self.consume_expect_token(TokenKind::For).range;
     let variable = self.parse_identifier();
     self.consume_expect_token(TokenKind::Assign);
     let init = self.parse_expression_statement();
@@ -473,8 +491,9 @@ impl<'a> Parser<'a> {
     };
     self.consume_expect_token(TokenKind::Do);
     let body = self.parse_block_statement(&[TokenKind::End]);
-    self.consume_expect_token(TokenKind::End);
-    ast::Statement::For(ast::ForStatement::new(variable, init, limit, step, body, for_token.range))
+    let end_range = self.consume_expect_token(TokenKind::End).range;
+    let range = create_middle_range(&start_range, &end_range);
+    ast::Statement::For(ast::ForStatement::new(variable, init, limit, step, body, range))
   }
 
   fn parse_break_statement(&mut self) -> ast::Statement {

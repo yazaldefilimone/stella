@@ -8,10 +8,8 @@ impl<'a> Checker<'a> {
     let right_type = if let Some(initializer) = &declaration.initializer {
       self.check_expression(initializer)?
     } else {
-      // unknown type or nil? and why?
-      Type::Unknown
+      Type::Nil
     };
-
     self.declare_variables(&declaration.values, right_type, declaration.local, declaration.get_range())?;
     Ok(Type::Nil)
   }
