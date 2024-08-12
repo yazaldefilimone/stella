@@ -41,7 +41,7 @@ pub fn format_cannot_index_non_array(type_name: &str) -> String {
 }
 
 pub fn format_key_not_found_in_table(key: &str, table: &str) -> String {
-  format!("key `{}` not found in table `{}`", key, table)
+  format!("property `{}` not found in table `{}`", key, table)
 }
 
 pub fn format_unsupported_operator(left: &str, right: &str, oper: &str) -> String {
@@ -118,7 +118,7 @@ pub fn format_warning_unused_variable(name: &str) -> String {
 }
 
 pub fn format_warning_redeclaration(name: &str) -> String {
-  format!("redeclaration of local variable `{}`", name)
+  format!("redeclaration of local value `{}`", name)
 }
 
 pub fn format_warning_uninitialized_variable(name: &str) -> String {
