@@ -1,10 +1,12 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use super::Checker;
 use crate::{
   diagnostics::{Diagnostic, TypeError},
-  types::{self, Type},
+  types::{self, GenericCallType, TableType, Type},
 };
+
+type GenericBinds = HashMap<String, Type>;
 
 impl<'a> Checker<'a> {
   pub fn check_optional_type(&mut self, ty: &Option<Type>, assume_nil: bool) -> Result<Type, Diagnostic> {
@@ -43,11 +45,37 @@ impl<'a> Checker<'a> {
     }
   }
 
-  pub fn create_generic_table(&self, types: &[Type], variables: &[String]) -> HashMap<String, Type> {
+  pub fn create_generic_table(&self, types: &[Type], variables: &[String]) -> GenericBinds {
     variables.iter().cloned().zip(types.iter().cloned()).collect()
   }
 
-  pub fn apply_generic_binds(&self, generic_value: &Type, binds: &HashMap<String, Type>) -> Result<Type, Diagnostic> {
+  pub fn apply_generic_bind_table(&self, table: &TableType, binds: &GenericBinds) -> Result<Type, Diagnostic> {
+    let array = table
+      .array
+      .as_ref()
+      .map(|array| array.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>())
+      .transpose()?;
+
+    let map = table
+      .map
+      .as_ref()
+      .map(|map| {
+        map
+          .iter()
+          .map(|(key, ty)| Ok((key.clone(), self.apply_generic_binds(ty, binds)?)))
+          .collect::<Result<BTreeMap<_, _>, Diagnostic>>()
+      })
+      .transpose()?;
+
+    Ok(Type::Table(TableType { array, map }))
+  }
+
+  pub fn apply_generic_bind_call(&self, call: &GenericCallType, binds: &GenericBinds) -> Result<Type, Diagnostic> {
+    let types = call.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
+    Ok(Type::GenericCall(types::GenericCallType { name: call.name.clone(), types, range: call.range.clone() }))
+  }
+
+  pub fn apply_generic_binds(&self, generic_value: &Type, binds: &GenericBinds) -> Result<Type, Diagnostic> {
     match generic_value {
       Type::Identifier(identifier) => {
         if let Some(bound_type) = binds.get(&identifier.name) {
@@ -62,11 +90,7 @@ impl<'a> Checker<'a> {
         let return_type = self.apply_generic_binds(&function.return_type, binds)?;
         Ok(Type::Function(types::FunctionType { params, return_type: Box::new(return_type) }))
       }
-      Type::Table(table) => {
-        let key_type = self.apply_generic_binds(&table.key_type, binds)?;
-        let value_type = self.apply_generic_binds(&table.value_type, binds)?;
-        Ok(Type::Table(types::TableType { key_type: Box::new(key_type), value_type: Box::new(value_type) }))
-      }
+      Type::Table(table) => self.apply_generic_bind_table(table, binds),
       Type::Union(union) => {
         let types = union.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
         Ok(Type::Union(types::UnionType { types }))
@@ -79,16 +103,7 @@ impl<'a> Checker<'a> {
         let types = group.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
         Ok(Type::Grup(types::GrupType { types }))
       }
-      Type::GenericCall(generic_call) => {
-        let types =
-          generic_call.types.iter().map(|ty| self.apply_generic_binds(ty, binds)).collect::<Result<Vec<_>, _>>()?;
-
-        Ok(Type::GenericCall(types::GenericCallType {
-          name: generic_call.name.clone(),
-          types,
-          range: generic_call.range.clone(),
-        }))
-      }
+      Type::GenericCall(generic_call) => self.apply_generic_bind_call(generic_call, binds),
       _ => Ok(generic_value.clone()),
     }
   }
@@ -108,7 +123,7 @@ impl<'a> Checker<'a> {
     })
   }
 
-  pub fn create_generic_table_type(&self, generics: &[String], inferred: &[Type]) -> HashMap<String, Type> {
+  pub fn create_generic_table_type(&self, generics: &[String], inferred: &[Type]) -> GenericBinds {
     generics.iter().cloned().zip(inferred.iter().cloned()).collect()
   }
 }

@@ -10,8 +10,9 @@ use report::report_error;
 use std::fmt::{self, Debug};
 
 use format::{
-  format_expected_function, format_function_arity_mismatch, format_mismatched_types,
-  format_missing_variable_declaration, format_module_not_exported, format_module_not_found,
+  format_cannot_index_non_array, format_expected_function, format_expected_table, format_function_arity_mismatch,
+  format_key_not_found_in_table, format_mismatched_accessor_type, format_mismatched_key_type, format_mismatched_types,
+  format_missing_variable_declaration, format_module_not_exported, format_module_not_found, format_no_field,
   format_redeclared_in_same_scope, format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable,
   format_unsupported_operator, format_warning_shadow_warning, format_warning_unused_variable,
 };
@@ -126,8 +127,13 @@ pub enum TypeError {
   FunctionArityMismatch(usize, usize, Option<Range>),
   UnsupportedOperator(String, String, String, Option<Range>),
   MissingVariableDeclaration(Option<Range>),
+  ExpectedTable(String, Option<Range>),
+  MismatchedKeyType(String, Option<Range>),
+  NoField(String, String, Option<Range>),
+  CantIndexNonArray(String, Option<Range>),
+  KeyNotFoundInTable(String, String, Option<Range>),
+  MismatchedAccessorType(String, Option<Range>),
 }
-
 impl From<TypeError> for Diagnostic {
   fn from(error: TypeError) -> Self {
     let (message, range) = match error {
@@ -144,6 +150,12 @@ impl From<TypeError> for Diagnostic {
       }
       TypeError::UndeclaredType(name, rg) => (format_undeclared_type(&name), rg),
       TypeError::ExpectedFunction(name, rg) => (format_expected_function(&name), rg),
+      TypeError::NoField(base, member, rg) => (format_no_field(&base, &member), rg),
+      TypeError::MismatchedKeyType(key, rg) => (format_mismatched_key_type(&key), rg),
+      TypeError::ExpectedTable(message, rg) => (format_expected_table(&message), rg),
+      TypeError::CantIndexNonArray(type_name, rg) => (format_cannot_index_non_array(&type_name), rg),
+      TypeError::KeyNotFoundInTable(key, table, rg) => (format_key_not_found_in_table(&key, &table), rg),
+      TypeError::MismatchedAccessorType(index, rg) => (format_mismatched_accessor_type(&index), rg),
     };
 
     Diagnostic::new(DiagnosticLevel::Error, message, range)
