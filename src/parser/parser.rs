@@ -108,7 +108,7 @@ impl<'a> Parser<'a> {
     ))
   }
 
-  // flow control
+  // control flow
   //
 
   fn parse_if_statement(&mut self) -> ast::Statement {

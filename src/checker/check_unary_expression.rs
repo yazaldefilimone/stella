@@ -14,7 +14,7 @@ impl<'a> Checker<'a> {
     match unary_expr.operator {
       ast::UnaryOperator::Negate => self.validate_unary_operator(operand_t, &Type::Number, unary_expr),
       ast::UnaryOperator::Not => self.validate_unary_operator(operand_t, &Type::Boolean, unary_expr),
-      _ => todo!("Implement more unary operators"),
+      ast::UnaryOperator::Hash => self.validate_unary_operator(operand_t, &Type::String, unary_expr),
     }
   }
 
