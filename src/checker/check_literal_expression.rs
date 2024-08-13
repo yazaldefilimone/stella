@@ -9,7 +9,7 @@ impl<'a> Checker<'a> {
       ast::LiteralExpression::Number(_) => Ok(Type::Number),
       ast::LiteralExpression::String(_) => Ok(Type::String),
       ast::LiteralExpression::Boolean(_) => Ok(Type::Boolean),
-      ast::LiteralExpression::Nil => Ok(Type::Nil),
+      ast::LiteralExpression::Nil(_) => Ok(Type::Nil),
     }
   }
 }

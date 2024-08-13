@@ -3,16 +3,15 @@ use std::collections::BTreeMap;
 
 use crate::types::Type;
 use print::create_print_type;
-pub mod io_type;
-pub mod number;
+mod io_type;
+mod number;
 mod print;
-pub mod string;
-pub mod table;
+mod string;
+mod table;
 
 pub fn create_stdlib() -> BTreeMap<String, Type> {
-  let mut stdlib = BTreeMap::new();
-  // nill
-  stdlib.insert("nil".to_string(), Type::Nil);
-  stdlib.insert("print".to_string(), create_print_type());
-  stdlib
+  let mut stdlib_variables = BTreeMap::new();
+  stdlib_variables.insert("nil".to_string(), Type::Nil);
+  stdlib_variables.insert("print".to_string(), create_print_type());
+  return stdlib_variables;
 }

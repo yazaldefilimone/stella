@@ -36,6 +36,18 @@ pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
   }
 }
 
+pub fn format_generic_call_arity_mismatch(expected: usize, found: usize) -> String {
+  if expected > 1 {
+    format!("expected `{}` type arguments, found `{}`", expected, found)
+  } else {
+    format!("expected `{}` type argument, found `{}`", expected, found)
+  }
+}
+
+pub fn format_optional_call_arity_mismatch(found: usize) -> String {
+  format!("expected one type argument, found `{}`", found)
+}
+
 pub fn format_cannot_index_non_array(type_name: &str) -> String {
   format!("cannot index into non-array type `{}`", type_name)
 }
@@ -112,7 +124,12 @@ pub fn format_incorrect_table_structure(expected: &str, found: &str) -> String {
 }
 
 // warning
-
+pub fn format_warning_redundant_type(name: &str, type_name: &str) -> String {
+  // re-specifying type `number` for variable `x` is redundant"
+  // or
+  // redundant type `number` for `x`"
+  format!("redundant `{}` for `{}`", type_name, name)
+}
 pub fn format_warning_unused_variable(name: &str) -> String {
   format!("unused value `{}`", name)
 }

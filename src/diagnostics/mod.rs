@@ -11,10 +11,11 @@ use std::fmt::{self, Debug};
 
 use format::{
   format_cannot_index_non_array, format_expected_function, format_expected_table, format_function_arity_mismatch,
-  format_key_not_found_in_table, format_mismatched_accessor_type, format_mismatched_key_type, format_mismatched_types,
-  format_missing_variable_declaration, format_module_not_exported, format_module_not_found, format_no_field,
-  format_redeclared_in_same_scope, format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable,
-  format_unsupported_operator, format_warning_shadow_warning, format_warning_unused_variable,
+  format_generic_call_arity_mismatch, format_key_not_found_in_table, format_mismatched_accessor_type,
+  format_mismatched_key_type, format_mismatched_types, format_missing_variable_declaration, format_module_not_exported,
+  format_module_not_found, format_no_field, format_optional_call_arity_mismatch, format_redeclared_in_same_scope,
+  format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable, format_unsupported_operator,
+  format_warning_redundant_type, format_warning_shadow_warning, format_warning_unused_variable,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -102,6 +103,7 @@ impl DiagnosticManager {
 pub enum TypeWarning {
   UnusedVariable(String, Option<Range>),
   ShadowedVariable(String, Option<Range>),
+  RedundantType(String, String, Option<Range>),
 }
 
 impl From<TypeWarning> for Diagnostic {
@@ -109,6 +111,7 @@ impl From<TypeWarning> for Diagnostic {
     let (message, range) = match warning {
       TypeWarning::UnusedVariable(name, loc) => (format_warning_unused_variable(&name), loc),
       TypeWarning::ShadowedVariable(name, loc) => (format_warning_shadow_warning(&name), loc),
+      TypeWarning::RedundantType(name, type_name, loc) => (format_warning_redundant_type(&name, &type_name), loc),
     };
     Diagnostic::new(DiagnosticLevel::Warning, message, range)
   }
@@ -133,6 +136,8 @@ pub enum TypeError {
   CantIndexNonArray(String, Option<Range>),
   KeyNotFoundInTable(String, String, Option<Range>),
   MismatchedAccessorType(String, Option<Range>),
+  GenericCallArityMismatch(usize, usize, Option<Range>),
+  OptionalCallArityMismatch(usize, Option<Range>),
 }
 impl From<TypeError> for Diagnostic {
   fn from(error: TypeError) -> Self {
@@ -156,6 +161,10 @@ impl From<TypeError> for Diagnostic {
       TypeError::CantIndexNonArray(type_name, rg) => (format_cannot_index_non_array(&type_name), rg),
       TypeError::KeyNotFoundInTable(key, table, rg) => (format_key_not_found_in_table(&key, &table), rg),
       TypeError::MismatchedAccessorType(index, rg) => (format_mismatched_accessor_type(&index), rg),
+      TypeError::GenericCallArityMismatch(expected, found, rg) => {
+        (format_generic_call_arity_mismatch(expected, found), rg)
+      }
+      TypeError::OptionalCallArityMismatch(found, rg) => (format_optional_call_arity_mismatch(found), rg),
     };
 
     Diagnostic::new(DiagnosticLevel::Error, message, range)

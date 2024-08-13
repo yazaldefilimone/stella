@@ -69,12 +69,12 @@ impl<'a> Parser<'a> {
     ast::Statement::TypeDeclaration(ast::TypeDeclaration::new(name, generics, initilizer, range))
   }
   fn parse_variable_declaration(&mut self, local: bool) -> ast::Statement {
-    let valyes = self.parse_variable_and_type(None);
+    let values = self.parse_variable_and_type(None);
     let mut initializer = None;
     if self.match_token_and_consume(TokenKind::Assign).is_some() {
       initializer = Some(self.parse_expression_statement());
     }
-    ast::Statement::VariableDeclaration(ast::VariableDeclaration::new(valyes, local, initializer))
+    ast::Statement::VariableDeclaration(ast::VariableDeclaration::new(values, local, initializer))
   }
 
   fn parse_function_statement(&mut self, local: bool) -> ast::Statement {
@@ -234,8 +234,8 @@ impl<'a> Parser<'a> {
     let token = self.lexer.peek_token();
     let mut expression = match token.kind {
       TokenKind::Number(_) | TokenKind::String(_) => self.parse_literal_expression(),
-      TokenKind::True | TokenKind::False => self.parse_literal_expression(),
       TokenKind::Identifier(_) => self.parse_identifier(),
+      TokenKind::Nil | TokenKind::True | TokenKind::False => self.parse_literal_expression(),
       TokenKind::LeftParen => self.parse_grouped_expression(),
       TokenKind::Require => self.parse_require_expression(),
       TokenKind::Function => self.parse_function_expression(),
@@ -302,6 +302,7 @@ impl<'a> Parser<'a> {
       TokenKind::String(value) => ast::Expression::new_literal(ast::LiteralExpression::new_string(value, token.range)),
       TokenKind::True => ast::Expression::new_literal(ast::LiteralExpression::new_bool(true, token.range)),
       TokenKind::False => ast::Expression::new_literal(ast::LiteralExpression::new_bool(false, token.range)),
+      TokenKind::Nil => ast::Expression::new_literal(ast::LiteralExpression::new_nil(token.range)),
       _ => self.report_unexpected_token(token),
     }
   }

@@ -127,7 +127,7 @@ impl<'a> Lexer<'a> {
   }
 
   fn read_keyword_or_identifier(&mut self) -> Token {
-    let text = self.read_while(|c| c.is_ascii_alphabetic() || c == '_');
+    let text = self.read_while(|c| c.is_ascii_alphabetic() || c == '_' || c == '$' || c.is_ascii_digit());
     let range = self.create_range();
     Token::new_keyword_or_identifier(range, text)
   }
