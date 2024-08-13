@@ -172,6 +172,10 @@ impl GenericType {
 impl Type {
   pub fn supports_operator(&self, operator: &BinaryOperator) -> bool {
     use BinaryOperator::*;
+    // optional
+    if supports_optional_operator(self, operator) {
+      return true;
+    }
     matches!(
       (self, operator),
       (Type::Number, Add)
@@ -222,11 +226,20 @@ impl Type {
       | (Type::Boolean, Type::Boolean, BinaryOperator::Equal)
       | (Type::Boolean, Type::Boolean, BinaryOperator::NotEqual)
       | (Type::Nil, Type::Nil, _) => Type::Boolean,
+
       (Type::Number, Type::Number, BinaryOperator::DoubleSlash) => Type::Number,
       (Type::Number, Type::Number, _) => Type::Number,
       (Type::String, Type::String, _) => Type::String,
+      // strings concat numbers
       (Type::Number, Type::String, BinaryOperator::DoubleDot)
       | (Type::String, Type::Number, BinaryOperator::DoubleDot) => Type::String,
+      // optional
+      (_, Type::Optional(_), BinaryOperator::DoubleDot)
+      | (Type::Optional(_), _, BinaryOperator::DoubleDot)
+      | (_, Type::Optional(_), BinaryOperator::Equal)
+      | (Type::Optional(_), _, BinaryOperator::Equal)
+      | (_, Type::Optional(_), BinaryOperator::NotEqual)
+      | (Type::Optional(_), _, BinaryOperator::NotEqual) => get_operator_optional_result_type(operator),
       _ => Type::Unknown,
     }
   }
@@ -240,7 +253,9 @@ impl Type {
       | (Type::Unknown, Type::Unknown)
       | (Type::Unknown, _)
       | (_, Type::Unknown) => true,
-      (Type::Optional(left), Type::Optional(right)) => left.inner_type.check_match(&right.inner_type),
+      (Type::Optional(left), Type::Optional(right)) => check_match_optional(left, right),
+      (Type::Optional(left), right) => check_match_optional_with_single_type(left, right),
+      (left, Type::Optional(right)) => check_match_optional_with_single_type(right, left),
       (Type::Union(left), Type::Union(right)) => check_match_union(&left.types, &right.types),
       (Type::Table(left), Type::Table(right)) => check_match_table(left, right),
       (Type::Function(left), Type::Function(right)) => check_match_function(left, right),
@@ -352,6 +367,36 @@ impl Type {
   pub fn new_generic_call(name: String, types: Vec<Type>, range: Range) -> Self {
     Type::GenericCall(GenericCallType { name, types, range })
   }
+}
+
+fn supports_optional_operator(left: &Type, operator: &BinaryOperator) -> bool {
+  if let Type::Optional(optional) = left {
+    matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+  } else {
+    false
+  }
+}
+
+// get_operator_result_type
+fn get_operator_optional_result_type(operator: &BinaryOperator) -> Type {
+  if matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot) {
+    Type::Boolean
+  } else {
+    Type::Unknown
+  }
+}
+
+// checks
+
+fn check_match_optional(left: &OptionalType, right: &OptionalType) -> bool {
+  left.inner_type.check_match(&right.inner_type)
+}
+
+fn check_match_optional_with_single_type(left: &OptionalType, right: &Type) -> bool {
+  if right.is_nil() {
+    return true;
+  }
+  left.inner_type.check_match(right)
 }
 
 fn check_match_union(left: &Vec<Type>, right: &Vec<Type>) -> bool {

@@ -25,7 +25,7 @@ impl<'a> Checker<'a> {
       return_type = replace_type(&return_type, &last_type);
     }
 
-    self.check_used_variable_in_current_scope();
+    self.check_unused_variables();
     self.ctx.leave_scope();
 
     let function_type = Type::new_function(params, return_type);

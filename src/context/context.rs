@@ -16,8 +16,8 @@ impl Context {
 
   fn create_global_scope() -> Scope {
     let mut global_scope = Scope::new();
-    let stdlib = create_stdlib();
-    global_scope.variables.extend(stdlib);
+    let stdlib_variables = create_stdlib();
+    global_scope.variables.extend(stdlib_variables);
     global_scope
   }
 

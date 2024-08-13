@@ -13,6 +13,7 @@ impl<'a> Checker<'a> {
     match ty {
       Some(Type::Identifier(identifier)) => self.check_type_identifier(identifier),
       Some(Type::Generic(generic)) => self.check_generic_type(generic),
+      Some(Type::GenericCall(generic_call)) => self.check_generic_call(generic_call),
       Some(t) => Ok(t.clone()),
       None => Ok(if assume_nil { Type::Nil } else { Type::Unknown }),
     }
@@ -28,6 +29,10 @@ impl<'a> Checker<'a> {
   }
 
   pub fn check_generic_call(&mut self, generic_call: &types::GenericCallType) -> Result<Type, Diagnostic> {
+    if let Some(stdlib_type) = self.check_stdlib_type(generic_call)? {
+      return Ok(stdlib_type);
+    }
+
     let ty = self.ctx.get_type(generic_call.name.as_str()).ok_or_else(|| {
       self.create_diagnostic(TypeError::UndeclaredType(generic_call.name.to_string(), Some(generic_call.range.clone())))
     })?;

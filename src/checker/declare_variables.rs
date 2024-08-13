@@ -1,8 +1,11 @@
+use crate::{
+  ast::tokens::Token,
+  diagnostics::{Diagnostic, TypeWarning},
+  types::Type,
+  utils::range::Range,
+};
+
 use super::Checker;
-use crate::ast::tokens::Token;
-use crate::diagnostics::{Diagnostic, TypeWarning};
-use crate::types::{FunctionType, Type};
-use crate::utils::range::Range;
 
 type NameType<'a> = &'a Vec<(Token, Option<Type>)>;
 type ValueType<'a> = &'a (Token, Option<Type>);
@@ -13,92 +16,78 @@ impl<'a> Checker<'a> {
       Type::Grup(group) => {
         for (index, token) in names.iter().enumerate() {
           let assigned_type = group.types.get(index).cloned().unwrap_or(Type::Nil);
-          self.declare_variable(token, assigned_type, local, &range)?;
+          // Check for shadowing and emit a warning if necessary
+          self.check_shadowing(token.0.lexeme(), local, &token.0.range)?;
+          self.declare_variable(token, assigned_type, local)?;
         }
       }
       _ => {
         for (index, token) in names.iter().enumerate() {
           let assigned_type = if index == 0 { self.check_type(ty.clone())? } else { Type::Nil };
-          self.declare_variable(token, assigned_type, local, &range)?;
+          // Check for shadowing and emit a warning if necessary
+          self.check_shadowing(token.0.lexeme(), local, &token.0.range)?;
+          self.declare_variable(token, assigned_type, local)?;
         }
       }
     }
     Ok(())
   }
 
-  pub fn declare_variable(&mut self, value: ValueType, ty: Type, local: bool, range: &Range) -> Result<(), Diagnostic> {
+  pub fn declare_variable(&mut self, value: ValueType, mut assigned_type: Type, local: bool) -> Result<(), Diagnostic> {
     let lexeme = value.0.lexeme();
-    let mut checked_type = self.check_type(ty)?;
-    if let Some(value_type) = &value.1 {
-      let checked_value_type = self.check_type(value_type.to_owned())?;
-      if !checked_value_type.check_match(&checked_type) {
-        return Err(self.create_type_mismatch(checked_value_type, checked_type, value.0.range.clone()));
+    let value_range = value.0.range.clone();
+
+    // Check if the variable already exists in the current context
+    let existing_type = self.ctx.get_variable(lexeme, None);
+    if let Some(existing_type) = existing_type {
+      // If the variable exists, check if the new type is compatible
+      if !existing_type.check_match(&assigned_type) {
+        return Err(self.create_type_mismatch(existing_type.to_owned(), assigned_type, value_range.clone()));
       }
-      // if ty is a function type, infer parameters and return type if not provided
-      match (&checked_type, &checked_value_type) {
-        (Type::Function(expected), Type::Function(found)) => {
-          self.bind_function(expected, found, range)?;
-          checked_type = Type::Function(found.clone());
-        }
-        _ => {}
+
+      // If the existing type can replace the new type, use the existing type
+      if existing_type.can_replace(&assigned_type) {
+        assigned_type = existing_type.clone();
       }
+
+      // Update the variable type in the context
+      self.ctx.redeclare_variable(lexeme, assigned_type, None);
+      return Ok(());
     }
 
-    self.emmit_shadowing_and_redeclaration(lexeme, local, &value.0.range)?;
+    // If there is a type specified in the declaration, check if it's redundant
+    //
+    if let Some(value_type) = &value.1 {
+      let value_type = self.check_type(value_type.to_owned())?;
+      // todo: previne to get variable twice....
+      if let Some(existing_type) = self.ctx.get_variable(lexeme, None) {
+        if !existing_type.check_match(&value_type) {
+          return Err(self.create_type_mismatch(existing_type.to_owned(), value_type.to_owned(), value_range));
+        }
 
-    self.ctx.declare_variable(lexeme, checked_type, None);
+        let diagnostic = TypeWarning::RedundantType(lexeme.to_string(), existing_type.to_string(), Some(value_range));
+        self.diagnostics.add(diagnostic.into());
+      }
+
+      assigned_type = self.infer_type(value_type, assigned_type, &value.0.range)?;
+    }
+
+    // If the variable doesn't exist, declare it
+    self.ctx.declare_variable(lexeme, assigned_type, None);
+
     if local {
       self.ctx.set_local_declaration(lexeme);
-    } else {
     }
     self.ctx.declare_variable_range(lexeme, value.0.range.clone());
     Ok(())
   }
 
-  pub fn emmit_shadowing_and_redeclaration(&mut self, lexeme: &str, local: bool, rg: &Range) -> Result<(), Diagnostic> {
-    if local {
-      if self.ctx.defined_in_current_scope(lexeme) {
-        if self.ctx.is_local_declaration(lexeme) {
-          return Err(self.create_redeclaration(lexeme, rg.clone()));
-        } else {
-          let diagnostic = TypeWarning::ShadowedVariable(lexeme.to_string(), Some(rg.clone()));
-          self.diagnostics.add(diagnostic.into());
-        }
-      }
-    } else if let Some(previous_type) = self.ctx.get_variable(lexeme, Some(0)) {
-      let current_type = self.ctx.get_variable(lexeme, None).unwrap_or_else(|| &Type::Unknown);
-      if !previous_type.check_match(&current_type) {
-        return Err(self.create_type_mismatch(previous_type.to_owned(), current_type.to_owned(), rg.clone()));
-      }
+  pub fn infer_type(&mut self, expected: Type, found: Type, range: &Range) -> Result<Type, Diagnostic> {
+    // If the types don't match, return a type mismatch error
+    if !expected.check_match(&found) {
+      return Err(self.create_type_mismatch(expected, found, range.clone()));
     }
-    Ok(())
-  }
-
-  pub fn bind_function(&mut self, expected: &FunctionType, found: &FunctionType, rg: &Range) -> Result<(), Diagnostic> {
-    if expected.params.len() != found.params.len() {
-      return Err(self.create_function_arity_mismatch(expected.params.len(), found.params.len(), rg.clone()));
-    }
-
-    for (expected_param, found_param) in expected.params.iter().zip(found.params.iter()) {
-      if expected_param.can_replace(found_param) {
-        continue;
-      }
-
-      if !expected_param.check_match(found_param) {
-        return Err(self.create_type_mismatch(expected_param.to_owned(), found_param.to_owned(), rg.clone()));
-      }
-    }
-
-    let expected_return_type = *expected.return_type.clone();
-    let found_return_type = *found.return_type.clone();
-
-    if expected_return_type.can_replace(&found_return_type) {
-      return Ok(());
-    }
-
-    if !expected_return_type.check_match(&found_return_type) {
-      return Err(self.create_type_mismatch(expected_return_type, found_return_type, rg.clone()));
-    }
-    return Ok(());
+    // Check if the expected type can replace the found type...
+    return if expected.can_replace(&found) { Ok(found) } else { Ok(expected) };
   }
 }

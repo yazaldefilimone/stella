@@ -1,5 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
+pub mod binding;
 pub mod check_assign_statement;
 pub mod check_binary_expression;
 pub mod check_block_statement;
@@ -18,18 +19,21 @@ pub mod check_member_expression;
 pub mod check_repeat_statement;
 pub mod check_require_expression;
 pub mod check_return_statement;
+pub mod check_shadowing;
 pub mod check_statement;
+pub mod check_stdlib;
 pub mod check_table_expression;
 pub mod check_type;
 pub mod check_type_declaration;
 pub mod check_unary_expression;
+pub mod check_unused_variables;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
 pub mod declare_variables;
 
 use crate::ast::ast;
 use crate::context::context::Context;
-use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError, TypeWarning};
+use crate::diagnostics::{Diagnostic, DiagnosticManager, TypeError};
 use crate::modules::loader::Loader;
 use crate::modules::resolver::Resolver;
 use crate::types::Type;
@@ -76,20 +80,8 @@ impl<'a> Checker<'a> {
     error.into()
   }
 
-  pub fn check_used_variable_in_current_scope(&mut self) {
-    let used_variables = self.ctx.check_unused_variables();
-    for used_variable in used_variables {
-      let used_variable_range = self.ctx.get_variable_range(&used_variable);
-      if used_variable_range.is_none() {
-        continue;
-      }
-      let report = TypeWarning::UnusedVariable(used_variable.clone(), used_variable_range);
-      self.diagnostics.add(report.into());
-    }
-  }
-
   pub fn show_diagnostics(&mut self) {
-    self.check_used_variable_in_current_scope();
+    self.check_unused_variables();
     self.diagnostics.emit_all(self.raw, &self.file_name);
   }
 

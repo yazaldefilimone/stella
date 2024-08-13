@@ -26,7 +26,7 @@ impl<'a> Checker<'a> {
     let last_type = self.check_statement(&function.body)?;
 
     // check unused variables in current scope
-    self.check_used_variable_in_current_scope();
+    self.check_unused_variables();
 
     if last_type.can_replace(&return_type) {
       return_type = replace_type(&return_type, &last_type);

@@ -311,8 +311,12 @@ impl VariableDeclaration {
 
   pub fn get_range(&self) -> Range {
     let left_range = self.values.first().unwrap().0.range.clone();
-    let right_range = self.initializer.as_ref().unwrap().get_range();
-    create_middle_range(&left_range, &right_range)
+    if let Some(initializer) = &self.initializer {
+      let right_range = initializer.get_range();
+      create_middle_range(&left_range, &right_range)
+    } else {
+      left_range
+    }
   }
 }
 
@@ -586,7 +590,7 @@ pub enum LiteralExpression {
   Number(NumberLiteral),
   String(StringLiteral),
   Boolean(BooleanLiteral),
-  Nil,
+  Nil(NilLiteral),
 }
 
 impl LiteralExpression {
@@ -602,12 +606,16 @@ impl LiteralExpression {
     LiteralExpression::Boolean(BooleanLiteral::new(value, range))
   }
 
+  pub fn new_nil(range: Range) -> Self {
+    LiteralExpression::Nil(NilLiteral::new(range))
+  }
+
   pub fn get_range(&self) -> Range {
     match self {
       LiteralExpression::Number(number) => number.range.clone(),
       LiteralExpression::String(string) => string.range.clone(),
       LiteralExpression::Boolean(boolean) => boolean.range.clone(),
-      LiteralExpression::Nil => Range::new(),
+      LiteralExpression::Nil(nil) => nil.range.clone(),
     }
   }
 }
@@ -645,6 +653,17 @@ pub struct BooleanLiteral {
 impl BooleanLiteral {
   pub fn new(value: bool, range: Range) -> Self {
     BooleanLiteral { value, range }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NilLiteral {
+  pub range: Range,
+}
+
+impl NilLiteral {
+  pub fn new(range: Range) -> Self {
+    NilLiteral { range }
   }
 }
 
