@@ -42,16 +42,17 @@ impl<'a> Checker<'a> {
     if let Some(existing_type) = existing_type {
       // If the variable exists, check if the new type is compatible
       if !existing_type.check_match(&assigned_type) {
-        return Err(self.create_type_mismatch(existing_type.to_owned(), assigned_type, value_range.clone()));
+        let diagnostic = self.create_type_mismatch(existing_type.to_owned(), assigned_type, value_range.clone());
+        return Err(diagnostic);
       }
 
       // If the existing type can replace the new type, use the existing type
       if existing_type.can_replace(&assigned_type) {
-        assigned_type = existing_type.clone();
+        self.ctx.redeclare_variable(lexeme, assigned_type, None);
+        return Ok(());
       }
-
       // Update the variable type in the context
-      self.ctx.redeclare_variable(lexeme, assigned_type, None);
+      self.ctx.redeclare_variable(lexeme, existing_type.clone(), None);
       return Ok(());
     }
 

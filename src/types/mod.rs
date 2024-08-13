@@ -20,6 +20,8 @@ pub enum Type {
   Identifier(IdentifierType),   // Identificador de tipos
   Nil,                          // nil
   Grup(GrupType),               // Grupo de tipos
+  // ...: number
+  Variadic(VariadicType),
 }
 
 impl Type {
@@ -41,6 +43,17 @@ impl Type {
   pub fn is_boolean(&self) -> bool {
     matches!(self, Type::Boolean)
   }
+  pub fn is_variadic(&self) -> bool {
+    matches!(self, Type::Variadic(_))
+  }
+
+  pub fn new_variadic(inner_type: Type) -> Self {
+    Type::Variadic(VariadicType { inner_type: Box::new(inner_type) })
+  }
+
+  pub fn new_group(types: Vec<Type>) -> Self {
+    Type::Grup(GrupType { types })
+  }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -60,7 +73,10 @@ pub struct GenericCallType {
 pub struct GrupType {
   pub types: Vec<Type>,
 }
-
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct VariadicType {
+  pub inner_type: Box<Type>,
+}
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UnionType {
   pub types: Vec<Type>,
@@ -172,8 +188,7 @@ impl GenericType {
 impl Type {
   pub fn supports_operator(&self, operator: &BinaryOperator) -> bool {
     use BinaryOperator::*;
-    // optional
-    if supports_optional_operator(self, operator) {
+    if supports_stdlib_operator(self, operator) {
       return true;
     }
     matches!(
@@ -239,7 +254,14 @@ impl Type {
       | (_, Type::Optional(_), BinaryOperator::Equal)
       | (Type::Optional(_), _, BinaryOperator::Equal)
       | (_, Type::Optional(_), BinaryOperator::NotEqual)
-      | (Type::Optional(_), _, BinaryOperator::NotEqual) => get_operator_optional_result_type(operator),
+      | (Type::Optional(_), _, BinaryOperator::NotEqual) => get_operator_stdlib_result_type(operator),
+      // union
+      (_, Type::Union(_), BinaryOperator::DoubleDot)
+      | (Type::Union(_), _, BinaryOperator::DoubleDot)
+      | (_, Type::Union(_), BinaryOperator::Equal)
+      | (Type::Union(_), _, BinaryOperator::Equal)
+      | (_, Type::Union(_), BinaryOperator::NotEqual)
+      | (Type::Union(_), _, BinaryOperator::NotEqual) => get_operator_stdlib_result_type(operator),
       _ => Type::Unknown,
     }
   }
@@ -253,16 +275,20 @@ impl Type {
       | (Type::Unknown, Type::Unknown)
       | (Type::Unknown, _)
       | (_, Type::Unknown) => true,
-      (Type::Optional(left), Type::Optional(right)) => check_match_optional(left, right),
-      (Type::Optional(left), right) => check_match_optional_with_single_type(left, right),
-      (left, Type::Optional(right)) => check_match_optional_with_single_type(right, left),
-      (Type::Union(left), Type::Union(right)) => check_match_union(&left.types, &right.types),
       (Type::Table(left), Type::Table(right)) => check_match_table(left, right),
       (Type::Function(left), Type::Function(right)) => check_match_function(left, right),
       (Type::Generic(left), Type::Generic(right)) => check_match_generic(left, right),
       (Type::Grup(left), Type::Grup(right)) => check_match_grup_return_type(left, right),
       (Type::Grup(left), right) => check_match_grup_return_with_single_type(left, right),
       (left, Type::Grup(right)) => check_match_grup_return_with_single_type(right, left),
+      // optional
+      (Type::Optional(left), Type::Optional(right)) => check_match_optional(left, right),
+      (Type::Optional(left), right) => check_match_optional_with_single_type(left, right),
+      (left, Type::Optional(right)) => check_match_optional_with_single_type(right, left),
+      // union
+      (Type::Union(left), Type::Union(right)) => check_match_union(&left.types, &right.types),
+      (Type::Union(left), right) => check_match_union_with_single_type(left, right),
+      (left, Type::Union(right)) => check_match_union_with_single_type(right, left),
       _ => false,
     }
   }
@@ -294,6 +320,7 @@ impl Type {
       Type::Identifier(identifier) => format_identifier_type(identifier),
       Type::Grup(grup_return) => format_grup_return_type(grup_return),
       Type::GenericCall(generic_call) => format_generic_call_type(generic_call),
+      Type::Variadic(variadic) => format_variadic_type(variadic),
     }
   }
 
@@ -369,16 +396,19 @@ impl Type {
   }
 }
 
-fn supports_optional_operator(left: &Type, operator: &BinaryOperator) -> bool {
-  if let Type::Optional(optional) = left {
-    matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
-  } else {
-    false
+fn supports_stdlib_operator(left: &Type, operator: &BinaryOperator) -> bool {
+  match left {
+    Type::Optional(_) => {
+      matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+    }
+    Type::Union(union) => {
+      matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+    }
+    _ => false,
   }
 }
 
-// get_operator_result_type
-fn get_operator_optional_result_type(operator: &BinaryOperator) -> Type {
+fn get_operator_stdlib_result_type(operator: &BinaryOperator) -> Type {
   if matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot) {
     Type::Boolean
   } else {
@@ -397,6 +427,10 @@ fn check_match_optional_with_single_type(left: &OptionalType, right: &Type) -> b
     return true;
   }
   left.inner_type.check_match(right)
+}
+
+fn check_match_union_with_single_type(left: &UnionType, right: &Type) -> bool {
+  return left.types.iter().any(|t| t.check_match(right));
 }
 
 fn check_match_union(left: &Vec<Type>, right: &Vec<Type>) -> bool {
@@ -488,6 +522,10 @@ fn format_grup_return_type(grup_return: &GrupType) -> String {
 fn format_generic_call_type(generic_call: &GenericCallType) -> String {
   let types_str = generic_call.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
   format!("{}<{}>", generic_call.name, types_str)
+}
+
+fn format_variadic_type(variadic: &VariadicType) -> String {
+  format!("...{}", variadic.inner_type.to_string())
 }
 
 pub fn can_replace_grup_return_type(replaced: &GrupType, replaced_type: &GrupType) -> bool {

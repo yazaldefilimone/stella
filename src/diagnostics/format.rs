@@ -131,6 +131,9 @@ pub fn format_warning_redundant_type(name: &str, type_name: &str) -> String {
   format!("redundant `{}` for `{}`", type_name, name)
 }
 pub fn format_warning_unused_variable(name: &str) -> String {
+  if name == "..." {
+    return format!("unused values in variadic arguments");
+  }
   format!("unused value `{}`", name)
 }
 

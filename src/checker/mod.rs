@@ -10,6 +10,7 @@ pub mod check_expression;
 pub mod check_for_statement;
 pub mod check_function_expression;
 pub mod check_function_statement;
+pub mod check_generic;
 pub mod check_grouped_expression;
 pub mod check_identifier;
 pub mod check_if_statement;
@@ -30,6 +31,7 @@ pub mod check_unused_variables;
 pub mod check_variable_declaration;
 pub mod check_while_statement;
 pub mod declare_variables;
+pub mod type_utils;
 
 use crate::ast::ast;
 use crate::context::context::Context;

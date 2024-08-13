@@ -42,10 +42,15 @@ impl<'a> Checker<'a> {
     for (param, ty) in arguments.iter() {
       let arg_type = if let Some(ty) = ty { ty.clone() } else { Type::Unknown };
       let lexeme = param.lexeme();
+      let arg_type = self.check_variadic_type(param, arg_type);
       self.ctx.declare_variable(lexeme, arg_type.clone(), None);
       self.ctx.declare_variable_range(lexeme, param.range.clone());
       params.push(arg_type);
     }
     Ok(params)
+  }
+
+  pub fn check_variadic_type(&mut self, token: &Token, inner_type: Type) -> Type {
+    return if token.is_triple_dot() { Type::new_variadic(inner_type) } else { inner_type };
   }
 }

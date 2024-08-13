@@ -13,5 +13,6 @@ pub fn create_stdlib() -> BTreeMap<String, Type> {
   let mut stdlib_variables = BTreeMap::new();
   stdlib_variables.insert("nil".to_string(), Type::Nil);
   stdlib_variables.insert("print".to_string(), create_print_type());
+  stdlib_variables.insert("io".to_string(), io_type::create_io_type());
   return stdlib_variables;
 }
