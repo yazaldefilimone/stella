@@ -1,16 +1,16 @@
-local x: number? = nil -- or Optional<number>
+local value1: optional<number> = 42
+value1: optional<number> = nil;
 
-if x == nil then
-    x = 10
-end
+local value2: optional<number> = nil
 
-function get_value(y: number?): number
-    if y == nil then
-        return 0
-    else
-        return y
-    end
-end
+local value3: optional<number>
 
-local value: number = get_value(x)
-local error_test: string = get_value(x)  -- ERROR: Type 'number?' is not assignable to type 'string'
+value3: optional<number> = 100
+
+local value4: optional<number>
+
+value4 = nil
+
+local value5: optional<number>
+
+value5 = "string"
