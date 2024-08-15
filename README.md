@@ -2,7 +2,7 @@
 
 **Stella** is a type checker for Lua. It helps you catch type errors before your code runs, making your Lua code safer and more reliable.
 
-Here are some examples of how Stella's type system can be used compared to plain Lua. The examples include generics, unions, optionals, and basic type checking.
+1. Generics
 
 <table>
 <tr>
@@ -19,7 +19,33 @@ local do_thing: fn<number, string> = function (n, b)
   local a = n + 10
   return "hei, stella checker :)"
 end
+```
 
+</td>
+<td>
+
+```lua
+local do_thing = function (n, b)
+  local a = n + 10
+  return "hei, stella checker :)"
+end
+```
+
+</td>
+</tr>
+</table>
+
+2. Function Types
+
+<table>
+<tr>
+<td><strong>Stella</strong></td> <td><strong>Lua</strong></td>
+</tr>
+
+<tr>
+<td>
+
+```lua
 type Apply<T> = function(num: T): T;
 
 type ApplyTwiceType<T> = function(n: number, fn: Apply<T>): T;
@@ -40,11 +66,6 @@ local result = apply_twice(3, inc)
 <td>
 
 ```lua
-local do_thing = function (n, b)
-  local a = n + 10
-  return "hei, stella checker :)"
-end
-
 local apply_twice = function(num, fn)
     print(fn)
     return fn(fn(num))
@@ -58,6 +79,14 @@ local result = apply_twice(3, inc)
 ```
 
 </td>
+</tr>
+</table>
+
+3. optionals
+
+<table>
+<tr>
+<td><strong>Stella</strong></td> <td><strong>Lua</strong></td>
 </tr>
 
 <tr>
@@ -89,6 +118,14 @@ local result = divide(10, 0)
 ```
 
 </td>
+</tr>
+</table>
+
+4. unions
+
+<table>
+<tr>
+<td><strong>Stella</strong></td> <td><strong>Lua</strong></td>
 </tr>
 
 <tr>
@@ -127,9 +164,7 @@ local value = get_value(true)
 </tr>
 </table>
 
-
-
-
+<samp>
 
 
 ```sh
