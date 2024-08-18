@@ -13,13 +13,16 @@ Program(
       ),
       local: false,
       arguments: [
-        (Token(
-          kind: Identifier("n"),
-          range: Range(
-            start: 19,
-            end: 20,
+        Variable(
+          name: Token(
+            kind: Identifier("n"),
+            range: Range(
+              start: 19,
+              end: 20,
+            ),
           ),
-        ), Some(Number)),
+          ty: Some(Number),
+        ),
       ],
       return_type: Some(Number),
       generics: [],
@@ -66,6 +69,7 @@ Program(
                 )),
               ],
             )),
+            else_if_branches: [],
             else_body: None,
             range: Range(
               start: 42,
@@ -77,13 +81,13 @@ Program(
               Binary(BinaryExpression(
                 operator: Add,
                 left: Call(CallExpression(
-                  name: Token(
-                    kind: Identifier("fibonacci"),
+                  left: Identifier(Identifier(
+                    name: "fibonacci",
                     range: Range(
                       start: 92,
                       end: 101,
                     ),
-                  ),
+                  )),
                   args: Grouped(GroupedExpression(
                     expressions: [
                       Binary(BinaryExpression(
@@ -115,13 +119,13 @@ Program(
                   )),
                 )),
                 right: Call(CallExpression(
-                  name: Token(
-                    kind: Identifier("fibonacci"),
+                  left: Identifier(Identifier(
+                    name: "fibonacci",
                     range: Range(
                       start: 111,
                       end: 120,
                     ),
-                  ),
+                  )),
                   args: Grouped(GroupedExpression(
                     expressions: [
                       Binary(BinaryExpression(

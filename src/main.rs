@@ -3,6 +3,7 @@ mod checker;
 mod cli;
 mod context;
 mod diagnostics;
+mod formatting;
 mod lexer;
 mod modules;
 mod parser;

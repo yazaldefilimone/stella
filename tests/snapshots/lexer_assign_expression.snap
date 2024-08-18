@@ -45,213 +45,318 @@ source: tests/snapshot_tests.rs
     ),
   ),
   Token(
-    kind: Assign,
+    kind: Comma,
     range: Range(
-      start: 114,
-      end: 115,
-    ),
-  ),
-  Token(
-    kind: String("Stella"),
-    range: Range(
-      start: 116,
-      end: 124,
-    ),
-  ),
-  Token(
-    kind: Local,
-    range: Range(
-      start: 125,
-      end: 130,
+      start: 113,
+      end: 114,
     ),
   ),
   Token(
     kind: Identifier("age"),
     range: Range(
-      start: 131,
-      end: 134,
+      start: 115,
+      end: 118,
     ),
   ),
   Token(
     kind: Colon,
     range: Range(
-      start: 134,
-      end: 135,
+      start: 118,
+      end: 119,
     ),
   ),
   Token(
     kind: Identifier("number"),
     range: Range(
-      start: 136,
-      end: 142,
+      start: 120,
+      end: 126,
     ),
   ),
   Token(
     kind: Assign,
     range: Range(
-      start: 143,
-      end: 144,
+      start: 127,
+      end: 128,
     ),
   ),
   Token(
-    kind: Identifier("name"),
+    kind: String("Stella"),
     range: Range(
-      start: 145,
-      end: 149,
+      start: 129,
+      end: 137,
     ),
   ),
   Token(
-    kind: Semicolon,
+    kind: Comma,
     range: Range(
-      start: 149,
-      end: 150,
+      start: 137,
+      end: 138,
     ),
   ),
   Token(
-    kind: Identifier("name"),
+    kind: Number("25"),
     range: Range(
-      start: 151,
-      end: 155,
-    ),
-  ),
-  Token(
-    kind: Assign,
-    range: Range(
-      start: 156,
-      end: 157,
-    ),
-  ),
-  Token(
-    kind: Number("10"),
-    range: Range(
-      start: 158,
-      end: 160,
+      start: 139,
+      end: 141,
     ),
   ),
   Token(
     kind: Local,
     range: Range(
+      start: 143,
+      end: 148,
+    ),
+  ),
+  Token(
+    kind: Identifier("age"),
+    range: Range(
+      start: 149,
+      end: 152,
+    ),
+  ),
+  Token(
+    kind: Colon,
+    range: Range(
+      start: 152,
+      end: 153,
+    ),
+  ),
+  Token(
+    kind: Identifier("number"),
+    range: Range(
+      start: 154,
+      end: 160,
+    ),
+  ),
+  Token(
+    kind: Assign,
+    range: Range(
       start: 161,
-      end: 166,
+      end: 162,
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    range: Range(
+      start: 163,
+      end: 167,
+    ),
+  ),
+  Token(
+    kind: Semicolon,
+    range: Range(
+      start: 167,
+      end: 168,
+    ),
+  ),
+  Token(
+    kind: Identifier("name"),
+    range: Range(
+      start: 169,
+      end: 173,
+    ),
+  ),
+  Token(
+    kind: Assign,
+    range: Range(
+      start: 174,
+      end: 175,
+    ),
+  ),
+  Token(
+    kind: Number("10"),
+    range: Range(
+      start: 176,
+      end: 178,
+    ),
+  ),
+  Token(
+    kind: Local,
+    range: Range(
+      start: 179,
+      end: 184,
     ),
   ),
   Token(
     kind: Identifier("is_student"),
     range: Range(
-      start: 167,
-      end: 177,
+      start: 185,
+      end: 195,
     ),
   ),
   Token(
     kind: Colon,
     range: Range(
-      start: 177,
-      end: 178,
+      start: 195,
+      end: 196,
     ),
   ),
   Token(
     kind: Identifier("boolean"),
     range: Range(
-      start: 179,
-      end: 186,
+      start: 197,
+      end: 204,
     ),
   ),
   Token(
     kind: Assign,
     range: Range(
-      start: 187,
-      end: 188,
+      start: 205,
+      end: 206,
     ),
   ),
   Token(
     kind: True,
     range: Range(
-      start: 189,
-      end: 193,
+      start: 207,
+      end: 211,
     ),
   ),
   Token(
     kind: Local,
     range: Range(
-      start: 195,
-      end: 200,
+      start: 213,
+      end: 218,
     ),
   ),
   Token(
     kind: Identifier("what_is_that"),
     range: Range(
-      start: 201,
-      end: 213,
+      start: 219,
+      end: 231,
     ),
   ),
   Token(
     kind: Colon,
     range: Range(
-      start: 213,
-      end: 214,
+      start: 231,
+      end: 232,
     ),
   ),
   Token(
     kind: Identifier("unknown"),
     range: Range(
-      start: 215,
-      end: 222,
+      start: 233,
+      end: 240,
     ),
   ),
   Token(
     kind: Semicolon,
     range: Range(
-      start: 222,
-      end: 223,
+      start: 240,
+      end: 241,
     ),
   ),
   Token(
     kind: Identifier("what_is_that"),
     range: Range(
-      start: 225,
-      end: 237,
+      start: 243,
+      end: 255,
     ),
   ),
   Token(
     kind: Assign,
     range: Range(
-      start: 238,
-      end: 239,
+      start: 256,
+      end: 257,
     ),
   ),
   Token(
     kind: Number("10"),
     range: Range(
-      start: 240,
-      end: 242,
+      start: 258,
+      end: 260,
     ),
   ),
   Token(
     kind: Identifier("what_is_that"),
     range: Range(
-      start: 245,
-      end: 257,
+      start: 263,
+      end: 275,
     ),
   ),
   Token(
     kind: Assign,
     range: Range(
-      start: 258,
-      end: 259,
+      start: 276,
+      end: 277,
     ),
   ),
   Token(
     kind: True,
     range: Range(
-      start: 260,
-      end: 264,
+      start: 278,
+      end: 282,
+    ),
+  ),
+  Token(
+    kind: Identifier("a"),
+    range: Range(
+      start: 286,
+      end: 287,
+    ),
+  ),
+  Token(
+    kind: LeftBracket,
+    range: Range(
+      start: 287,
+      end: 288,
+    ),
+  ),
+  Token(
+    kind: Number("1"),
+    range: Range(
+      start: 288,
+      end: 289,
+    ),
+  ),
+  Token(
+    kind: RightBracket,
+    range: Range(
+      start: 289,
+      end: 290,
+    ),
+  ),
+  Token(
+    kind: Assign,
+    range: Range(
+      start: 291,
+      end: 292,
+    ),
+  ),
+  Token(
+    kind: Identifier("b"),
+    range: Range(
+      start: 293,
+      end: 294,
+    ),
+  ),
+  Token(
+    kind: LeftBracket,
+    range: Range(
+      start: 294,
+      end: 295,
+    ),
+  ),
+  Token(
+    kind: Number("2"),
+    range: Range(
+      start: 295,
+      end: 296,
+    ),
+  ),
+  Token(
+    kind: RightBracket,
+    range: Range(
+      start: 296,
+      end: 297,
     ),
   ),
   Token(
     kind: EOF,
     range: Range(
-      start: 265,
-      end: 265,
+      start: 298,
+      end: 298,
     ),
   ),
 ]

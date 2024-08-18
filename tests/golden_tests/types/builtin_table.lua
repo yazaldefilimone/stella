@@ -32,7 +32,7 @@ print(list[4])
 
 type LinkedList = {
   value: number,
-  next: Optional<LinkedList>
+  next: Option<LinkedList>
 }
 
 local list: LinkedList = {

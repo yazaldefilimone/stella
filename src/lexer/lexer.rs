@@ -52,7 +52,6 @@ impl<'a> Lexer<'a> {
       ')' => self.read_simple_token(TokenKind::RightParen),
       '%' => self.read_simple_token(TokenKind::Percent),
       '#' => self.read_simple_token(TokenKind::Hash),
-      '.' => self.read_check_ahead("..", TokenKind::Dot, TokenKind::DoubleDot),
       ',' => self.read_simple_token(TokenKind::Comma),
       ':' => self.read_simple_token(TokenKind::Colon),
       ';' => self.read_simple_token(TokenKind::Semicolon),
@@ -64,11 +63,21 @@ impl<'a> Lexer<'a> {
       '/' => self.read_slash(),
       '0'..='9' => self.read_number(),
       'a'..='z' | 'A'..='Z' | '_' => self.read_keyword_or_identifier(),
+      '.' => self.read_dot(),
       _ => {
         let mut range = self.create_range();
         let message = format!("Invalid character '{}'", current_char);
         report_and_exit(&message, &mut range, &self.raw, &self.file_name);
       }
+    }
+  }
+
+  fn read_dot(&mut self) -> Token {
+    if self.starts_with("...") {
+      self.advance_many(3);
+      return Token::new(TokenKind::TripleDot, self.create_range());
+    } else {
+      self.read_check_ahead("..", TokenKind::Dot, TokenKind::DoubleDot)
     }
   }
 

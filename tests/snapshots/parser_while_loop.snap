@@ -3,24 +3,32 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("count"),
-          range: Range(
-            start: 6,
-            end: 11,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("count"),
+            range: Range(
+              start: 6,
+              end: 11,
+            ),
           ),
-        ), Some(Number)),
-      ],
-      local: true,
-      initializer: Some(Literal(Number(NumberLiteral(
-        value: "0",
-        range: Range(
-          start: 22,
-          end: 23,
+          ty: Some(Number),
         ),
-      )))),
+      ],
+      initializer: [
+        Literal(Number(NumberLiteral(
+          value: "0",
+          range: Range(
+            start: 22,
+            end: 23,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 0,
+        end: 11,
+      ),
     )),
     While(WhileStatement(
       condition: Binary(BinaryExpression(
@@ -47,13 +55,13 @@ Program(
       body: Block(BlockStatement(
         statements: [
           Expression(Call(CallExpression(
-            name: Token(
-              kind: Identifier("print"),
+            left: Identifier(Identifier(
+              name: "print",
               range: Range(
                 start: 49,
                 end: 54,
               ),
-            ),
+            )),
             args: Grouped(GroupedExpression(
               expressions: [
                 Identifier(Identifier(
@@ -70,38 +78,44 @@ Program(
               ),
             )),
           ))),
-          Assign(AssignStatement(
-            values: [
-              (Token(
-                kind: Identifier("count"),
+          Expression(Assign(AssignExpression(
+            left: [
+              Identifier(Identifier(
+                name: "count",
                 range: Range(
                   start: 66,
                   end: 71,
                 ),
-              ), None),
+              )),
             ],
-            value: Binary(BinaryExpression(
-              operator: Add,
-              left: Identifier(Identifier(
-                name: "count",
+            right: [
+              Binary(BinaryExpression(
+                operator: Add,
+                left: Identifier(Identifier(
+                  name: "count",
+                  range: Range(
+                    start: 74,
+                    end: 79,
+                  ),
+                )),
+                right: Literal(Number(NumberLiteral(
+                  value: "1",
+                  range: Range(
+                    start: 82,
+                    end: 83,
+                  ),
+                ))),
                 range: Range(
-                  start: 74,
-                  end: 79,
+                  start: 80,
+                  end: 81,
                 ),
               )),
-              right: Literal(Number(NumberLiteral(
-                value: "1",
-                range: Range(
-                  start: 82,
-                  end: 83,
-                ),
-              ))),
-              range: Range(
-                start: 80,
-                end: 81,
-              ),
-            )),
-          )),
+            ],
+            range: Range(
+              start: 66,
+              end: 71,
+            ),
+          ))),
         ],
       )),
       range: Range(

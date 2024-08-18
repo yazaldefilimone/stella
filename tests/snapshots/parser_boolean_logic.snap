@@ -3,43 +3,59 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("a"),
-          range: Range(
-            start: 6,
-            end: 7,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("a"),
+            range: Range(
+              start: 6,
+              end: 7,
+            ),
           ),
-        ), Some(Boolean)),
-      ],
-      local: true,
-      initializer: Some(Literal(Boolean(BooleanLiteral(
-        value: true,
-        range: Range(
-          start: 19,
-          end: 23,
+          ty: Some(Boolean),
         ),
-      )))),
+      ],
+      initializer: [
+        Literal(Boolean(BooleanLiteral(
+          value: true,
+          range: Range(
+            start: 19,
+            end: 23,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 0,
+        end: 7,
+      ),
     )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("b"),
-          range: Range(
-            start: 30,
-            end: 31,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("b"),
+            range: Range(
+              start: 30,
+              end: 31,
+            ),
           ),
-        ), Some(Boolean)),
-      ],
-      local: true,
-      initializer: Some(Literal(Boolean(BooleanLiteral(
-        value: false,
-        range: Range(
-          start: 43,
-          end: 48,
+          ty: Some(Boolean),
         ),
-      )))),
+      ],
+      initializer: [
+        Literal(Boolean(BooleanLiteral(
+          value: false,
+          range: Range(
+            start: 43,
+            end: 48,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 24,
+        end: 31,
+      ),
     )),
     If(IfStatement(
       condition: Binary(BinaryExpression(
@@ -73,13 +89,13 @@ Program(
       then_body: Block(BlockStatement(
         statements: [
           Expression(Call(CallExpression(
-            name: Token(
-              kind: Identifier("print"),
+            left: Identifier(Identifier(
+              name: "print",
               range: Range(
                 start: 74,
                 end: 79,
               ),
-            ),
+            )),
             args: Grouped(GroupedExpression(
               expressions: [
                 Literal(String(StringLiteral(
@@ -98,6 +114,7 @@ Program(
           ))),
         ],
       )),
+      else_if_branches: [],
       else_body: None,
       range: Range(
         start: 50,

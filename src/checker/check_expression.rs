@@ -1,10 +1,10 @@
+use super::type_utils::CheckResult;
 use super::Checker;
 use crate::ast::ast;
-use crate::diagnostics::Diagnostic;
 use crate::types::Type;
 
 impl<'a> Checker<'a> {
-  pub fn check_expression(&mut self, expression: &ast::Expression) -> Result<Type, Diagnostic> {
+  pub fn check_expression(&mut self, expression: &ast::Expression) -> CheckResult<Option<Type>> {
     match expression {
       ast::Expression::Literal(literal) => self.check_literal_expression(literal),
       ast::Expression::Identifier(ident) => self.check_identifier(ident),
@@ -17,6 +17,8 @@ impl<'a> Checker<'a> {
       ast::Expression::Table(table) => self.check_table_expression(table),
       ast::Expression::Member(member) => self.check_member_expression(member),
       ast::Expression::Index(index) => self.check_index_expression(index),
+      ast::Expression::Assign(assign) => self.check_assign_expression(assign),
+      _ => unreachable!(),
     }
   }
 }

@@ -1,13 +1,9 @@
-use crate::{
-  diagnostics::{Diagnostic, TypeWarning},
-  types::Type,
-  utils::range::Range,
-};
+use crate::{diagnostics::TypeWarning, types::Type, utils::range::Range};
 
-use super::Checker;
+use super::{type_utils::CheckResult, Checker};
 
 impl<'a> Checker<'a> {
-  pub fn check_shadowing(&mut self, lexeme: &str, local: bool, rg: &Range) -> Result<(), Diagnostic> {
+  pub fn check_shadowing(&mut self, lexeme: &str, local: bool, rg: &Range) -> CheckResult<()> {
     if local {
       self.check_local_shadowing(lexeme, rg)
     } else {
@@ -15,7 +11,7 @@ impl<'a> Checker<'a> {
     }
   }
 
-  fn check_local_shadowing(&mut self, lexeme: &str, rg: &Range) -> Result<(), Diagnostic> {
+  fn check_local_shadowing(&mut self, lexeme: &str, rg: &Range) -> CheckResult<()> {
     if self.ctx.defined_in_current_scope(lexeme) {
       if self.ctx.is_local_declaration(lexeme) {
         return Err(self.create_redeclaration(lexeme, rg.clone()));
@@ -27,7 +23,7 @@ impl<'a> Checker<'a> {
     Ok(())
   }
 
-  fn check_global_redeclaration(&mut self, lexeme: &str, rg: &Range) -> Result<(), Diagnostic> {
+  fn check_global_redeclaration(&mut self, lexeme: &str, rg: &Range) -> CheckResult<()> {
     if let Some(previous_type) = self.ctx.get_variable(lexeme, Some(0)) {
       let current_type = self.ctx.get_variable(lexeme, None).unwrap_or_else(|| &Type::Unknown);
       if !previous_type.check_match(&current_type) {

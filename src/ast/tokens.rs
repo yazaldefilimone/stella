@@ -39,6 +39,13 @@ impl Token {
     Token::new(TokenKind::BlockComment(comment), range)
   }
 
+  pub fn is_triple_dot(&self) -> bool {
+    match &self.kind {
+      TokenKind::TripleDot => true,
+      _ => false,
+    }
+  }
+
   pub fn new_keyword_or_identifier(range: Range, keyword: String) -> Token {
     match keyword.as_str() {
       "function" => Token::new(TokenKind::Function, range),
@@ -149,10 +156,11 @@ pub enum TokenKind {
 impl Token {
   pub fn lexeme(&self) -> &str {
     match &self.kind {
-      TokenKind::Identifier(name) => name,
-      TokenKind::Number(number) => number,
-      TokenKind::String(string) => string,
-      _ => panic!("Invalid token"),
+      TokenKind::Identifier(name) => name.as_str(),
+      TokenKind::Number(number) => number.as_str(),
+      TokenKind::String(string) => string.as_str(),
+      TokenKind::TripleDot => "...",
+      _ => "",
     }
   }
 
@@ -162,81 +170,17 @@ impl Token {
       _ => false,
     }
   }
+
+  pub fn is_identifier(&self) -> bool {
+    match &self.kind {
+      TokenKind::Identifier(_) => true,
+      _ => false,
+    }
+  }
   pub fn is_comment(&self) -> bool {
     match &self.kind {
       TokenKind::Comment(_) | TokenKind::BlockComment(_) => true,
       _ => false,
     }
-  }
-}
-
-impl TokenKind {
-  pub fn to_string(&self) -> &str {
-    let text = match self {
-      TokenKind::Identifier(name) => name,
-      TokenKind::Number(number) => number.as_str(),
-      TokenKind::String(string) => string.as_str(),
-      TokenKind::EOF => "EOF",
-      TokenKind::Function => "function",
-      TokenKind::Local => "local",
-      TokenKind::If => "if",
-      TokenKind::Then => "then",
-      TokenKind::Else => "else",
-      TokenKind::ElseIf => "elseif",
-      TokenKind::End => "end",
-      TokenKind::While => "while",
-      TokenKind::Do => "do",
-      TokenKind::For => "for",
-      TokenKind::In => "in",
-      TokenKind::Repeat => "repeat",
-      TokenKind::Until => "until",
-      TokenKind::Return => "return",
-      TokenKind::Break => "break",
-      TokenKind::True => "true",
-      TokenKind::False => "false",
-      TokenKind::Nil => "nil",
-      TokenKind::Type => "type",
-      TokenKind::Enum => "enum",
-      TokenKind::Continue => "continue",
-      TokenKind::Assign => "=",
-      TokenKind::PlusAssign => "+=",
-      TokenKind::MinusAssign => "-=",
-      TokenKind::StarAssign => "*=",
-      TokenKind::SlashAssign => "/=",
-      TokenKind::NotEqual => "~=",
-      TokenKind::LessEqual => "<=",
-      TokenKind::GreaterEqual => ">=",
-      TokenKind::DoubleDot => "..",
-      TokenKind::TripleDot => "...",
-      TokenKind::LeftParen => "(",
-      TokenKind::RightParen => ")",
-      TokenKind::LeftBrace => "{",
-      TokenKind::RightBrace => "}",
-      TokenKind::LeftBracket => "[",
-      TokenKind::RightBracket => "]",
-      TokenKind::Comma => ",",
-      TokenKind::Semicolon => ";",
-      TokenKind::Colon => ":",
-      TokenKind::DoubleColon => "::",
-      TokenKind::Dot => ".",
-      TokenKind::Tilde => "~",
-      TokenKind::Hash => "#",
-      TokenKind::Plus => "+",
-      TokenKind::Minus => "-",
-      TokenKind::Star => "*",
-      TokenKind::Slash => "/",
-      TokenKind::DoubleSlash => "//",
-      TokenKind::Not => "not",
-      TokenKind::Percent => "%",
-      TokenKind::Equal => "==",
-      TokenKind::Less => "<",
-      TokenKind::Greater => ">",
-      TokenKind::Or => "or",
-      TokenKind::And => "and",
-      TokenKind::Comment(_) => "comment",
-      TokenKind::BlockComment(_) => "block comment",
-      TokenKind::Require => "require",
-    };
-    return text;
   }
 }

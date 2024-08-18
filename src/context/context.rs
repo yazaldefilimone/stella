@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use crate::{stdlib::create_stdlib, types::Type, utils::range::Range};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 pub struct Context {
   pub scope_pointer: usize,
@@ -65,11 +65,18 @@ impl Context {
       Some(pointer) => (self.get_scope_mut(pointer), pointer as i32),
       None => (self.current_scope_mut(), -1),
     };
+
     if let Some(scope) = scope {
       scope.variables.insert(name.to_owned(), tyy);
+      // set unused variable
       scope.unused_variables.insert(name.to_owned());
     };
+
     return if scope_pointer < 0 { self.scope_pointer } else { scope_pointer as usize };
+  }
+
+  pub fn declare_global_variable(&mut self, name: &str, tyy: Type) {
+    self.scopes.get_mut(0).unwrap().variables.insert(name.to_owned(), tyy);
   }
 
   pub fn redeclare_variable(&mut self, name: &str, tyy: Type, scope_pointer: Option<usize>) -> bool {
@@ -109,6 +116,9 @@ impl Context {
     }
     None
   }
+  pub fn get_global_variable(&self, name: &str) -> Option<&Type> {
+    self.scopes.get(0).and_then(|scope| scope.variables.get(name))
+  }
   pub fn defined_in_current_scope(&self, name: &str) -> bool {
     self.current_scope().map_or(false, |scope| scope.variables.contains_key(name))
   }
@@ -123,21 +133,26 @@ impl Context {
   }
 
   pub fn check_unused_variables(&self) -> Vec<String> {
-    self
-      .scopes
-      .iter()
-      .flat_map(|scope| scope.unused_variables.iter().filter(|var| *var != &self.return_decl_name).cloned())
-      .collect()
+    let scope = self.current_scope();
+    scope.map_or(vec![], |scope| {
+      scope.unused_variables.iter().filter(|var| *var != &self.return_decl_name).cloned().collect()
+    })
   }
 
   pub fn use_variable(&mut self, name: &str, scope_pointer: Option<usize>) {
-    let scope = match scope_pointer {
-      Some(pointer) => self.get_scope_mut(pointer),
-      None => self.current_scope_mut(),
-    };
+    if let Some(pointer) = scope_pointer {
+      if let Some(scope) = self.get_scope_mut(pointer) {
+        if scope.unused_variables.contains(name) {
+          scope.unused_variables.remove(name);
+        }
+      }
+      return;
+    }
 
-    if let Some(scope) = scope {
-      scope.unused_variables.remove(name);
+    for scope in self.scopes.iter_mut().rev() {
+      if scope.unused_variables.contains(name) {
+        scope.unused_variables.remove(name);
+      }
     }
   }
 
@@ -203,12 +218,22 @@ impl Context {
     }
   }
   pub fn get_type(&self, name: &str) -> Option<&Type> {
-    self.current_scope().and_then(|scope| scope.types.get(name))
+    for scope in self.scopes.iter().rev() {
+      if let Some(ty) = scope.types.get(name) {
+        return Some(ty);
+      }
+    }
+    None
   }
 
   // Range Management
-  pub fn declare_variable_range(&mut self, name: &str, range: Range) {
-    if let Some(scope) = self.current_scope_mut() {
+  pub fn declare_variable_range(&mut self, name: &str, range: Range, scope_pointer: Option<usize>) {
+    let scope = if let Some(pointer) = scope_pointer {
+      self.get_scope_mut(pointer)
+    } else {
+      self.current_scope_mut()
+    };
+    if let Some(scope) = scope {
       scope.ranges.insert(name.to_owned(), range);
     }
   }
@@ -226,10 +251,10 @@ impl Context {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
-  pub variables: BTreeMap<String, Type>,
-  pub types: BTreeMap<String, Type>,
+  pub variables: HashMap<String, Type>,
+  pub types: HashMap<String, Type>,
   pub unused_variables: BTreeSet<String>,
-  pub ranges: BTreeMap<String, Range>,
+  pub ranges: HashMap<String, Range>,
   pub local_declarations: BTreeMap<String, bool>,
 }
 
@@ -237,10 +262,10 @@ impl Scope {
   pub fn new() -> Self {
     Scope {
       local_declarations: BTreeMap::new(),
-      variables: BTreeMap::new(),
-      types: BTreeMap::new(),
+      variables: HashMap::new(),
+      types: HashMap::new(),
       unused_variables: BTreeSet::new(),
-      ranges: BTreeMap::new(),
+      ranges: HashMap::new(),
     }
   }
 }

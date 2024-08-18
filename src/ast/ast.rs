@@ -19,7 +19,6 @@ impl Program {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Statement {
-  Assign(AssignStatement),
   Function(FunctionStatement),
   Return(ReturnStatement),
   If(IfStatement),
@@ -30,15 +29,15 @@ pub enum Statement {
   Goto(GotoStatement),
   Block(BlockStatement),
   Empty(EmptyStatement),
-  VariableDeclaration(VariableDeclaration),
   TypeDeclaration(TypeDeclaration),
+  Continue(ContinueStatement),
+  Local(LocalStatement),
   Expression(Expression),
 }
 
 impl Statement {
   pub fn get_range(&self) -> Range {
     match self {
-      Statement::Assign(assign) => assign.get_range(),
       Statement::Function(function) => function.get_range(),
       Statement::Return(return_) => return_.get_range(),
       Statement::If(if_) => if_.get_range(),
@@ -49,28 +48,81 @@ impl Statement {
       Statement::Goto(goto) => goto.get_range(),
       Statement::Block(block) => block.get_range(),
       Statement::Empty(empty) => empty.get_range(),
-      Statement::VariableDeclaration(variable) => variable.get_range(),
+      // Statement::VariableDeclaration(variable) => variable.get_range(),
       Statement::TypeDeclaration(declaration) => declaration.get_range(),
       Statement::Expression(expression) => expression.get_range(),
+      Statement::Continue(continue_) => continue_.get_range(),
+      Statement::Local(local) => local.get_range(),
     }
+  }
+
+  pub fn new_function(function: FunctionStatement) -> Self {
+    Statement::Function(function)
+  }
+
+  pub fn new_return(return_: ReturnStatement) -> Self {
+    Statement::Return(return_)
+  }
+
+  pub fn new_if(if_: IfStatement) -> Self {
+    Statement::If(if_)
+  }
+
+  pub fn new_while(while_: WhileStatement) -> Self {
+    Statement::While(while_)
+  }
+
+  pub fn new_repeat(repeat: RepeatStatement) -> Self {
+    Statement::Repeat(repeat)
+  }
+
+  pub fn new_for(for_: ForStatement) -> Self {
+    Statement::For(for_)
+  }
+
+  pub fn new_break(break_: BreakStatement) -> Self {
+    Statement::Break(break_)
+  }
+
+  pub fn new_goto(goto: GotoStatement) -> Self {
+    Statement::Goto(goto)
+  }
+
+  pub fn new_block(block: BlockStatement) -> Self {
+    Statement::Block(block)
+  }
+
+  pub fn new_empty(empty: EmptyStatement) -> Self {
+    Statement::Empty(empty)
+  }
+
+  pub fn new_type(type_: TypeDeclaration) -> Self {
+    Statement::TypeDeclaration(type_)
+  }
+
+  pub fn new_continue(continue_: ContinueStatement) -> Self {
+    Statement::Continue(continue_)
+  }
+
+  pub fn new_local(local: LocalStatement) -> Self {
+    Statement::Local(local)
   }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AssignStatement {
-  pub values: Vec<(Token, Option<Type>)>,
-  pub value: Expression,
+pub struct AssignExpression {
+  pub left: Vec<Expression>,
+  pub right: Vec<Expression>,
+  pub range: Range,
 }
 
-impl AssignStatement {
-  pub fn new(values: Vec<(Token, Option<Type>)>, value: Expression) -> Self {
-    AssignStatement { values, value }
+impl AssignExpression {
+  pub fn new(left: Vec<Expression>, right: Vec<Expression>, range: Range) -> Self {
+    AssignExpression { left, right, range }
   }
 
   pub fn get_range(&self) -> Range {
-    let left_range = self.values.first().unwrap().0.range.clone();
-    let right_range = self.value.get_range();
-    create_middle_range(&left_range, &right_range)
+    return self.range.clone();
   }
 }
 
@@ -78,7 +130,7 @@ impl AssignStatement {
 pub struct FunctionStatement {
   pub name: Token,
   pub local: bool,
-  pub arguments: Vec<(Token, Option<Type>)>,
+  pub arguments: Vec<Variable>,
   pub return_type: Option<Type>,
   pub generics: Vec<Type>,
   pub body: Box<Statement>,
@@ -91,7 +143,7 @@ impl FunctionStatement {
     name: Token,
     local: bool,
     generics: Vec<Type>,
-    arguments: Vec<(Token, Option<Type>)>,
+    arguments: Vec<Variable>,
     return_type: Option<Type>,
     body: Statement,
     range: Range,
@@ -120,17 +172,59 @@ impl ReturnStatement {
   }
 }
 
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub struct ContinueStatement {
+  pub range: Range,
+}
+
+impl ContinueStatement {
+  pub fn new(range: Range) -> Self {
+    ContinueStatement { range }
+  }
+  pub fn get_range(&self) -> Range {
+    self.range.clone()
+  }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IfStatement {
   pub condition: Expression,
   pub then_body: Box<Statement>,
+  pub else_if_branches: Vec<ElseIfStatement>,
   pub else_body: Option<Box<Statement>>,
   pub range: Range,
 }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ElseIfStatement {
+  pub condition: Expression,
+  pub then_branch: Box<Statement>,
+  pub range: Range,
+}
+
+impl ElseIfStatement {
+  pub fn new(condition: Expression, body: Statement, range: Range) -> Self {
+    ElseIfStatement { condition, then_branch: Box::new(body), range }
+  }
+  pub fn get_range(&self) -> Range {
+    self.range.clone()
+  }
+}
 
 impl IfStatement {
-  pub fn new(condition: Expression, then_body: Statement, else_body: Option<Statement>, range: Range) -> Self {
-    IfStatement { condition, then_body: Box::new(then_body), else_body: else_body.map(Box::new), range }
+  pub fn new(
+    condition: Expression,
+    then_body: Statement,
+    else_if_branches: Vec<ElseIfStatement>,
+    else_body: Option<Statement>,
+    range: Range,
+  ) -> Self {
+    IfStatement {
+      condition,
+      then_body: Box::new(then_body),
+      else_if_branches,
+      else_body: else_body.map(Box::new),
+      range,
+    }
   }
 
   pub fn get_range(&self) -> Range {
@@ -173,8 +267,7 @@ impl RepeatStatement {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ForStatement {
-  pub variable: Expression,
-  pub init: Expression,
+  pub init: AssignExpresion,
   pub limit: Expression,
   pub step: Option<Expression>,
   pub body: Box<Statement>,
@@ -183,14 +276,13 @@ pub struct ForStatement {
 
 impl ForStatement {
   pub fn new(
-    variable: Expression,
-    init: Expression,
+    init: AssignExpresion,
     limit: Expression,
     step: Option<Expression>,
     body: Statement,
     range: Range,
   ) -> Self {
-    ForStatement { variable, init, limit, step, body: Box::new(body), range }
+    ForStatement { init, limit, step, body: Box::new(body), range }
   }
 
   pub fn get_range(&self) -> Range {
@@ -298,25 +390,49 @@ impl TypeFunction {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct VariableDeclaration {
-  pub values: Vec<(Token, Option<Type>)>,
-  pub local: bool,
-  pub initializer: Option<Expression>,
+pub struct Variable {
+  pub name: Token,
+  pub ty: Option<Type>,
 }
 
-impl VariableDeclaration {
-  pub fn new(values: Vec<(Token, Option<Type>)>, local: bool, initializer: Option<Expression>) -> Self {
-    VariableDeclaration { values, local, initializer }
+impl Variable {
+  pub fn new(name: Token, ty: Option<Type>) -> Self {
+    return Variable { name, ty };
   }
-
   pub fn get_range(&self) -> Range {
-    let left_range = self.values.first().unwrap().0.range.clone();
-    if let Some(initializer) = &self.initializer {
-      let right_range = initializer.get_range();
-      create_middle_range(&left_range, &right_range)
-    } else {
-      left_range
-    }
+    return self.name.range.clone();
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LocalStatement {
+  pub variables: Vec<Variable>,
+  pub initializer: Vec<Expression>,
+  pub range: Range,
+}
+
+impl LocalStatement {
+  pub fn new(variables: Vec<Variable>, initializer: Vec<Expression>, range: Range) -> Self {
+    LocalStatement { variables, initializer, range }
+  }
+  pub fn get_range(&self) -> Range {
+    self.range.clone()
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AssignExpresion {
+  pub variables: Vec<Expression>,
+  pub initializer: Vec<Expression>,
+  pub range: Range,
+}
+
+impl AssignExpresion {
+  pub fn new(variables: Vec<Expression>, initializer: Vec<Expression>, range: Range) -> Self {
+    AssignExpresion { variables, initializer, range }
+  }
+  pub fn get_range(&self) -> Range {
+    self.range.clone()
   }
 }
 
@@ -333,6 +449,8 @@ pub enum Expression {
   Table(TableExpression),
   Member(MemberExpression),
   Index(IndexExpression),
+  Assign(AssignExpression),
+  Variable(Variable),
 }
 
 impl Expression {
@@ -344,8 +462,8 @@ impl Expression {
     Expression::Identifier(Identifier::new(name, range))
   }
 
-  pub fn new_call(name: Token, args: Expression) -> Self {
-    Expression::Call(CallExpression::new(name, Box::new(args)))
+  pub fn new_call(left: Expression, args: Expression) -> Self {
+    Expression::Call(CallExpression::new(Box::new(left), Box::new(args)))
   }
 
   pub fn new_require(module_name: Token, range: Range) -> Self {
@@ -360,16 +478,28 @@ impl Expression {
     Expression::Table(TableExpression::new(values, range))
   }
 
-  pub fn new_member(base: Expression, member: Expression) -> Self {
-    Expression::Member(MemberExpression::new(Box::new(base), Box::new(member)))
+  pub fn new_member(base: Expression, identifier: Identifier) -> Self {
+    Expression::Member(MemberExpression::new(Box::new(base), identifier))
   }
 
   pub fn new_index(base: Expression, index: Expression, bracket_range: Range) -> Self {
     Expression::Index(IndexExpression::new(Box::new(base), Box::new(index), bracket_range))
   }
 
+  pub fn new_assign(left: Vec<Expression>, right: Vec<Expression>, range: Range) -> Self {
+    Expression::Assign(AssignExpression::new(left, right, range))
+  }
+
+  pub fn new_unary(operator: UnaryOperator, operand: Expression, range: Range) -> Self {
+    Expression::Unary(UnaryExpression::new(operator, Box::new(operand), range))
+  }
+
+  pub fn new_binary(operator: BinaryOperator, left: Expression, right: Expression, range: Range) -> Self {
+    Expression::Binary(BinaryExpression::new(operator, Box::new(left), Box::new(right), range))
+  }
+
   pub fn new_function(
-    arguments: Vec<(Token, Option<Type>)>,
+    arguments: Vec<Variable>,
     return_type: Option<Type>,
     body: Statement,
     range: Range,
@@ -391,6 +521,8 @@ impl Expression {
       Expression::Table(table) => table.get_range(),
       Expression::Member(member) => member.get_range(),
       Expression::Index(index) => index.get_range(),
+      Expression::Assign(assign) => assign.get_range(),
+      Expression::Variable(var) => var.get_range(),
     }
   }
 
@@ -400,6 +532,14 @@ impl Expression {
 
   pub fn is_function(&self) -> bool {
     matches!(self, Expression::Function(_))
+  }
+
+  pub fn is_identifier(&self) -> bool {
+    matches!(self, Expression::Identifier(_))
+  }
+
+  pub fn is_literal(&self) -> bool {
+    matches!(self, Expression::Literal(_))
   }
 }
 
@@ -451,17 +591,17 @@ impl Identifier {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CallExpression {
-  pub name: Token,
+  pub left: Box<Expression>,
   pub args: Box<Expression>,
 }
 
 impl CallExpression {
-  pub fn new(name: Token, args: Box<Expression>) -> Self {
-    CallExpression { name, args }
+  pub fn new(left: Box<Expression>, args: Box<Expression>) -> Self {
+    CallExpression { left, args }
   }
 
   pub fn get_range(&self) -> Range {
-    let left_range = self.name.range.clone();
+    let left_range = self.left.get_range();
     let right_range = self.args.get_range();
     create_middle_range(&left_range, &right_range)
   }
@@ -493,16 +633,16 @@ impl UnaryExpression {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MemberExpression {
   pub base: Box<Expression>,
-  pub member: Box<Expression>,
+  pub identifier: Identifier,
 }
 impl MemberExpression {
-  pub fn new(base: Box<Expression>, member: Box<Expression>) -> Self {
-    MemberExpression { base, member }
+  pub fn new(base: Box<Expression>, identifier: Identifier) -> Self {
+    MemberExpression { base, identifier }
   }
 
   pub fn get_range(&self) -> Range {
     let left_range = self.base.get_range();
-    let right_range = self.member.get_range();
+    let right_range = self.identifier.range.clone();
     create_middle_range(&left_range, &right_range)
   }
 }
@@ -542,7 +682,7 @@ impl TableExpression {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FunctionExpression {
-  pub arguments: Vec<(Token, Option<Type>)>,
+  pub arguments: Vec<Variable>,
   pub return_type: Option<Type>,
   pub body: Box<Statement>,
   pub range: Range,
@@ -551,7 +691,7 @@ pub struct FunctionExpression {
 
 impl FunctionExpression {
   pub fn new(
-    arguments: Vec<(Token, Option<Type>)>,
+    arguments: Vec<Variable>,
     return_type: Option<Type>,
     body: Statement,
     range: Range,
@@ -682,6 +822,21 @@ impl UnaryOperator {
       UnaryOperator::Hash => "#",
     }
   }
+
+  pub fn support_number(&self) -> bool {
+    matches!(self, UnaryOperator::Negate | UnaryOperator::Not | UnaryOperator::Hash)
+  }
+
+  pub fn support_string(&self) -> bool {
+    matches!(self, UnaryOperator::Hash)
+  }
+
+  pub fn support_boolean(&self) -> bool {
+    matches!(self, UnaryOperator::Not)
+  }
+  pub fn support_nil(&self) -> bool {
+    matches!(self, UnaryOperator::Not)
+  }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -703,29 +858,72 @@ pub enum BinaryOperator {
   DoubleSlash,        // //
 }
 
+impl BinaryOperator {
+  pub fn precedence(&self) -> u8 {
+    match self {
+      BinaryOperator::Or => 1,
+      BinaryOperator::And => 2,
+      BinaryOperator::Equal | BinaryOperator::NotEqual => 3,
+      BinaryOperator::LessThan
+      | BinaryOperator::GreaterThan
+      | BinaryOperator::LessThanOrEqual
+      | BinaryOperator::GreaterThanOrEqual => 4,
+      BinaryOperator::Add | BinaryOperator::Subtract => 5,
+      BinaryOperator::Multiply | BinaryOperator::Divide | BinaryOperator::Modulus => 6,
+      BinaryOperator::DoubleSlash => 7,
+      BinaryOperator::DoubleDot => 8,
+    }
+  }
+
+  /// Returns `true` if the operator is right-associative.
+  pub fn is_right_associative(&self) -> bool {
+    matches!(self, BinaryOperator::DoubleDot)
+  }
+
+  /// Determines if the current operator has higher precedence than another operator.
+  pub fn has_higher_precedence_than(&self, other: &BinaryOperator) -> bool {
+    self.precedence() > other.precedence()
+  }
+
+  /// Determines if the current operator has equal precedence to another operator.
+  pub fn has_equal_precedence_to(&self, other: &BinaryOperator) -> bool {
+    self.precedence() == other.precedence()
+  }
+}
+
 pub struct TypeExpression {
   pub name: Type,
   pub range: Range,
 }
 
 impl BinaryOperator {
-  pub fn to_str(&self) -> &str {
-    match self {
-      BinaryOperator::Add => "+",
-      BinaryOperator::Subtract => "-",
-      BinaryOperator::Multiply => "*",
-      BinaryOperator::Divide => "/",
-      BinaryOperator::Modulus => "%",
-      BinaryOperator::And => "and",
-      BinaryOperator::Or => "or",
-      BinaryOperator::Equal => "==",
-      BinaryOperator::NotEqual => "~=",
-      BinaryOperator::LessThan => "<",
-      BinaryOperator::GreaterThan => ">",
-      BinaryOperator::LessThanOrEqual => "<=",
-      BinaryOperator::GreaterThanOrEqual => ">=",
-      BinaryOperator::DoubleDot => "..",
-      BinaryOperator::DoubleSlash => "//",
-    }
+  pub fn support_number(&self) -> bool {
+    matches!(
+      self,
+      BinaryOperator::Add
+        | BinaryOperator::Subtract
+        | BinaryOperator::Multiply
+        | BinaryOperator::Divide
+        | BinaryOperator::Modulus
+        | BinaryOperator::DoubleDot
+        | BinaryOperator::Equal
+        | BinaryOperator::NotEqual
+        | BinaryOperator::LessThan
+        | BinaryOperator::GreaterThan
+        | BinaryOperator::LessThanOrEqual
+        | BinaryOperator::GreaterThanOrEqual
+    )
+  }
+
+  pub fn support_string(&self) -> bool {
+    matches!(self, |BinaryOperator::Equal| BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+  }
+
+  pub fn support_boolean(&self) -> bool {
+    matches!(self, BinaryOperator::And | BinaryOperator::Or | BinaryOperator::Equal | BinaryOperator::NotEqual)
+  }
+
+  pub fn support_nil(&self) -> bool {
+    matches!(self, BinaryOperator::Equal | BinaryOperator::NotEqual)
   }
 }
