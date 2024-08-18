@@ -1,47 +1,97 @@
-#![allow(dead_code, unused_variables)]
-
-use std::collections::BTreeMap;
-
-use crate::{ast::ast::BinaryOperator, utils::range::Range};
+use crate::{
+  ast::ast::{BinaryOperator, UnaryOperator},
+  utils::range::Range,
+};
 use serde::{Deserialize, Serialize};
+use std::collections::{BTreeMap, HashSet};
+mod match_type;
+use match_type::*;
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Type {
-  Number,                       // e.g. 10
-  String,                       // e.g. "hello"
-  Boolean,                      // e.g. true
-  Table(TableType),             // e.g. {1, "one"}
-  Function(FunctionType),       // e.g. function(a, b) return a + b end
-  Generic(GenericType),         // e.g. type Either<T, U> = {left: T, right: U}
-  GenericCall(GenericCallType), // e.g. fn<number, string> = function(a, b) return a + b end
-  Union(UnionType),             // e.g. number | string
-  Optional(OptionalType),       // e.g. number | nil
-  Unknown,                      // unknown
-  Identifier(IdentifierType),   // Identificador de tipos
-  Nil,                          // nil
-  Grup(GrupType),               // Grupo de tipos
-  // ...: number
+  Number,
+  String,
+  Boolean,
+  Table(TableType),
+  Function(FunctionType),
+  Generic(GenericType),
+  GenericCall(GenericCallType),
+  Union(UnionType),
+  Option(OptionType),
+  Unknown,
+  Identifier(IdentifierType),
+  Nil,
+  Group(GroupType),
   Variadic(VariadicType),
 }
 
+impl Hash for Type {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    match self {
+      Type::Number => state.write_u8(0),
+      Type::String => state.write_u8(1),
+      Type::Boolean => state.write_u8(2),
+      Type::Unknown => state.write_u8(3),
+      Type::Nil => state.write_u8(4),
+      Type::Table(table) => table.hash(state),
+      Type::Function(function) => function.hash(state),
+      Type::Generic(generic) => generic.hash(state),
+      Type::GenericCall(generic_call) => generic_call.hash(state),
+      Type::Union(union) => union.hash(state),
+      Type::Option(option) => option.hash(state),
+      Type::Identifier(identifier) => identifier.hash(state),
+      Type::Group(group) => group.hash(state),
+      Type::Variadic(variadic) => variadic.hash(state),
+    }
+  }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TableType {
+  pub array: Option<HashSet<Type>>,
+  // todo: hash map or btree map?
+  pub map: Option<BTreeMap<String, Type>>,
+}
+
+impl Hash for TableType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    if let Some(array) = &self.array {
+      state.write_u8(10);
+      for element in array {
+        element.hash(state);
+      }
+    }
+    if let Some(map) = &self.map {
+      state.write_u8(20);
+      for (key, value) in map {
+        key.hash(state);
+        value.hash(state);
+      }
+    }
+  }
+}
+
 impl Type {
-  pub fn is_unknown(&self) -> bool {
-    matches!(self, Type::Unknown)
+  pub fn new(name: &str, range: Range) -> Self {
+    match name {
+      "boolean" => Type::Boolean,
+      "number" => Type::Number,
+      "string" => Type::String,
+      "nil" => Type::Nil,
+      "unknown" => Type::Unknown,
+      _ => Type::Identifier(IdentifierType { name: name.to_string(), range }),
+    }
   }
   pub fn is_nil(&self) -> bool {
-    matches!(self, Type::Nil)
+    match self {
+      Type::Nil => true,
+      Type::Group(group) => group.types.len() == 1 && group.types[0].is_nil(),
+      _ => false,
+    }
   }
 
-  pub fn is_string(&self) -> bool {
-    matches!(self, Type::String)
-  }
-
-  pub fn is_number(&self) -> bool {
-    matches!(self, Type::Number)
-  }
-
-  pub fn is_boolean(&self) -> bool {
-    matches!(self, Type::Boolean)
+  pub fn is_group(&self) -> bool {
+    matches!(self, Type::Group(_))
   }
   pub fn is_variadic(&self) -> bool {
     matches!(self, Type::Variadic(_))
@@ -50,220 +100,30 @@ impl Type {
   pub fn new_variadic(inner_type: Type) -> Self {
     Type::Variadic(VariadicType { inner_type: Box::new(inner_type) })
   }
-
   pub fn new_group(types: Vec<Type>) -> Self {
-    Type::Grup(GrupType { types })
+    Type::Group(GroupType { types })
   }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct IdentifierType {
-  pub name: String,
-  pub range: Range,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct GenericCallType {
-  pub name: String,
-  pub types: Vec<Type>,
-  pub range: Range,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct GrupType {
-  pub types: Vec<Type>,
-}
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct VariadicType {
-  pub inner_type: Box<Type>,
-}
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct UnionType {
-  pub types: Vec<Type>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct OptionalType {
-  pub inner_type: Box<Type>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct TableType {
-  pub array: Option<Vec<Type>>,
-  pub map: Option<BTreeMap<String, Type>>,
-}
-
-impl TableType {
-  pub fn new(array: Option<Vec<Type>>, map: Option<BTreeMap<String, Type>>) -> Self {
-    TableType { array, map }
+  pub fn new_table(array: Option<HashSet<Type>>, map: Option<BTreeMap<String, Type>>) -> Self {
+    Type::Table(TableType { array, map })
+  }
+  pub fn new_function(params: Vec<Type>, return_type: Type) -> Self {
+    Type::Function(FunctionType { params, return_type: Box::new(return_type) })
+  }
+  pub fn new_union(types: Vec<Type>) -> Self {
+    Type::Union(UnionType { types })
+  }
+  pub fn new_option(inner_type: Type) -> Self {
+    Type::Option(OptionType { inner_type: Box::new(inner_type) })
+  }
+  pub fn new_generic(name: &str, variables: Vec<String>, value: Type, range: Range) -> Self {
+    Type::Generic(GenericType::new(name.to_string(), variables, value, range))
+  }
+  pub fn new_generic_call(name: String, types: Vec<Type>, range: Range) -> Self {
+    Type::GenericCall(GenericCallType { name, types, range })
   }
 
-  pub fn new_array(array: Vec<Type>) -> Self {
-    TableType { array: Some(array), map: None }
-  }
-
-  pub fn new_map(map: BTreeMap<String, Type>) -> Self {
-    TableType { array: None, map: Some(map) }
-  }
-
-  pub fn is_array(&self) -> bool {
-    self.array.is_some()
-  }
-
-  pub fn is_map(&self) -> bool {
-    self.map.is_some()
-  }
-
-  pub fn get_type(&self, key: &str) -> Option<&Type> {
-    if let Some(map) = &self.map {
-      map.get(key)
-    } else {
-      None
-    }
-  }
-  pub fn get_array_len(&self) -> Option<usize> {
-    self.array.as_ref().map(|array| array.len())
-  }
-
-  pub fn get_array_type(&self, index: usize) -> Option<&Type> {
-    self.array.as_ref().and_then(|array| array.get(index))
-  }
-
-  pub fn get_array(&self) -> Option<&Vec<Type>> {
-    self.array.as_ref()
-  }
-
-  pub fn get_map(&self) -> Option<&BTreeMap<String, Type>> {
-    self.map.as_ref()
-  }
-
-  pub fn to_string(&self) -> String {
-    let mut map_str = String::new();
-    if let Some(map) = &self.map {
-      map_str = format!(
-        "<{}>",
-        map.iter().map(|(k, v)| format!("{}: {}", k, v.to_string())).collect::<Vec<String>>().join(", ")
-      );
-    }
-
-    if let Some(array) = &self.array {
-      map_str = format!("<{}>", array.iter().map(Type::to_string).collect::<Vec<String>>().join(", "));
-    }
-
-    format!(
-      "table{}",
-      format!(
-        "{}{}",
-        map_str,
-        self
-          .array
-          .as_ref()
-          .map(|array| format!("<{}>", array.iter().map(Type::to_string).collect::<Vec<String>>().join(", ")))
-          .unwrap_or(String::new())
-      )
-    )
-  }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FunctionType {
-  pub params: Vec<Type>,
-  pub return_type: Box<Type>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct GenericType {
-  pub name: String,
-  pub variables: Vec<String>,
-  pub value: Box<Type>,
-  pub range: Range,
-}
-
-impl GenericType {
-  pub fn new(name: String, variables: Vec<String>, value: Type, range: Range) -> Self {
-    GenericType { name, variables, value: Box::new(value), range }
-  }
-}
-
-impl Type {
-  pub fn supports_operator(&self, operator: &BinaryOperator) -> bool {
-    use BinaryOperator::*;
-    if supports_stdlib_operator(self, operator) {
-      return true;
-    }
-    matches!(
-      (self, operator),
-      (Type::Number, Add)
-        | (Type::Number, Subtract)
-        | (Type::Number, Multiply)
-        | (Type::Number, DoubleSlash)
-        | (Type::Number, Divide)
-        | (Type::Number, Modulus)
-        | (Type::Number, And)
-        | (Type::Number, Or)
-        | (Type::Number, Equal)
-        | (Type::Number, NotEqual)
-        | (Type::Number, LessThan)
-        | (Type::Number, GreaterThan)
-        | (Type::Number, LessThanOrEqual)
-        | (Type::Number, GreaterThanOrEqual)
-        | (Type::Number, DoubleDot)
-        | (Type::String, Add)
-        | (Type::String, Equal)
-        | (Type::String, NotEqual)
-        | (Type::String, LessThan)
-        | (Type::String, GreaterThan)
-        | (Type::String, LessThanOrEqual)
-        | (Type::String, GreaterThanOrEqual)
-        | (Type::String, DoubleDot)
-        | (Type::Boolean, And)
-        | (Type::Boolean, Or)
-        | (Type::Boolean, Equal)
-        | (Type::Boolean, NotEqual)
-        | (Type::Nil, Equal)
-        | (Type::Nil, NotEqual)
-        | (Type::Unknown, _)
-    )
-  }
-
-  pub fn get_operator_result_type(&self, other: &Type, operator: &BinaryOperator) -> Type {
-    match (self, other, operator) {
-      (Type::Number, Type::Number, BinaryOperator::Equal)
-      | (Type::Number, Type::Number, BinaryOperator::NotEqual)
-      | (Type::Number, Type::Number, BinaryOperator::LessThan)
-      | (Type::Number, Type::Number, BinaryOperator::GreaterThan)
-      | (Type::Number, Type::Number, BinaryOperator::LessThanOrEqual)
-      | (Type::Number, Type::Number, BinaryOperator::GreaterThanOrEqual)
-      | (Type::String, Type::String, BinaryOperator::Equal)
-      | (Type::String, Type::String, BinaryOperator::NotEqual)
-      | (Type::String, Type::String, BinaryOperator::LessThan)
-      | (Type::String, Type::String, BinaryOperator::GreaterThan)
-      | (Type::Boolean, Type::Boolean, BinaryOperator::Equal)
-      | (Type::Boolean, Type::Boolean, BinaryOperator::NotEqual)
-      | (Type::Nil, Type::Nil, _) => Type::Boolean,
-
-      (Type::Number, Type::Number, BinaryOperator::DoubleSlash) => Type::Number,
-      (Type::Number, Type::Number, _) => Type::Number,
-      (Type::String, Type::String, _) => Type::String,
-      // strings concat numbers
-      (Type::Number, Type::String, BinaryOperator::DoubleDot)
-      | (Type::String, Type::Number, BinaryOperator::DoubleDot) => Type::String,
-      // optional
-      (_, Type::Optional(_), BinaryOperator::DoubleDot)
-      | (Type::Optional(_), _, BinaryOperator::DoubleDot)
-      | (_, Type::Optional(_), BinaryOperator::Equal)
-      | (Type::Optional(_), _, BinaryOperator::Equal)
-      | (_, Type::Optional(_), BinaryOperator::NotEqual)
-      | (Type::Optional(_), _, BinaryOperator::NotEqual) => get_operator_stdlib_result_type(operator),
-      // union
-      (_, Type::Union(_), BinaryOperator::DoubleDot)
-      | (Type::Union(_), _, BinaryOperator::DoubleDot)
-      | (_, Type::Union(_), BinaryOperator::Equal)
-      | (Type::Union(_), _, BinaryOperator::Equal)
-      | (_, Type::Union(_), BinaryOperator::NotEqual)
-      | (Type::Union(_), _, BinaryOperator::NotEqual) => get_operator_stdlib_result_type(operator),
-      _ => Type::Unknown,
-    }
+  pub fn new_boolean() -> Self {
+    Type::Boolean
   }
 
   pub fn check_match(&self, other: &Type) -> bool {
@@ -275,283 +135,327 @@ impl Type {
       | (Type::Unknown, Type::Unknown)
       | (Type::Unknown, _)
       | (_, Type::Unknown) => true,
+      // table
       (Type::Table(left), Type::Table(right)) => check_match_table(left, right),
+
+      // function
       (Type::Function(left), Type::Function(right)) => check_match_function(left, right),
+
+      // generic
       (Type::Generic(left), Type::Generic(right)) => check_match_generic(left, right),
-      (Type::Grup(left), Type::Grup(right)) => check_match_grup_return_type(left, right),
-      (Type::Grup(left), right) => check_match_grup_return_with_single_type(left, right),
-      (left, Type::Grup(right)) => check_match_grup_return_with_single_type(right, left),
-      // optional
-      (Type::Optional(left), Type::Optional(right)) => check_match_optional(left, right),
-      (Type::Optional(left), right) => check_match_optional_with_single_type(left, right),
-      (left, Type::Optional(right)) => check_match_optional_with_single_type(right, left),
+
+      // group
+      (Type::Group(left), Type::Group(right)) => check_match_group(left, right),
+      (Type::Group(left), right) => check_match_group_with_single_type(left, right),
+      (left, Type::Group(right)) => check_match_group_with_single_type(right, left),
+
+      // Option
+      (Type::Option(left), Type::Option(right)) => check_match_option(left, right),
+      (Type::Option(left), right) => check_match_option_right(left, right),
+      (_, Type::Option(_)) => false,
+
       // union
       (Type::Union(left), Type::Union(right)) => check_match_union(&left.types, &right.types),
       (Type::Union(left), right) => check_match_union_with_single_type(left, right),
       (left, Type::Union(right)) => check_match_union_with_single_type(right, left),
+
+      // variadic
+      (Type::Variadic(left), Type::Variadic(right)) => check_match_variadic(left, right),
+      (Type::Variadic(left), right) => check_match_variadic_with_single_type(left, right),
+      (left, Type::Variadic(right)) => check_match_variadic_with_single_type(right, left),
       _ => false,
     }
   }
 
+  pub fn supports_operator(&self, operator: &BinaryOperator) -> bool {
+    if matches!(self, Type::Number) {
+      return operator.support_number();
+    }
+    if matches!(self, Type::String) {
+      return operator.support_string();
+    }
+    if matches!(self, Type::Boolean) {
+      return operator.support_boolean();
+    }
+    if matches!(self, Type::Nil) {
+      return operator.support_nil();
+    }
+    return matches!(self, Type::Unknown) || supports_stdlib_operator(self, operator);
+  }
+
+  pub fn suport_unary_operator(&self, operator: &UnaryOperator) -> bool {
+    // println!("left: {:#?} ->  right: {:#?}", self, other);
+
+    if matches!(self, Type::Number) {
+      return operator.support_number();
+    }
+    if matches!(self, Type::String) {
+      return operator.support_string();
+    }
+    if matches!(self, Type::Boolean) {
+      return operator.support_boolean();
+    }
+    if matches!(self, Type::Nil) {
+      return operator.support_nil();
+    }
+    return matches!(self, Type::Unknown) || supports_stdlib_unary_operator(self, operator);
+  }
+
+  pub fn get_unary_operator_result_type(&self, operator: &UnaryOperator) -> Type {
+    use UnaryOperator::*;
+    match (self, operator) {
+      (Type::Number, Negate) => Type::Number,
+      (Type::Table(_) | Type::String, Hash) => Type::Number,
+      (_, Not) => Type::Boolean,
+      (Type::Unknown, _) => Type::Unknown,
+      _ => unreachable!("{} right: {:#?}", operator, self),
+    }
+  }
+
+  pub fn get_operator_result_type(&self, other: &Type, operator: &BinaryOperator) -> Type {
+    use BinaryOperator::*;
+    let result = get_operator_stdlib_result_type(self, operator);
+    if result.is_some() {
+      return result.unwrap();
+    }
+    // format!("operator: {:#?}", operator).as_str();
+
+    match operator {
+      // string concat
+      DoubleDot => match (self, other) {
+        (Type::String, Type::String)
+        | (Type::Number, Type::String)
+        | (Type::String, Type::Number)
+        | (Type::Unknown, Type::String)
+        | (Type::String, Type::Unknown)
+        | (Type::Unknown, Type::Unknown) => Type::String,
+        _ => unreachable!("left: {:#?} {} right: {:#?}", self, operator, other),
+      },
+      // math operators
+      Add | Subtract | Multiply | Divide | Modulus | DoubleSlash => match (self, other) {
+        (Type::Number, Type::Number)
+        | (Type::Unknown, Type::Number)
+        | (Type::Number, Type::Unknown)
+        | (Type::Unknown, Type::Unknown) => Type::Number,
+        _ => unreachable!("left: {:#?} {} right: {:#?}", self, operator, other),
+      },
+      // comparison operators
+      // println!("comparison operators");
+      Equal | NotEqual | LessThan | GreaterThan | LessThanOrEqual | GreaterThanOrEqual => match (self, other) {
+        (Type::Number, Type::Number)
+        | (Type::Unknown, Type::Number)
+        | (Type::Number, Type::Unknown)
+        | (Type::String, Type::String)
+        | (Type::Unknown, Type::String)
+        | (Type::String, Type::Unknown)
+        | (Type::Boolean, Type::Boolean)
+        | (Type::Unknown, Type::Boolean)
+        | (Type::Boolean, Type::Unknown)
+        | (Type::Unknown, Type::Unknown) => Type::Boolean,
+        _ => unreachable!("left: {:#?} {} right: {:#?}", self, operator, other),
+      },
+      //  logical operators
+      And | Or => match (self, other) {
+        (Type::Boolean, Type::Boolean)
+        | (Type::Unknown, Type::Boolean)
+        | (Type::Boolean, Type::Unknown)
+        | (Type::Unknown, Type::Unknown) => Type::Boolean,
+        _ => unreachable!("left: {:#?} {} right: {:#?}", self, operator, other),
+      },
+    }
+  }
+
   pub fn can_replace(&self, replaced: &Type) -> bool {
-    matches!(self, Type::Unknown)
+    matches!(self, Type::Unknown) || !matches!(replaced, Type::Unknown)
   }
 
-  pub fn replace_generic(&self, replaced: &Type) -> Type {
-    if let Type::Identifier(_) = self {
-      replaced.clone()
-    } else {
-      self.clone()
-    }
-  }
-
-  pub fn to_string(&self) -> String {
-    match self {
-      Type::Number => "number".to_string(),
-      Type::String => "string".to_string(),
-      Type::Boolean => "boolean".to_string(),
-      Type::Nil => "nil".to_string(),
-      Type::Unknown => "unknown".to_string(),
-      Type::Table(table) => format_table_type(table),
-      Type::Function(function) => format_function_type(function),
-      Type::Generic(generic) => format_generic_type(generic),
-      Type::Union(union) => format_union_type(union),
-      Type::Optional(optional) => format_optional_type(optional),
-      Type::Identifier(identifier) => format_identifier_type(identifier),
-      Type::Grup(grup_return) => format_grup_return_type(grup_return),
-      Type::GenericCall(generic_call) => format_generic_call_type(generic_call),
-      Type::Variadic(variadic) => format_variadic_type(variadic),
-    }
-  }
-
-  pub fn is_grup(&self) -> bool {
-    matches!(self, Type::Grup(_))
-  }
-
-  pub fn same_grup_length(&self, other: &Type) -> bool {
-    if let (Type::Grup(left), Type::Grup(right)) = (self, other) {
+  pub fn same_group_length(&self, other: &Type) -> bool {
+    if let (Type::Group(left), Type::Group(right)) = (self, other) {
       left.types.len() == right.types.len()
     } else {
       false
     }
   }
-
-  pub fn new_type(name: &str, range: Range) -> Self {
-    match name {
-      "number" => Type::Number,
-      "string" => Type::String,
-      "boolean" => Type::Boolean,
-      "nil" => Type::Nil,
-      "unknown" => Type::Unknown,
-      _ => Type::new_identifier(name, range),
-    }
-  }
-
-  pub fn new_identifier(name: &str, range: Range) -> Self {
-    Type::Identifier(IdentifierType { name: name.to_owned(), range })
-  }
-
-  pub fn new_generic(name: &str, variables: Vec<String>, value: Type, range: Range) -> Self {
-    Type::Generic(GenericType::new(name.to_owned(), variables, value, range))
-  }
-
-  pub fn accept_generic(name: &str) -> bool {
-    !matches!(name, "number" | "string" | "boolean" | "nil" | "unknown")
-  }
-
-  pub fn new_number() -> Self {
-    Type::Number
-  }
-
-  pub fn new_string() -> Self {
-    Type::String
-  }
-
-  pub fn new_boolean() -> Self {
-    Type::Boolean
-  }
-
-  pub fn new_table(array: Option<Vec<Type>>, map: Option<BTreeMap<String, Type>>) -> Self {
-    Type::Table(TableType { array, map })
-  }
-
-  pub fn new_function(params: Vec<Type>, return_type: Type) -> Type {
-    Type::Function(FunctionType { params, return_type: Box::new(return_type) })
-  }
-
-  pub fn new_union(types: Vec<Type>) -> Self {
-    Type::Union(UnionType { types })
-  }
-
-  pub fn new_optional(inner_type: Type) -> Self {
-    Type::Optional(OptionalType { inner_type: Box::new(inner_type) })
-  }
-
-  pub fn new_grup(types: Vec<Type>) -> Self {
-    Type::Grup(GrupType { types })
-  }
-
-  pub fn new_generic_call(name: String, types: Vec<Type>, range: Range) -> Self {
-    Type::GenericCall(GenericCallType { name, types, range })
-  }
 }
 
 fn supports_stdlib_operator(left: &Type, operator: &BinaryOperator) -> bool {
-  match left {
-    Type::Optional(_) => {
-      matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+  matches!(left, Type::Option(_) | Type::Union(_))
+    && matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+}
+
+fn supports_stdlib_unary_operator(left: &Type, operator: &UnaryOperator) -> bool {
+  // tables
+  if matches!(left, Type::Table(_)) {
+    return matches!(operator, UnaryOperator::Not | UnaryOperator::Hash | UnaryOperator::Negate);
+  }
+
+  if matches!(left, Type::Option(_)) {
+    return matches!(operator, UnaryOperator::Not);
+  }
+
+  return false;
+}
+
+fn get_operator_stdlib_result_type(left: &Type, operator: &BinaryOperator) -> Option<Type> {
+  if matches!(left, Type::Union(_)) {
+    if matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual) {
+      return Some(Type::Boolean);
     }
-    Type::Union(union) => {
-      matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot)
+    if matches!(operator, BinaryOperator::DoubleDot) {
+      return Some(Type::String);
     }
-    _ => false,
-  }
-}
-
-fn get_operator_stdlib_result_type(operator: &BinaryOperator) -> Type {
-  if matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual | BinaryOperator::DoubleDot) {
-    Type::Boolean
-  } else {
-    Type::Unknown
-  }
-}
-
-// checks
-
-fn check_match_optional(left: &OptionalType, right: &OptionalType) -> bool {
-  left.inner_type.check_match(&right.inner_type)
-}
-
-fn check_match_optional_with_single_type(left: &OptionalType, right: &Type) -> bool {
-  if right.is_nil() {
-    return true;
-  }
-  left.inner_type.check_match(right)
-}
-
-fn check_match_union_with_single_type(left: &UnionType, right: &Type) -> bool {
-  return left.types.iter().any(|t| t.check_match(right));
-}
-
-fn check_match_union(left: &Vec<Type>, right: &Vec<Type>) -> bool {
-  left.len() == right.len() && left.iter().zip(right).all(|(left_type, right_type)| left_type.check_match(right_type))
-}
-
-fn check_match_table(left: &TableType, right: &TableType) -> bool {
-  if let (Some(left_array), Some(right_array)) = (&left.array, &right.array) {
-    left_array.len() == right_array.len() && left_array.iter().zip(right_array).all(|(l, r)| l.check_match(r))
-  } else if let (Some(left_map), Some(right_map)) = (&left.map, &right.map) {
-    left_map.len() == right_map.len() && left_map.iter().zip(right_map).all(|(l, r)| l.1.check_match(&r.1))
-  } else {
-    false
-  }
-}
-
-fn check_match_function(left: &FunctionType, right: &FunctionType) -> bool {
-  left.params.len() == right.params.len()
-    && left.params.iter().zip(&right.params).all(|(l, r)| l.check_match(r))
-    && left.return_type.check_match(&*right.return_type)
-}
-
-fn check_match_grup_return_type(left: &GrupType, right: &GrupType) -> bool {
-  left.types.iter().zip(&right.types).all(|(l, r)| l.check_match(r))
-}
-
-fn check_match_grup_return_with_single_type(left: &GrupType, right: &Type) -> bool {
-  left.types.len() == 1 && left.types[0].check_match(right)
-}
-
-fn check_match_generic(left: &GenericType, right: &GenericType) -> bool {
-  left.name == right.name
-    && left.variables.len() == right.variables.len()
-    && left.variables.iter().zip(&right.variables).all(|(l, r)| l == r)
-    && left.value.check_match(&right.value)
-}
-
-fn format_generic_type(generic: &GenericType) -> String {
-  let types_str = generic.variables.iter().map(|t| t.to_string()).collect::<Vec<String>>().join(", ");
-  if types_str.is_empty() {
-    format!("{}", generic.name)
-  } else {
-    format!("{}<{}>", generic.name, types_str)
-  }
-}
-
-fn format_function_type(function: &FunctionType) -> String {
-  let params_str = function.params.iter().map(|t| t.to_string()).collect::<Vec<String>>().join(", ");
-  format!("function({}): {}", params_str, function.return_type.to_string())
-}
-
-fn format_table_type(table: &TableType) -> String {
-  let mut array_str = String::new();
-  let mut map_str = String::new();
-
-  if let Some(array) = &table.array {
-    array_str = format!("<{}>", array.iter().map(Type::to_string).collect::<Vec<String>>().join(", "));
   }
 
-  if let Some(map) = &table.map {
-    map_str =
-      format!("<{}>", map.iter().map(|(k, v)| format!("{}: {}", k, v.to_string())).collect::<Vec<String>>().join(", "));
+  if matches!(left, Type::Union(_)) {
+    if matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual) {
+      return Some(Type::Boolean);
+    }
+    if matches!(operator, BinaryOperator::DoubleDot) {
+      return Some(Type::String);
+    }
   }
 
-  format!("table{}", format!("{}{}", array_str, map_str))
-}
+  if matches!(left, Type::Table(_)) {
+    if matches!(operator, BinaryOperator::Equal | BinaryOperator::NotEqual) {
+      return Some(Type::Boolean);
+    }
 
-fn format_union_type(union: &UnionType) -> String {
-  let types_str = union.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
-  format!("union<{}>", types_str)
-}
-
-fn format_optional_type(optional: &OptionalType) -> String {
-  format!("optional<{}>", optional.inner_type.to_string())
-}
-
-fn format_identifier_type(identifier: &IdentifierType) -> String {
-  identifier.name.clone()
-}
-
-fn format_grup_return_type(grup_return: &GrupType) -> String {
-  if grup_return.types.len() == 1 {
-    return grup_return.types[0].to_string();
+    if matches!(operator, BinaryOperator::DoubleDot) {
+      return Some(Type::String);
+    }
   }
-  let types_str = grup_return.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
-  format!("({})", types_str)
+
+  return None;
 }
 
-fn format_generic_call_type(generic_call: &GenericCallType) -> String {
-  let types_str = generic_call.types.iter().map(Type::to_string).collect::<Vec<String>>().join(", ");
-  format!("{}<{}>", generic_call.name, types_str)
-}
-
-fn format_variadic_type(variadic: &VariadicType) -> String {
-  format!("...{}", variadic.inner_type.to_string())
-}
-
-pub fn can_replace_grup_return_type(replaced: &GrupType, replaced_type: &GrupType) -> bool {
-  replaced.types.len() == replaced_type.types.len()
-    && replaced.types.iter().zip(&replaced_type.types).all(|(l, r)| l.can_replace(r))
+impl TableType {
+  pub fn get_type(&self, key: &str) -> Option<&Type> {
+    self.map.as_ref()?.get(key)
+  }
 }
 
 pub fn replace_type(replaced: &Type, replaced_type: &Type) -> Type {
-  match (replaced, replaced_type) {
-    (Type::Grup(replaced), Type::Grup(replaced_type)) => Type::Grup(replace_grup_return_type(replaced, replaced_type)),
-    _ => {
-      if replaced.can_replace(replaced_type) {
-        replaced_type.clone()
-      } else {
-        replaced.clone()
-      }
+  match replaced {
+    Type::Unknown => replaced_type.clone(),
+    _ => replaced.clone(),
+  }
+}
+
+impl GenericType {
+  pub fn new(name: String, variables: Vec<String>, value: Type, range: Range) -> Self {
+    GenericType { name, variables, value: Box::new(value), range }
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IdentifierType {
+  pub name: String,
+  pub range: Range,
+}
+
+impl Hash for IdentifierType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    self.name.hash(state);
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GenericCallType {
+  pub name: String,
+  pub types: Vec<Type>,
+  pub range: Range,
+}
+
+impl Hash for GenericCallType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    self.name.hash(state);
+    for type_ in &self.types {
+      type_.hash(state);
     }
   }
 }
 
-pub fn replace_grup_return_type(replaced: &GrupType, replaced_type: &GrupType) -> GrupType {
-  let mut types = Vec::with_capacity(replaced.types.len());
-  for (replaced_type, replaced_type_type) in replaced.types.iter().zip(replaced_type.types.iter()) {
-    if replaced_type.can_replace(replaced_type_type) {
-      types.push(replaced_type_type.clone());
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GroupType {
+  pub types: Vec<Type>,
+}
+
+impl Hash for GroupType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_u8(30);
+    for type_ in &self.types {
+      type_.hash(state);
     }
   }
-  GrupType { types }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct VariadicType {
+  pub inner_type: Box<Type>,
+}
+impl Hash for VariadicType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_u8(40);
+    self.inner_type.hash(state);
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UnionType {
+  pub types: Vec<Type>,
+}
+
+impl Hash for UnionType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_u8(50);
+    for type_ in &self.types {
+      type_.hash(state);
+    }
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OptionType {
+  pub inner_type: Box<Type>,
+}
+impl Hash for OptionType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_u8(60);
+    self.inner_type.hash(state);
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FunctionType {
+  pub params: Vec<Type>,
+  pub return_type: Box<Type>,
+}
+
+impl Hash for FunctionType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_u8(70);
+    for type_ in &self.params {
+      type_.hash(state);
+    }
+    self.return_type.hash(state);
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GenericType {
+  pub name: String,
+  pub variables: Vec<String>,
+  pub value: Box<Type>,
+  pub range: Range,
+}
+
+impl Hash for GenericType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    state.write_u8(80);
+    self.name.hash(state);
+    for variable in &self.variables {
+      variable.hash(state);
+    }
+    self.value.hash(state);
+  }
 }

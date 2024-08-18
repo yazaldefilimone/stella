@@ -1,7 +1,8 @@
 #![allow(dead_code, unused_variables)]
 
+pub mod assign_variables;
 pub mod binding;
-pub mod check_assign_statement;
+pub mod check_assign_expression;
 pub mod check_binary_expression;
 pub mod check_block_statement;
 pub mod check_call_expression;
@@ -16,6 +17,7 @@ pub mod check_identifier;
 pub mod check_if_statement;
 pub mod check_index_expression;
 pub mod check_literal_expression;
+pub mod check_local_statement;
 pub mod check_member_expression;
 pub mod check_repeat_statement;
 pub mod check_require_expression;
@@ -28,10 +30,12 @@ pub mod check_type;
 pub mod check_type_declaration;
 pub mod check_unary_expression;
 pub mod check_unused_variables;
-pub mod check_variable_declaration;
 pub mod check_while_statement;
 pub mod declare_variables;
+pub mod narrowing;
 pub mod type_utils;
+
+use type_utils::CheckResult;
 
 use crate::ast::ast;
 use crate::context::context::Context;
@@ -61,15 +65,15 @@ impl<'a> Checker<'a> {
     Checker { ctx, file_name: file_name.to_string(), diagnostics, loader, resolver, raw, expect: None }
   }
 
-  pub fn check(&mut self, program: &ast::Program) -> Result<Type, Diagnostic> {
+  pub fn check(&mut self, program: &ast::Program) -> CheckResult<Type> {
     let mut last_t = Type::Nil;
     for statement in &program.statements {
       match self.check_statement(statement) {
-        Ok(ty) => last_t = ty,
+        Ok(Some(ty)) => last_t = ty,
+        Ok(None) => {}
         Err(diag) => self.diagnostics.add(diag),
       }
     }
-
     self.show_diagnostics();
     return Ok(last_t);
   }
@@ -78,6 +82,15 @@ impl<'a> Checker<'a> {
   //   // Empty statements don't change the type context
   // }
 
+  pub fn enter_scope(&mut self) {
+    self.ctx.enter_scope();
+  }
+
+  pub fn leave_scope(&mut self) {
+    // check unused variables in current scope
+    self.check_unused_variables();
+    self.ctx.leave_scope();
+  }
   pub fn create_diagnostic(&self, error: TypeError) -> Diagnostic {
     error.into()
   }

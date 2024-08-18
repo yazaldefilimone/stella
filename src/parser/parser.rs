@@ -1,12 +1,14 @@
-#![allow(dead_code)]
+// #![allow(dead_code)]
 
+use std::collections::{BTreeMap, HashSet};
+
+use super::precedence::Precedence;
 use crate::ast::ast;
 use crate::ast::tokens::{Token, TokenKind};
 use crate::diagnostics::report::report_and_exit;
 use crate::lexer::Lexer;
 use crate::types::Type;
 use crate::utils::range::{create_middle_range, Range};
-
 pub struct Parser<'a> {
   lexer: Lexer<'a>,
   raw: &'a str,
@@ -16,8 +18,10 @@ impl<'a> Parser<'a> {
   pub fn new(raw: &'a str, file_name: &'a str) -> Self {
     Self { lexer: Lexer::new(raw, file_name), raw }
   }
+
   pub fn parse_program(&mut self) -> ast::Program {
     let mut program = ast::Program::new();
+
     while !self.is_end() {
       let statement = self.parse_statement();
       program.statements.push(statement);
@@ -41,81 +45,157 @@ impl<'a> Parser<'a> {
       TokenKind::Break => self.parse_break_statement(),
       TokenKind::Continue => self.parse_continue_statement(),
       TokenKind::Return => self.parse_return_statement(),
-      TokenKind::Function => self.parse_function_statement(false),
+      TokenKind::Function => self.parse_function_declaration(None),
       TokenKind::Type => self.parse_type_declaration(),
-      _ => self.parse_assign_expression_or_call_expression(),
+      _ => self.parse_expression_statement(),
     };
     self.match_token_and_consume(TokenKind::Semicolon);
     statement
   }
 
-  // declarations
-  //
   fn parse_local_declaration(&mut self) -> ast::Statement {
-    self.consume_expect_token(TokenKind::Local);
+    let local = self.consume_expect_token(TokenKind::Local);
     if self.match_token(&TokenKind::Function) {
-      return self.parse_function_statement(true);
+      return self.parse_function_declaration(Some(local.range));
     }
-    self.parse_variable_declaration(true)
+    self.parse_local_variable(local.range)
+  }
+
+  fn parse_local_variable(&mut self, local_range: Range) -> ast::Statement {
+    let mut variables = vec![self.parse_variable()];
+    let mut end_range = variables.first().unwrap().get_range();
+
+    while self.match_token_and_consume(TokenKind::Comma).is_some() {
+      let variable = self.parse_variable();
+      if !self.match_token(&TokenKind::Comma) {
+        end_range = variable.get_range();
+      }
+      variables.push(variable)
+    }
+
+    let mut initializer = vec![];
+
+    if self.match_token_and_consume(TokenKind::Assign).is_some() {
+      initializer.push(self.parse_expression());
+    }
+
+    while self.match_token(&TokenKind::Comma) {
+      self.consume_expect_token(TokenKind::Comma);
+      let expression = self.parse_expression();
+
+      if !self.match_token(&TokenKind::Comma) {
+        end_range = expression.get_range();
+      }
+
+      initializer.push(expression)
+    }
+
+    let range = create_middle_range(&local_range, &end_range);
+
+    let local = ast::LocalStatement::new(variables, initializer, range);
+
+    return ast::Statement::Local(local);
+  }
+
+  fn parse_variables(&mut self) -> Vec<ast::Variable> {
+    let mut variables = vec![];
+    let peeked = self.lexer.peek_token();
+
+    if !peeked.is_identifier() {
+      return variables;
+    }
+
+    variables.push(self.parse_variable());
+
+    while self.match_token_and_consume(TokenKind::Comma).is_some() {
+      variables.push(self.parse_variable());
+    }
+
+    variables
+  }
+  fn parse_variable(&mut self) -> ast::Variable {
+    let name = self.lexer.next_token();
+
+    if !name.is_identifier() {
+      self.report_unexpected_token(name);
+    }
+
+    let ty = if self.match_token_and_consume(TokenKind::Colon).is_some() {
+      Some(self.parse_type(true))
+    } else {
+      None
+    };
+
+    return ast::Variable::new(name, ty);
   }
 
   fn parse_type_declaration(&mut self) -> ast::Statement {
     let range = self.consume_expect_token(TokenKind::Type).range.clone();
     let name = self.consume_token();
-    let generics = self.parse_simple_generic_str();
+    let generics = self.parse_generic_type_names();
     self.consume_expect_token(TokenKind::Assign);
-    // we can accept function type
-    let initilizer = self.parse_type(false);
-    ast::Statement::TypeDeclaration(ast::TypeDeclaration::new(name, generics, initilizer, range))
-  }
-  fn parse_variable_declaration(&mut self, local: bool) -> ast::Statement {
-    let values = self.parse_variable_and_type(None);
-    let mut initializer = None;
-    if self.match_token_and_consume(TokenKind::Assign).is_some() {
-      initializer = Some(self.parse_expression_statement());
-    }
-    ast::Statement::VariableDeclaration(ast::VariableDeclaration::new(values, local, initializer))
+    let initializer = self.parse_type(false);
+    ast::Statement::TypeDeclaration(ast::TypeDeclaration::new(name, generics, initializer, range))
   }
 
-  fn parse_function_statement(&mut self, local: bool) -> ast::Statement {
-    let start = self.consume_expect_token(TokenKind::Function).range;
+  fn parse_function_declaration(&mut self, local_range: Option<Range>) -> ast::Statement {
+    let function_keyword = self.consume_expect_token(TokenKind::Function);
+
+    let local = local_range.is_some();
+
+    let start_range = local_range.unwrap_or(function_keyword.range);
     let name = self.consume_token();
-    let generics = self.parse_generic_type();
+
+    if !name.is_identifier() {
+      self.report_unexpected_token(name);
+    }
+
+    let generics = self.parse_generic_types();
+
     self.consume_expect_token(TokenKind::LeftParen);
-    let arguments = self.parse_arguments_with_option_type();
+
+    let parameters = self.parse_variables();
+
     self.consume_expect_token(TokenKind::RightParen);
 
     let mut return_type = None;
+    let mut return_type_range = None;
 
-    let mut range_return_type = None;
-    if self.match_token(&TokenKind::Colon) {
-      self.consume_expect_token(TokenKind::Colon);
-      range_return_type = Some(self.lexer.peek_token().range.clone());
-      return_type = Some(self.parse_type(true))
+    if self.match_token_and_consume(TokenKind::Colon).is_some() {
+      return_type_range = Some(self.lexer.peek_token().range.clone());
+      return_type = Some(self.parse_type(true));
     }
     let body = self.parse_block_statement(&[TokenKind::End]);
     let end_range = self.consume_expect_token(TokenKind::End).range;
-    let range = create_middle_range(&start, &end_range);
-    ast::Statement::Function(ast::FunctionStatement::new(
-      name,
-      local,
-      generics,
-      arguments,
-      return_type,
-      body,
-      range,
-      range_return_type,
-    ))
+    let range = create_middle_range(&start_range, &end_range);
+    let function =
+      ast::FunctionStatement::new(name, local, generics, parameters, return_type, body, range, return_type_range);
+    ast::Statement::new_function(function)
   }
 
-  // flow control
-  //
+  fn parse_expression_statement(&mut self) -> ast::Statement {
+    let expression = self.parse_expression();
+    ast::Statement::Expression(expression)
+  }
 
   fn parse_if_statement(&mut self) -> ast::Statement {
     let start_range = self.consume_expect_token(TokenKind::If).range;
-    let condition = self.parse_expression_statement();
+    let condition = self.parse_expression();
     self.consume_expect_token(TokenKind::Then);
-    let then_body = self.parse_block_statement(&[TokenKind::Else, TokenKind::End]);
+    let then_body = self.parse_block_statement(&[TokenKind::Else, TokenKind::ElseIf, TokenKind::End]);
+
+    let mut else_if: Vec<ast::ElseIfStatement> = Vec::new();
+
+    while self.match_token(&TokenKind::ElseIf) {
+      let start_range = self.consume_expect_token(TokenKind::ElseIf).range;
+      let condition = self.parse_expression();
+      self.consume_expect_token(TokenKind::Then);
+      let body = self.parse_block_statement(&[TokenKind::Else, TokenKind::ElseIf, TokenKind::End]);
+      let body_range = body.get_range();
+      let branch = ast::ElseIfStatement::new(condition, body, create_middle_range(&start_range, &body_range));
+      else_if.push(branch);
+    }
+
     let else_body = if self.match_token_and_consume(TokenKind::Else).is_some() {
       Some(self.parse_block_statement(&[TokenKind::End]))
     } else {
@@ -123,12 +203,12 @@ impl<'a> Parser<'a> {
     };
     let end_range = self.consume_expect_token(TokenKind::End).range;
     let range = create_middle_range(&start_range, &end_range);
-    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_body, range))
+    ast::Statement::If(ast::IfStatement::new(condition, then_body, else_if, else_body, range))
   }
 
   fn parse_while_statement(&mut self) -> ast::Statement {
     let while_token = self.consume_expect_token(TokenKind::While);
-    let condition = self.parse_expression_statement();
+    let condition = self.parse_expression();
     self.consume_expect_token(TokenKind::Do);
     let body = self.parse_block_statement(&[TokenKind::End]);
     self.consume_expect_token(TokenKind::End);
@@ -139,19 +219,18 @@ impl<'a> Parser<'a> {
     let repeat_token = self.consume_expect_token(TokenKind::Repeat);
     let body = self.parse_block_statement(&[TokenKind::Until]);
     self.consume_expect_token(TokenKind::Until);
-    let condition = self.parse_expression_statement();
+    let condition = self.parse_expression();
     ast::Statement::Repeat(ast::RepeatStatement::new(body, condition, repeat_token.range))
   }
 
   fn parse_for_statement(&mut self) -> ast::Statement {
     let start_range = self.consume_expect_token(TokenKind::For).range;
-    let variable = self.parse_identifier();
-    self.consume_expect_token(TokenKind::Assign);
-    let init = self.parse_expression_statement();
+    // todo: I think this is wrong... :(
+    let init = self.parse_simple_assignment();
     self.consume_expect_token(TokenKind::Comma);
-    let limit = self.parse_expression_statement();
+    let limit = self.parse_expression();
     let step = if self.match_token_and_consume(TokenKind::Comma).is_some() {
-      Some(self.parse_expression_statement())
+      Some(self.parse_expression())
     } else {
       None
     };
@@ -159,7 +238,16 @@ impl<'a> Parser<'a> {
     let body = self.parse_block_statement(&[TokenKind::End]);
     let end_range = self.consume_expect_token(TokenKind::End).range;
     let range = create_middle_range(&start_range, &end_range);
-    ast::Statement::For(ast::ForStatement::new(variable, init, limit, step, body, range))
+    ast::Statement::For(ast::ForStatement::new(init, limit, step, body, range))
+  }
+
+  fn parse_simple_assignment(&mut self) -> ast::AssignExpresion {
+    let ident = self.parse_identifier();
+    let range = ident.range.clone();
+    let ident_expression = ast::Expression::Identifier(ident);
+    self.consume_expect_token(TokenKind::Assign);
+    let value = self.parse_primary_expression();
+    ast::AssignExpresion::new(vec![ident_expression], vec![value], range)
   }
 
   fn parse_break_statement(&mut self) -> ast::Statement {
@@ -168,28 +256,26 @@ impl<'a> Parser<'a> {
   }
 
   fn parse_continue_statement(&mut self) -> ast::Statement {
-    // Implementação ausente
-    unimplemented!()
+    let continue_token = self.consume_expect_token(TokenKind::Continue);
+    ast::Statement::Continue(ast::ContinueStatement::new(continue_token.range))
   }
 
   fn parse_return_statement(&mut self) -> ast::Statement {
     let return_token = self.consume_expect_token(TokenKind::Return);
-    let values = self.parse_return_value();
+    let values = self.parse_return_values();
     ast::Statement::Return(ast::ReturnStatement::new(values, return_token.range))
   }
 
-  // expressions
-  //
   fn parse_function_expression(&mut self) -> ast::Expression {
     let start_range = self.consume_expect_token(TokenKind::Function).range;
     self.consume_expect_token(TokenKind::LeftParen);
-    let arguments = self.parse_arguments_with_option_type();
+    let parameters = self.parse_variables();
     self.consume_expect_token(TokenKind::RightParen);
 
     let mut return_type = None;
-    let mut range_return_type = None;
+    let mut return_type_range = None;
     if self.match_token_and_consume(TokenKind::Colon).is_some() {
-      range_return_type = Some(self.lexer.peek_token().range.clone());
+      return_type_range = Some(self.lexer.peek_token().range.clone());
       return_type = Some(self.parse_type(false));
     }
 
@@ -197,44 +283,132 @@ impl<'a> Parser<'a> {
     let end_range = self.consume_expect_token(TokenKind::End).range;
     let range = create_middle_range(&start_range, &end_range);
 
-    ast::Expression::new_function(arguments, return_type, body, range, range_return_type)
+    ast::Expression::new_function(parameters, return_type, body, range, return_type_range)
   }
 
-  fn parse_or_expression(&mut self) -> ast::Expression {
-    // self.parse_binary_expression(Self::parse_and_expression, vec![BinaryOperator::Or])
-    self.parse_binary_expression(Self::parse_and_expression)
+  fn parse_expression(&mut self) -> ast::Expression {
+    self.parse_precedence(Precedence::Assignment)
   }
 
-  fn parse_and_expression(&mut self) -> ast::Expression {
-    // self.parse_binary_expression(Self::parse_unary_expression, vec![BinaryOperator::And])
-    self.parse_binary_expression(Self::parse_unary_expression)
-  }
-
-  fn parse_binary_expression(&mut self, parse_sub_expression: fn(&mut Self) -> ast::Expression) -> ast::Expression {
-    let mut expression = parse_sub_expression(self);
-    while let Some((operator, range)) = self.parse_operator() {
-      let right_expression = parse_sub_expression(self);
-      let binary_exp = ast::BinaryExpression::new(operator, Box::new(expression), Box::new(right_expression), range);
-      expression = ast::Expression::Binary(binary_exp);
+  // ! this is a recursive function :(... I think is better than the previous one
+  fn parse_precedence(&mut self, precedence: Precedence) -> ast::Expression {
+    let mut left = if precedence == Precedence::Unary {
+      self.parse_unary_expression()
+    } else {
+      self.parse_precedence(precedence.next())
+    };
+    while let Some(token) = self.match_any_token(precedence.operators()) {
+      let operator = self.token_to_binary_operator(&token);
+      let right = self.parse_precedence(precedence.next());
+      left = ast::Expression::new_binary(operator, left, right, token.range);
     }
-    expression
+
+    left
   }
+
+  // fn parse_expression(&mut self) -> ast::Expression {
+  //   self.parse_assignment_expression()
+  // }
+
+  // fn parse_assignment_expression(&mut self) -> ast::Expression {
+  //   let expression = self.parse_or_expression();
+
+  //   if self.match_token(&TokenKind::Assign) {
+  //     let assign_token = self.consume_token();
+  //     let value = self.parse_expression();
+  //     return ast::Expression::new_assign(vec![expression], vec![value], assign_token.range);
+  //   }
+
+  //   expression
+  // }
+
+  // fn parse_or_expression(&mut self) -> ast::Expression {
+  //   self.parse_binary_expression(Self::parse_and_expression, &[TokenKind::Or])
+  // }
+
+  // fn parse_and_expression(&mut self) -> ast::Expression {
+  //   self.parse_binary_expression(Self::parse_equality_expression, &[TokenKind::And])
+  // }
+
+  // fn parse_equality_expression(&mut self) -> ast::Expression {
+  //   self.parse_binary_expression(Self::parse_comparison_expression, &[TokenKind::Equal, TokenKind::NotEqual])
+  // }
+
+  // fn parse_comparison_expression(&mut self) -> ast::Expression {
+  //   self.parse_binary_expression(
+  //     Self::parse_term,
+  //     &[TokenKind::Less, TokenKind::LessEqual, TokenKind::Greater, TokenKind::GreaterEqual],
+  //   )
+  // }
+
+  // fn parse_term(&mut self) -> ast::Expression {
+  //   self.parse_binary_expression(Self::parse_factor, &[TokenKind::Plus, TokenKind::Minus])
+  // }
+
+  // fn parse_factor(&mut self) -> ast::Expression {
+  //   self.parse_binary_expression(Self::parse_unary_expression, &[TokenKind::Star, TokenKind::Slash, TokenKind::Percent])
+  // }
+
+  // fn parse_binary_expression(
+  //   &mut self,
+  //   parse_sub_expression: fn(&mut Self) -> ast::Expression,
+  //   operator_kinds: &[TokenKind],
+  // ) -> ast::Expression {
+  //   let mut left = parse_sub_expression(self);
+
+  //   while let Some(token) = self.match_any_token(operator_kinds) {
+  //     let operator = self.token_to_binary_operator(&token);
+  //     let right = parse_sub_expression(self);
+  //     left = ast::Expression::new_binary(operator, left, right, token.range);
+  //   }
+
+  //   left
+  // }
 
   fn parse_unary_expression(&mut self) -> ast::Expression {
-    let unary_range = self.lexer.peek_token().range.clone();
-    if let Some(operator) = self.parse_unary_operator() {
-      let expression = self.parse_expression_statement();
-      let unary_expression = ast::UnaryExpression::new(operator, Box::new(expression), unary_range);
-      ast::Expression::Unary(unary_expression)
+    if let Some(token) = self.match_any_token(&[TokenKind::Minus, TokenKind::Not, TokenKind::Hash]) {
+      let operator = self.token_to_unary_operator(&token);
+      let expr = self.parse_unary_expression();
+      ast::Expression::new_unary(operator, expr, token.range)
     } else {
       self.parse_primary_expression()
     }
   }
+
+  fn token_to_binary_operator(&self, token: &Token) -> ast::BinaryOperator {
+    match token.kind {
+      TokenKind::Plus => ast::BinaryOperator::Add,
+      TokenKind::Minus => ast::BinaryOperator::Subtract,
+      TokenKind::Star => ast::BinaryOperator::Multiply,
+      TokenKind::Slash => ast::BinaryOperator::Divide,
+      TokenKind::Percent => ast::BinaryOperator::Modulus,
+      TokenKind::And => ast::BinaryOperator::And,
+      TokenKind::Or => ast::BinaryOperator::Or,
+      TokenKind::Equal => ast::BinaryOperator::Equal,
+      TokenKind::NotEqual => ast::BinaryOperator::NotEqual,
+      TokenKind::Less => ast::BinaryOperator::LessThan,
+      TokenKind::Greater => ast::BinaryOperator::GreaterThan,
+      TokenKind::LessEqual => ast::BinaryOperator::LessThanOrEqual,
+      TokenKind::GreaterEqual => ast::BinaryOperator::GreaterThanOrEqual,
+      TokenKind::DoubleDot => ast::BinaryOperator::DoubleDot,
+      _ => self.report_unexpected_token(token.clone()),
+    }
+  }
+
+  fn token_to_unary_operator(&self, token: &Token) -> ast::UnaryOperator {
+    match token.kind {
+      TokenKind::Minus => ast::UnaryOperator::Negate,
+      TokenKind::Not => ast::UnaryOperator::Not,
+      TokenKind::Hash => ast::UnaryOperator::Hash,
+      _ => self.report_unexpected_token(token.clone()),
+    }
+  }
+
   fn parse_primary_expression(&mut self) -> ast::Expression {
     let token = self.lexer.peek_token();
     let mut expression = match token.kind {
       TokenKind::Number(_) | TokenKind::String(_) => self.parse_literal_expression(),
-      TokenKind::Identifier(_) => self.parse_identifier(),
+      TokenKind::Identifier(_) => self.parse_identifier_expression(),
       TokenKind::Nil | TokenKind::True | TokenKind::False => self.parse_literal_expression(),
       TokenKind::LeftParen => self.parse_grouped_expression(),
       TokenKind::Require => self.parse_require_expression(),
@@ -243,6 +417,7 @@ impl<'a> Parser<'a> {
       _ => self.report_unexpected_token(token),
     };
 
+    // index expression and member expression
     while self.match_token(&TokenKind::Dot) || self.match_token(&TokenKind::LeftBracket) {
       if self.match_token(&TokenKind::Dot) {
         expression = self.parse_member_expression(expression);
@@ -250,18 +425,32 @@ impl<'a> Parser<'a> {
         expression = self.parse_index_expression(expression);
       }
     }
+    // call expression
+    while self.match_token(&TokenKind::LeftParen) {
+      expression = self.parse_call_expression(Some(expression));
+    }
+
+    // assign expression
+    if self.match_token(&TokenKind::Assign) || self.match_token(&TokenKind::Colon) {
+      return self.parse_assign_expression(Some(expression));
+    }
+
+    // call expression
+    // if self.match_token(&TokenKind::LeftParen) {
+    //   return self.parse_call_expression(Some(expression));
+    // }
     expression
   }
 
   fn parse_member_expression(&mut self, base: ast::Expression) -> ast::Expression {
     self.consume_expect_token(TokenKind::Dot); // consume '.'
-    let member_expression = self.parse_expression_statement();
+    let member_expression = self.parse_identifier();
     ast::Expression::new_member(base, member_expression)
   }
 
   fn parse_index_expression(&mut self, base: ast::Expression) -> ast::Expression {
     let start_range = self.consume_expect_token(TokenKind::LeftBracket).range; // consume '['
-    let index_expression = self.parse_expression_statement();
+    let index_expression = self.parse_expression();
     let end_range = self.consume_expect_token(TokenKind::RightBracket).range; // consume ']'
 
     let bracket_range = create_middle_range(&start_range, &end_range);
@@ -277,17 +466,16 @@ impl<'a> Parser<'a> {
     let left_range = self.consume_expect_token(TokenKind::LeftBrace).range;
     let mut values = vec![];
     while !self.match_token(&TokenKind::RightBrace) {
-      let value_or_key = self.parse_expression_statement();
+      let key_or_value = self.parse_expression();
       if self.match_token_and_consume(TokenKind::Assign).is_some() {
-        let value = self.parse_expression_statement();
-        values.push((value_or_key, Some(value)));
+        let value = self.parse_expression();
+        values.push((key_or_value, Some(value)));
       } else {
-        values.push((value_or_key, None));
+        values.push((key_or_value, None));
       }
       if self.match_token(&TokenKind::RightBrace) {
         break;
       }
-      // skip comma
       self.consume_expect_token(TokenKind::Comma);
     }
     let right_range = self.consume_expect_token(TokenKind::RightBrace).range;
@@ -316,16 +504,16 @@ impl<'a> Parser<'a> {
       return ast::Expression::new_grouped(expressions, create_middle_range(&left_range, &right_range));
     }
 
-    expressions.push(self.parse_expression_statement());
+    expressions.push(self.parse_expression());
 
     while self.match_token(&TokenKind::Comma) {
       self.consume_expect_token(TokenKind::Comma);
-      expressions.push(self.parse_expression_statement());
+      expressions.push(self.parse_expression());
     }
     let right_range = self.consume_expect_token(TokenKind::RightParen).range;
 
     let range = create_middle_range(&left_range, &right_range);
-    return ast::Expression::new_grouped(expressions, range);
+    ast::Expression::new_grouped(expressions, range)
   }
 
   fn parse_require_expression(&mut self) -> ast::Expression {
@@ -335,97 +523,78 @@ impl<'a> Parser<'a> {
     ast::Expression::new_require(module_name, range)
   }
 
-  fn parse_assign_expression_or_call_expression(&mut self) -> ast::Statement {
-    let token = self.lexer.peek_token();
-    match token.kind {
-      TokenKind::Identifier(_) => self.parse_assign_statement_or_call_statement(token),
-      TokenKind::LeftBrace => {
-        let table_expression = self.parse_table_expression();
-        ast::Statement::Expression(table_expression)
-      }
-      _ => self.report_unexpected_token(token),
-    }
-  }
-
-  fn parse_call_expression(&mut self, ident: Token) -> ast::Expression {
+  fn parse_call_expression(&mut self, left: Option<ast::Expression>) -> ast::Expression {
+    let left = left.unwrap_or_else(|| self.parse_expression());
     let args = self.parse_grouped_expression();
-    ast::Expression::new_call(ident, args)
+    ast::Expression::new_call(left, args)
   }
 
-  // statements
-  //
   fn parse_block_statement(&mut self, end_tokens: &[TokenKind]) -> ast::Statement {
     let mut statements = Vec::new();
-    // skip block comments
     self.skip_comments();
     while !self.contains_token(end_tokens) {
       statements.push(self.parse_statement());
-      // skip block comments
       self.skip_comments();
     }
     ast::Statement::Block(ast::BlockStatement::new(statements))
   }
 
-  fn parse_assign_statement_or_call_statement(&mut self, ident_token: Token) -> ast::Statement {
-    self.lexer.next_token(); // consume identifier
-    if self.match_token(&TokenKind::Assign) || self.match_token(&TokenKind::Colon) {
-      self.parse_assign_statement(ident_token)
-    } else if self.match_token(&TokenKind::LeftParen) {
-      let expression = self.parse_call_expression(ident_token);
-      ast::Statement::Expression(expression)
-    } else {
-      // support print "hello"...
-      let peeked = self.lexer.peek_token();
-      if ident_token.kind == TokenKind::Identifier("print".to_string()) && peeked.is_string() {
-        let args = self.parse_expression_statement();
-        let range = args.get_range();
-        let args = ast::Expression::new_grouped(vec![args], range);
-        let expression = ast::Expression::new_call(ident_token, args);
-        ast::Statement::Expression(expression)
-      } else {
-        self.report_unexpected_token(ident_token)
+  fn parse_assign_expression(&mut self, left: Option<ast::Expression>) -> ast::Expression {
+    let mut variables = vec![left.unwrap_or_else(|| self.parse_expression())];
+    // println!("{:?}", variables);
+    let start_range = variables.first().unwrap().get_range();
+
+    while self.match_token_and_consume(TokenKind::Comma).is_some() {
+      variables.push(self.parse_expression());
+    }
+
+    let mut end_range = variables.last().unwrap().get_range();
+
+    self.consume_expect_token(TokenKind::Assign); // consume '='
+
+    let mut initializer = vec![self.parse_expression()];
+
+    while self.match_token_and_consume(TokenKind::Comma).is_some() {
+      let expression = self.parse_expression();
+      if !self.match_token(&TokenKind::Comma) {
+        end_range = expression.get_range();
       }
+      initializer.push(expression)
     }
-  }
 
-  fn parse_assign_statement(&mut self, ident_token: Token) -> ast::Statement {
-    let values = self.parse_variable_and_type(Some(ident_token));
-    self.consume_expect_token(TokenKind::Assign);
-    let init = self.parse_expression_statement();
-    ast::Statement::Assign(ast::AssignStatement::new(values, init))
-  }
+    let range = create_middle_range(&start_range, &end_range);
 
-  fn parse_expression_statement(&mut self) -> ast::Expression {
-    self.parse_or_expression()
-  }
-
-  // utils functions
-  //
-
-  pub fn parse_arguments_with_type(&mut self) -> Vec<Type> {
-    let mut arguments = Vec::new();
-    while !self.match_token(&TokenKind::RightParen) {
-      // todo: what I should do here?
-      let _ = self.consume_token();
-      self.consume_expect_token(TokenKind::Colon);
-      let ty = self.parse_type(false);
-      arguments.push(ty);
-      self.match_token_and_consume(TokenKind::Comma);
-    }
-    arguments
+    ast::Expression::new_assign(variables, initializer, range)
   }
 
   pub fn parse_function_type(&mut self) -> Type {
     self.consume_expect_token(TokenKind::Function);
     self.consume_expect_token(TokenKind::LeftParen);
-    let params = self.parse_arguments_with_type();
+    let params = self.parse_parameters_with_type();
     self.consume_expect_token(TokenKind::RightParen);
     self.consume_expect_token(TokenKind::Colon);
     let return_type = self.parse_type(true);
-    return Type::new_function(params, return_type);
+    Type::new_function(params, return_type)
   }
 
-  fn parse_grup_return_type(&mut self) -> Type {
+  pub fn parse_parameters_with_type(&mut self) -> Vec<Type> {
+    let mut parameters = Vec::new();
+    while !self.match_token(&TokenKind::RightParen) {
+      let _ = self.consume_token();
+      self.consume_expect_token(TokenKind::Colon);
+      let ty = self.parse_type(false);
+      parameters.push(ty);
+      self.match_token_and_consume(TokenKind::Comma);
+    }
+    parameters
+  }
+
+  fn parse_nill_type(&mut self) -> Type {
+    self.consume_token();
+    return Type::Nil;
+  }
+
+  fn parse_group_return_type(&mut self) -> Type {
     self.consume_expect_token(TokenKind::LeftParen);
     let mut types = Vec::new();
     while !self.match_token(&TokenKind::RightParen) {
@@ -433,41 +602,26 @@ impl<'a> Parser<'a> {
       self.match_token_and_consume(TokenKind::Comma);
     }
     self.consume_expect_token(TokenKind::RightParen);
-    Type::new_grup(types)
+    Type::new_group(types)
   }
 
-  fn parse_arguments_with_option_type(&mut self) -> Vec<(Token, Option<Type>)> {
-    let mut arguments = Vec::new();
-    while !self.match_token(&TokenKind::RightParen) {
-      let name = self.consume_token();
-      let mut tty = None;
-      if self.match_token_and_consume(TokenKind::Colon).is_some() {
-        tty = Some(self.parse_type(false));
-      };
-      arguments.push((name, tty));
-      self.match_token_and_consume(TokenKind::Comma);
-    }
-    arguments
-  }
-
-  fn parse_generic_type(&mut self) -> Vec<Type> {
+  fn parse_generic_types(&mut self) -> Vec<Type> {
     let mut types = Vec::new();
-
     if !self.match_token(&TokenKind::Less) {
       return types;
     }
-
     self.consume_expect_token(TokenKind::Less);
     while !self.match_token(&TokenKind::Greater) {
       let ty = self.parse_type(false);
       types.push(ty);
       self.match_token_and_consume(TokenKind::Comma);
     }
+
     self.consume_expect_token(TokenKind::Greater);
     types
   }
 
-  fn parse_simple_generic_str(&mut self) -> Vec<String> {
+  fn parse_generic_type_names(&mut self) -> Vec<String> {
     if !self.match_token(&TokenKind::Less) {
       return vec![];
     }
@@ -482,95 +636,40 @@ impl<'a> Parser<'a> {
     generics
   }
 
-  fn parse_return_value(&mut self) -> Vec<ast::Expression> {
+  fn parse_return_values(&mut self) -> Vec<ast::Expression> {
     let mut values = Vec::new();
     if self.match_token(&TokenKind::Semicolon) {
       return values;
     }
-    values.push(self.parse_expression_statement());
+    values.push(self.parse_expression());
     while self.match_token_and_consume(TokenKind::Comma).is_some() {
-      values.push(self.parse_expression_statement());
+      values.push(self.parse_expression());
     }
     values
   }
 
-  fn parse_operator(&mut self) -> Option<(ast::BinaryOperator, Range)> {
-    let token = self.lexer.peek_token();
-    let operator = match token.kind {
-      TokenKind::Plus => ast::BinaryOperator::Add,
-      TokenKind::Minus => ast::BinaryOperator::Subtract,
-      TokenKind::Star => ast::BinaryOperator::Multiply,
-      TokenKind::Slash => ast::BinaryOperator::Divide,
-      TokenKind::Percent => ast::BinaryOperator::Modulus,
-      TokenKind::And => ast::BinaryOperator::And,
-      TokenKind::Or => ast::BinaryOperator::Or,
-      TokenKind::Equal => ast::BinaryOperator::Equal,
-      TokenKind::NotEqual => ast::BinaryOperator::NotEqual,
-      TokenKind::Less => ast::BinaryOperator::LessThan,
-      TokenKind::Greater => ast::BinaryOperator::GreaterThan,
-      TokenKind::LessEqual => ast::BinaryOperator::LessThanOrEqual,
-      TokenKind::GreaterEqual => ast::BinaryOperator::GreaterThanOrEqual,
-      TokenKind::DoubleDot => ast::BinaryOperator::DoubleDot,
-      TokenKind::DoubleSlash => ast::BinaryOperator::DoubleSlash,
-      _ => return None,
-    };
-    self.lexer.next_token();
-    return Some((operator, token.range));
-  }
-
-  fn parse_unary_operator(&mut self) -> Option<ast::UnaryOperator> {
-    let token = self.lexer.peek_token();
-    let operator = match token.kind {
-      TokenKind::Minus => ast::UnaryOperator::Negate,
-      TokenKind::Not => ast::UnaryOperator::Not,
-      TokenKind::Hash => ast::UnaryOperator::Hash,
-      _ => return None,
-    };
-    self.lexer.next_token();
-    Some(operator)
-  }
-
-  fn parse_identifier(&mut self) -> ast::Expression {
+  fn parse_identifier(&mut self) -> ast::Identifier {
     let token = self.lexer.next_token();
-
-    if self.match_token(&TokenKind::LeftParen) {
-      return self.parse_call_expression(token);
-    }
-
     match token.kind {
-      TokenKind::Identifier(name) => ast::Expression::new_identifier(name, token.range),
+      TokenKind::Identifier(name) => ast::Identifier::new(name, token.range),
       _ => self.report_unexpected_token(token),
     }
   }
 
-  fn parse_variable_and_type(&mut self, token: Option<Token>) -> Vec<(Token, Option<Type>)> {
-    let mut names: Vec<(Token, Option<Type>)> = Vec::new();
+  fn parse_identifier_expression(&mut self) -> ast::Expression {
+    let token = self.lexer.next_token();
 
-    let token = if token.is_some() { token.unwrap() } else { self.consume_token() };
-
-    let mut name = (token, None);
-    if self.match_token_and_consume(TokenKind::Colon).is_some() {
-      name.1 = Some(self.parse_type(false));
-    };
-    names.push(name);
-    while self.match_token_and_consume(TokenKind::Comma).is_some() {
-      name = (self.consume_token(), None);
-      if self.match_token_and_consume(TokenKind::Colon).is_some() {
-        name.1 = Some(self.parse_type(false));
-      };
-      names.push(name);
+    if !token.is_identifier() {
+      self.report_unexpected_token(token);
     }
-    names
+
+    ast::Expression::new_identifier(token.lexeme().to_owned(), token.range)
   }
 
-  fn parse_type(&mut self, excepted_paren: bool) -> Type {
-    let token = self.lexer.peek_token();
-    if !excepted_paren && token.kind == TokenKind::LeftParen {
-      self.report_unexpected_token(token)
-    }
+  fn parse_identifier_type(&mut self) -> Type {
+    let token = self.lexer.next_token();
     match token.kind {
       TokenKind::Identifier(name) => {
-        self.lexer.next_token();
         if self.match_token(&TokenKind::Less) {
           self.consume_expect_token(TokenKind::Less);
           let mut types = Vec::new();
@@ -583,13 +682,54 @@ impl<'a> Parser<'a> {
           let range = create_middle_range(&token.range, &right_range);
           return Type::new_generic_call(name, types, range);
         }
-
-        Type::new_type(&name, token.range)
+        Type::new(&name, token.range)
       }
-      TokenKind::LeftParen => self.parse_grup_return_type(),
-      TokenKind::Function => self.parse_function_type(),
       _ => self.report_unexpected_token(token),
     }
+  }
+
+  fn parse_type(&mut self, allow_parenthesis: bool) -> Type {
+    let token = self.lexer.peek_token();
+    if !allow_parenthesis && token.kind == TokenKind::LeftParen {
+      self.report_unexpected_token(token)
+    }
+    match token.kind {
+      TokenKind::Identifier(_) => self.parse_identifier_type(),
+      TokenKind::Nil => self.parse_nill_type(),
+      TokenKind::LeftParen => self.parse_group_return_type(),
+      TokenKind::Function => self.parse_function_type(),
+      TokenKind::LeftBrace => self.parse_table_type(),
+      _ => self.report_unexpected_token(token),
+    }
+  }
+
+  fn parse_table_type(&mut self) -> Type {
+    self.consume_expect_token(TokenKind::LeftBrace);
+    let mut array_elements = HashSet::new();
+    let mut map_elements = BTreeMap::new();
+    while !self.match_token(&TokenKind::RightBrace) {
+      let type_or_key = self.parse_type(false);
+      let peeked = self.lexer.peek_token();
+      match (&type_or_key, &peeked.kind) {
+        (Type::Identifier(identifier), &TokenKind::Colon) => {
+          self.consume_expect_token(TokenKind::Colon);
+          let value_type = self.parse_type(false);
+          map_elements.insert(identifier.name.to_string(), value_type);
+        }
+        _ => {
+          array_elements.insert(type_or_key);
+        }
+      }
+      if self.match_token(&TokenKind::RightBrace) {
+        break;
+      }
+      self.consume_expect_token(TokenKind::Comma);
+    }
+
+    self.consume_expect_token(TokenKind::RightBrace);
+    let array = if array_elements.is_empty() { None } else { Some(array_elements) };
+    let map = if map_elements.is_empty() { None } else { Some(map_elements) };
+    Type::new_table(array, map)
   }
 
   fn consume_expect_token(&mut self, kind: TokenKind) -> Token {
@@ -607,6 +747,15 @@ impl<'a> Parser<'a> {
 
   fn match_token(&mut self, kind: &TokenKind) -> bool {
     self.lexer.peek_token().kind == *kind
+  }
+
+  fn match_any_token(&mut self, kinds: &[TokenKind]) -> Option<Token> {
+    let token = self.lexer.peek_token();
+    if kinds.contains(&token.kind) {
+      Some(self.consume_token())
+    } else {
+      None
+    }
   }
 
   fn match_token_and_consume(&mut self, kind: TokenKind) -> Option<Token> {

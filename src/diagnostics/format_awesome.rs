@@ -17,7 +17,7 @@ pub fn format_function_arity_mismatch(expected: usize, found: usize) -> String {
 }
 
 pub fn format_unsupported_operator(left: &str, right: &str, op: &BinaryOperator) -> String {
-  format!("can't use '{}' between '{}' and '{}'. that's not allowed! 🛑", op.to_str(), left, right)
+  format!("can't use '{}' between '{}' and '{}'. that's not allowed! 🛑", op.to_string(), left, right)
 }
 
 pub fn format_redeclared_in_same_scope(name: &str) -> String {

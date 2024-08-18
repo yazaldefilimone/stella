@@ -4,20 +4,30 @@ source: tests/snapshot_tests.rs
 Program(
   statements: [
     For(ForStatement(
-      variable: Identifier(Identifier(
-        name: "i",
+      init: AssignExpresion(
+        variables: [
+          Identifier(Identifier(
+            name: "i",
+            range: Range(
+              start: 4,
+              end: 5,
+            ),
+          )),
+        ],
+        initializer: [
+          Literal(Number(NumberLiteral(
+            value: "1",
+            range: Range(
+              start: 7,
+              end: 8,
+            ),
+          ))),
+        ],
         range: Range(
           start: 4,
           end: 5,
         ),
-      )),
-      init: Literal(Number(NumberLiteral(
-        value: "1",
-        range: Range(
-          start: 7,
-          end: 8,
-        ),
-      ))),
+      ),
       limit: Literal(Number(NumberLiteral(
         value: "10",
         range: Range(
@@ -29,13 +39,13 @@ Program(
       body: Block(BlockStatement(
         statements: [
           Expression(Call(CallExpression(
-            name: Token(
-              kind: Identifier("print"),
+            left: Identifier(Identifier(
+              name: "print",
               range: Range(
                 start: 20,
                 end: 25,
               ),
-            ),
+            )),
             args: Grouped(GroupedExpression(
               expressions: [
                 Identifier(Identifier(

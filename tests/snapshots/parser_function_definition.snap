@@ -13,13 +13,16 @@ Program(
       ),
       local: false,
       arguments: [
-        (Token(
-          kind: Identifier("name"),
-          range: Range(
-            start: 15,
-            end: 19,
+        Variable(
+          name: Token(
+            kind: Identifier("name"),
+            range: Range(
+              start: 15,
+              end: 19,
+            ),
           ),
-        ), Some(String)),
+          ty: Some(String),
+        ),
       ],
       return_type: Some(Number),
       generics: [],
@@ -65,41 +68,49 @@ Program(
         end: 36,
       )),
     )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("result"),
-          range: Range(
-            start: 76,
-            end: 82,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("result"),
+            range: Range(
+              start: 76,
+              end: 82,
+            ),
           ),
-        ), Some(Number)),
-      ],
-      local: true,
-      initializer: Some(Call(CallExpression(
-        name: Token(
-          kind: Identifier("greet"),
-          range: Range(
-            start: 93,
-            end: 98,
-          ),
+          ty: Some(Number),
         ),
-        args: Grouped(GroupedExpression(
-          expressions: [
-            Literal(String(StringLiteral(
-              value: "Stella",
-              range: Range(
-                start: 99,
-                end: 107,
-              ),
-            ))),
-          ],
-          range: Range(
-            start: 98,
-            end: 108,
-          ),
+      ],
+      initializer: [
+        Call(CallExpression(
+          left: Identifier(Identifier(
+            name: "greet",
+            range: Range(
+              start: 93,
+              end: 98,
+            ),
+          )),
+          args: Grouped(GroupedExpression(
+            expressions: [
+              Literal(String(StringLiteral(
+                value: "Stella",
+                range: Range(
+                  start: 99,
+                  end: 107,
+                ),
+              ))),
+            ],
+            range: Range(
+              start: 98,
+              end: 108,
+            ),
+          )),
         )),
-      ))),
+      ],
+      range: Range(
+        start: 70,
+        end: 82,
+      ),
     )),
   ],
 )

@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use super::Checker;
-use crate::{diagnostics::Diagnostic, types::Type};
+use super::{type_utils::CheckResult, Checker};
+use crate::types::Type;
 
 type GenericBinds = HashMap<String, Type>;
 
 impl<'a> Checker<'a> {
-  pub fn check_optional_type(&mut self, ty: &Option<Type>, assume_nil: bool) -> Result<Type, Diagnostic> {
+  pub fn check_option_type(&mut self, ty: &Option<Type>, assume_nil: bool) -> CheckResult<Type> {
     match ty {
       Some(Type::Identifier(identifier)) => self.check_type_identifier(identifier),
       Some(Type::Generic(generic)) => self.check_generic_type(generic),
@@ -16,7 +16,7 @@ impl<'a> Checker<'a> {
     }
   }
 
-  pub fn check_type(&mut self, ty: Type) -> Result<Type, Diagnostic> {
+  pub fn check_type(&mut self, ty: Type) -> CheckResult<Type> {
     match ty {
       Type::Identifier(identifier) => self.check_type_identifier(&identifier),
       Type::Generic(generic) => self.check_generic_type(&generic),

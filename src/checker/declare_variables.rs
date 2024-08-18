@@ -1,94 +1,136 @@
-use crate::{
-  ast::tokens::Token,
-  diagnostics::{Diagnostic, TypeWarning},
-  types::Type,
-  utils::range::Range,
-};
-
-use super::Checker;
+use super::{type_utils::CheckResult, Checker};
+use crate::{ast::tokens::Token, diagnostics::TypeWarning, types::Type, utils::range::Range};
 
 type NameType<'a> = &'a Vec<(Token, Option<Type>)>;
-type ValueType<'a> = &'a (Token, Option<Type>);
+
+type LeftHandSide<'a> = &'a (&'a str, Option<Type>);
 
 impl<'a> Checker<'a> {
-  pub fn declare_variables(&mut self, names: NameType, ty: Type, local: bool, range: Range) -> Result<(), Diagnostic> {
+  pub fn declare_variables(&mut self, names: NameType, ty: Type, local: bool, range: Range) -> CheckResult<()> {
     match ty {
-      Type::Grup(group) => {
+      Type::Group(group) => {
+        // Handle group type where multiple values are assigned at once
         for (index, token) in names.iter().enumerate() {
+          let left_hand_side: LeftHandSide = &(token.0.lexeme(), token.1.clone());
+          let range = token.0.range.clone();
           let assigned_type = group.types.get(index).cloned().unwrap_or(Type::Nil);
-          // Check for shadowing and emit a warning if necessary
-          self.check_shadowing(token.0.lexeme(), local, &token.0.range)?;
-          self.declare_variable(token, assigned_type, local)?;
+          self.check_shadowing(token.0.lexeme(), local, &range)?;
+          if local {
+            self.declare_local_variable(&left_hand_side, assigned_type, range)?;
+          } else {
+            self.declare_global_variable(left_hand_side, assigned_type, range)?;
+          }
         }
       }
       _ => {
+        // Handle single type where one type is assigned to multiple variables
         for (index, token) in names.iter().enumerate() {
           let assigned_type = if index == 0 { self.check_type(ty.clone())? } else { Type::Nil };
-          // Check for shadowing and emit a warning if necessary
-          self.check_shadowing(token.0.lexeme(), local, &token.0.range)?;
-          self.declare_variable(token, assigned_type, local)?;
+          let range = token.0.range.clone();
+          let left_hand_side: LeftHandSide = &(token.0.lexeme(), token.1.clone());
+          self.check_shadowing(token.0.lexeme(), local, &range)?;
+          if local {
+            self.declare_local_variable(&left_hand_side, assigned_type, range)?;
+          } else {
+            self.declare_global_variable(left_hand_side, assigned_type, range)?;
+          }
         }
       }
     }
     Ok(())
   }
 
-  pub fn declare_variable(&mut self, value: ValueType, mut assigned_type: Type, local: bool) -> Result<(), Diagnostic> {
-    let lexeme = value.0.lexeme();
-    let value_range = value.0.range.clone();
+  // declares a global variable with a given type
+  pub fn declare_global_variable(&mut self, left: LeftHandSide, assign_ty: Type, range: Range) -> CheckResult<()> {
+    let (name, current_ty) = left;
+    // check shadowing
+    self.check_shadowing(name, false, &range)?;
 
-    // Check if the variable already exists in the current context
-    let existing_type = self.ctx.get_variable(lexeme, None);
-    if let Some(existing_type) = existing_type {
-      // If the variable exists, check if the new type is compatible
-      if !existing_type.check_match(&assigned_type) {
-        let diagnostic = self.create_type_mismatch(existing_type.to_owned(), assigned_type, value_range.clone());
-        return Err(diagnostic);
+    // Global variables are usually not redeclared, but we should check if they exist
+    if let Some(existing_type) = self.ctx.get_global_variable(name) {
+      if !existing_type.check_match(&assign_ty) {
+        return Err(self.create_type_mismatch(existing_type.to_owned(), assign_ty, range));
       }
-
-      // If the existing type can replace the new type, use the existing type
-      if existing_type.can_replace(&assigned_type) {
-        self.ctx.redeclare_variable(lexeme, assigned_type, None);
-        return Ok(());
-      }
-      // Update the variable type in the context
-      self.ctx.redeclare_variable(lexeme, existing_type.clone(), None);
-      return Ok(());
     }
 
-    // If there is a type specified in the declaration, check if it's redundant
-    //
-    if let Some(value_type) = &value.1 {
-      let value_type = self.check_type(value_type.to_owned())?;
-      // todo: previne to get variable twice....
-      if let Some(existing_type) = self.ctx.get_variable(lexeme, None) {
-        if !existing_type.check_match(&value_type) {
-          return Err(self.create_type_mismatch(existing_type.to_owned(), value_type.to_owned(), value_range));
+    // If a type is specified in the variable declaration, check if it's redundant
+    if let Some(declared_type) = &current_ty {
+      let declared_type = self.check_type(declared_type.to_owned())?;
+      if !assign_ty.check_match(&declared_type) {
+        return Err(self.create_type_mismatch(assign_ty, declared_type, range));
+      }
+
+      // check redundant type
+      if let Some(existing_type) = self.ctx.get_variable(name, None) {
+        if !existing_type.check_match(&assign_ty) {
+          return Err(self.create_type_mismatch(existing_type.to_owned(), assign_ty, range));
         }
 
-        let diagnostic = TypeWarning::RedundantType(lexeme.to_string(), existing_type.to_string(), Some(value_range));
+        let diagnostic = TypeWarning::RedundantType(name.to_string(), existing_type.to_string(), Some(range.clone()));
+
         self.diagnostics.add(diagnostic.into());
       }
-
-      assigned_type = self.infer_type(value_type, assigned_type, &value.0.range)?;
     }
 
-    // If the variable doesn't exist, declare it
-    self.ctx.declare_variable(lexeme, assigned_type, None);
-
-    if local {
-      self.ctx.set_local_declaration(lexeme);
-    }
-    self.ctx.declare_variable_range(lexeme, value.0.range.clone());
+    // declare the variable as global
+    self.ctx.declare_global_variable(name, assign_ty);
+    // declare the variable range in global scope
+    self.ctx.declare_variable_range(name, range, Some(0));
     Ok(())
   }
 
-  pub fn infer_type(&mut self, expected: Type, found: Type, range: &Range) -> Result<Type, Diagnostic> {
-    // If the types don't match, return a type mismatch error
+  // declares a local variable with a given type
+  //   pub fn declare_global_variable(&mut self, left: &LeftHandSide, assign_ty: Type, range: Range) -> CheckResult<()> {
+
+  pub fn declare_local_variable(&mut self, left: LeftHandSide, assign_ty: Type, range: Range) -> CheckResult<()> {
+    let (name, current_ty) = left;
+    // check shadowing
+    self.check_shadowing(name, true, &range)?;
+    // Local variables can shadow globals or other locals
+    if let Some(existing_type) = self.ctx.get_variable(name, Some(self.ctx.scope_pointer)) {
+      if self.ctx.is_local_declaration(name) {
+        return Err(self.create_redeclaration(name, range));
+      }
+
+      if !existing_type.check_match(&assign_ty) {
+        return Err(self.create_type_mismatch(existing_type.to_owned(), assign_ty, range));
+      }
+    }
+
+    // If a type is specified in the variable declaration, check if it's redundant
+    if let Some(declared_type) = &current_ty {
+      let declared_type = self.check_type(declared_type.to_owned())?;
+      if !assign_ty.check_match(&declared_type) {
+        return Err(self.create_type_mismatch(assign_ty, declared_type, range));
+      }
+
+      // check redundant type
+      if let Some(existing_type) = self.ctx.get_variable(name, None) {
+        if !existing_type.check_match(&assign_ty) {
+          return Err(self.create_type_mismatch(existing_type.to_owned(), assign_ty, range));
+        }
+        let diagnostic = TypeWarning::RedundantType(name.to_string(), existing_type.to_string(), Some(range.clone()));
+        self.diagnostics.add(diagnostic.into());
+      }
+    }
+
+    // declare the variable as local
+    self.ctx.declare_variable(name, assign_ty, None);
+    self.ctx.set_local_declaration(name);
+    // declare the variable range in current scope
+    self.ctx.declare_variable_range(name, range, None);
+    Ok(())
+  }
+
+  // Infers the type of a variable by checking if the types match
+  pub fn infer_type(&mut self, expected: Type, found: Type, range: &Range) -> CheckResult<Type> {
     if !expected.check_match(&found) {
       return Err(self.create_type_mismatch(expected, found, range.clone()));
     }
-    // Check if the expected type can replace the found type...
-    return if expected.can_replace(&found) { Ok(found) } else { Ok(expected) };
+    if expected.can_replace(&found) {
+      Ok(found)
+    } else {
+      Ok(expected)
+    }
   }
 }

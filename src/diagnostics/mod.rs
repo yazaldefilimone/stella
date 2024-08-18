@@ -4,18 +4,20 @@ mod format;
 mod format_awesome;
 pub mod report;
 
-use crate::utils::highlight_text_with_gray;
+use crate::ast::ast::UnaryOperator;
 use crate::utils::range::Range;
+use crate::{ast::ast::BinaryOperator, utils::highlight_text_with_gray};
 use report::report_error;
 use std::fmt::{self, Debug};
 
 use format::{
-  format_cannot_index_non_array, format_expected_function, format_expected_table, format_function_arity_mismatch,
-  format_generic_call_arity_mismatch, format_key_not_found_in_table, format_mismatched_accessor_type,
-  format_mismatched_key_type, format_mismatched_types, format_missing_variable_declaration, format_module_not_exported,
-  format_module_not_found, format_no_field, format_optional_call_arity_mismatch, format_redeclared_in_same_scope,
-  format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable, format_unsupported_operator,
-  format_warning_redundant_type, format_warning_shadow_warning, format_warning_unused_variable,
+  format_cannot_index_non_array, format_expected_function, format_expected_table, format_expected_variadic,
+  format_field_not_found_in_table, format_function_arity_mismatch, format_generic_call_arity_mismatch,
+  format_mismatched_accessor_type, format_mismatched_key_type, format_mismatched_types, format_module_not_exported,
+  format_module_not_found, format_no_field, format_option_call_arity_mismatch, format_redeclared_in_same_scope,
+  format_shadow_warning, format_type_mismatch_assignment, format_undeclared_type, format_undeclared_variable,
+  format_unsupported_operator, format_unsupported_unary_operator, format_warning_redundant_type,
+  format_warning_unused_variable,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -110,7 +112,7 @@ impl From<TypeWarning> for Diagnostic {
   fn from(warning: TypeWarning) -> Self {
     let (message, range) = match warning {
       TypeWarning::UnusedVariable(name, loc) => (format_warning_unused_variable(&name), loc),
-      TypeWarning::ShadowedVariable(name, loc) => (format_warning_shadow_warning(&name), loc),
+      TypeWarning::ShadowedVariable(name, loc) => (format_shadow_warning(&name), loc),
       TypeWarning::RedundantType(name, type_name, loc) => (format_warning_redundant_type(&name, &type_name), loc),
     };
     Diagnostic::new(DiagnosticLevel::Warning, message, range)
@@ -128,8 +130,8 @@ pub enum TypeError {
   TypeMismatchAssignment(String, String, Option<Range>),
   RedeclaredInSameScope(String, Option<Range>),
   FunctionArityMismatch(usize, usize, Option<Range>),
-  UnsupportedOperator(String, String, String, Option<Range>),
-  MissingVariableDeclaration(Option<Range>),
+  UnsupportedOperator(String, BinaryOperator, String, Option<Range>),
+  UnsupportedUnaryOperator(UnaryOperator, String, Option<Range>),
   ExpectedTable(String, Option<Range>),
   MismatchedKeyType(String, Option<Range>),
   NoField(String, String, Option<Range>),
@@ -137,7 +139,8 @@ pub enum TypeError {
   KeyNotFoundInTable(String, String, Option<Range>),
   MismatchedAccessorType(String, Option<Range>),
   GenericCallArityMismatch(usize, usize, Option<Range>),
-  OptionalCallArityMismatch(usize, Option<Range>),
+  OptionCallArityMismatch(usize, Option<Range>),
+  ExpectedVariadic(String, Option<Range>),
 }
 impl From<TypeError> for Diagnostic {
   fn from(error: TypeError) -> Self {
@@ -145,11 +148,10 @@ impl From<TypeError> for Diagnostic {
       TypeError::MismatchedTypes(expected, found, rg) => (format_mismatched_types(&expected, &found), rg),
       TypeError::UndeclaredVariable(name, rg) => (format_undeclared_variable(&name), rg),
       TypeError::FunctionArityMismatch(expected, found, rg) => (format_function_arity_mismatch(expected, found), rg),
-      TypeError::UnsupportedOperator(left, right, op, rg) => (format_unsupported_operator(&left, &right, &op), rg),
+      TypeError::UnsupportedOperator(left, op, right, rg) => (format_unsupported_operator(&left, op, &right), rg),
       TypeError::RedeclaredInSameScope(name, rg) => (format_redeclared_in_same_scope(&name), rg),
       TypeError::ModuleNotFound(name, rg) => (format_module_not_found(&name), rg),
       TypeError::ModuleNotExported(name, rg) => (format_module_not_exported(&name), rg),
-      TypeError::MissingVariableDeclaration(rg) => (format_missing_variable_declaration(), rg),
       TypeError::TypeMismatchAssignment(expected, found, rg) => {
         (format_type_mismatch_assignment(&expected, &found), rg)
       }
@@ -159,12 +161,16 @@ impl From<TypeError> for Diagnostic {
       TypeError::MismatchedKeyType(key, rg) => (format_mismatched_key_type(&key), rg),
       TypeError::ExpectedTable(message, rg) => (format_expected_table(&message), rg),
       TypeError::CantIndexNonArray(type_name, rg) => (format_cannot_index_non_array(&type_name), rg),
-      TypeError::KeyNotFoundInTable(key, table, rg) => (format_key_not_found_in_table(&key, &table), rg),
+      TypeError::KeyNotFoundInTable(key, table, rg) => (format_field_not_found_in_table(&key, &table), rg),
       TypeError::MismatchedAccessorType(index, rg) => (format_mismatched_accessor_type(&index), rg),
       TypeError::GenericCallArityMismatch(expected, found, rg) => {
         (format_generic_call_arity_mismatch(expected, found), rg)
       }
-      TypeError::OptionalCallArityMismatch(found, rg) => (format_optional_call_arity_mismatch(found), rg),
+      TypeError::OptionCallArityMismatch(found, rg) => (format_option_call_arity_mismatch(found), rg),
+      TypeError::ExpectedVariadic(type_name, rg) => (format_expected_variadic(&type_name), rg),
+      TypeError::UnsupportedUnaryOperator(operator, right, rg) => {
+        (format_unsupported_unary_operator(operator, &right), rg)
+      }
     };
 
     Diagnostic::new(DiagnosticLevel::Error, message, range)

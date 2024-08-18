@@ -3,6 +3,7 @@ pub mod checker;
 pub mod cli;
 pub mod context;
 pub mod diagnostics;
+pub mod formatting;
 pub mod lexer;
 pub mod modules;
 pub mod parser;

@@ -13,20 +13,26 @@ Program(
       ),
       local: false,
       arguments: [
-        (Token(
-          kind: Identifier("a"),
-          range: Range(
-            start: 13,
-            end: 14,
+        Variable(
+          name: Token(
+            kind: Identifier("a"),
+            range: Range(
+              start: 13,
+              end: 14,
+            ),
           ),
-        ), None),
-        (Token(
-          kind: Identifier("b"),
-          range: Range(
-            start: 16,
-            end: 17,
+          ty: None,
+        ),
+        Variable(
+          name: Token(
+            kind: Identifier("b"),
+            range: Range(
+              start: 16,
+              end: 17,
+            ),
           ),
-        ), None),
+          ty: None,
+        ),
       ],
       return_type: None,
       generics: [],
@@ -69,48 +75,56 @@ Program(
       ),
       range_return_type: None,
     )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("result"),
-          range: Range(
-            start: 47,
-            end: 53,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("result"),
+            range: Range(
+              start: 47,
+              end: 53,
+            ),
           ),
-        ), None),
-      ],
-      local: true,
-      initializer: Some(Call(CallExpression(
-        name: Token(
-          kind: Identifier("add"),
-          range: Range(
-            start: 56,
-            end: 59,
-          ),
+          ty: None,
         ),
-        args: Grouped(GroupedExpression(
-          expressions: [
-            Literal(Number(NumberLiteral(
-              value: "5",
-              range: Range(
-                start: 60,
-                end: 61,
-              ),
-            ))),
-            Literal(Number(NumberLiteral(
-              value: "10",
-              range: Range(
-                start: 63,
-                end: 65,
-              ),
-            ))),
-          ],
-          range: Range(
-            start: 59,
-            end: 66,
-          ),
+      ],
+      initializer: [
+        Call(CallExpression(
+          left: Identifier(Identifier(
+            name: "add",
+            range: Range(
+              start: 56,
+              end: 59,
+            ),
+          )),
+          args: Grouped(GroupedExpression(
+            expressions: [
+              Literal(Number(NumberLiteral(
+                value: "5",
+                range: Range(
+                  start: 60,
+                  end: 61,
+                ),
+              ))),
+              Literal(Number(NumberLiteral(
+                value: "10",
+                range: Range(
+                  start: 63,
+                  end: 65,
+                ),
+              ))),
+            ],
+            range: Range(
+              start: 59,
+              end: 66,
+            ),
+          )),
         )),
-      ))),
+      ],
+      range: Range(
+        start: 41,
+        end: 53,
+      ),
     )),
   ],
 )

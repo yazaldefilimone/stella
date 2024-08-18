@@ -3,129 +3,244 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("name"),
-          range: Range(
-            start: 101,
-            end: 105,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("name"),
+            range: Range(
+              start: 101,
+              end: 105,
+            ),
           ),
-        ), Some(String)),
-      ],
-      local: true,
-      initializer: Some(Literal(String(StringLiteral(
-        value: "Stella",
-        range: Range(
-          start: 116,
-          end: 124,
+          ty: Some(String),
         ),
-      )))),
-    )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("age"),
-          range: Range(
-            start: 131,
-            end: 134,
+        Variable(
+          name: Token(
+            kind: Identifier("age"),
+            range: Range(
+              start: 115,
+              end: 118,
+            ),
           ),
-        ), Some(Number)),
-      ],
-      local: true,
-      initializer: Some(Identifier(Identifier(
-        name: "name",
-        range: Range(
-          start: 145,
-          end: 149,
+          ty: Some(Number),
         ),
-      ))),
-    )),
-    Assign(AssignStatement(
-      values: [
-        (Token(
-          kind: Identifier("name"),
-          range: Range(
-            start: 151,
-            end: 155,
-          ),
-        ), None),
       ],
-      value: Literal(Number(NumberLiteral(
-        value: "10",
-        range: Range(
-          start: 158,
-          end: 160,
+      initializer: [
+        Literal(String(StringLiteral(
+          value: "Stella",
+          range: Range(
+            start: 129,
+            end: 137,
+          ),
+        ))),
+        Literal(Number(NumberLiteral(
+          value: "25",
+          range: Range(
+            start: 139,
+            end: 141,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 95,
+        end: 141,
+      ),
+    )),
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("age"),
+            range: Range(
+              start: 149,
+              end: 152,
+            ),
+          ),
+          ty: Some(Number),
         ),
-      ))),
-    )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("is_student"),
-          range: Range(
-            start: 167,
-            end: 177,
-          ),
-        ), Some(Boolean)),
       ],
-      local: true,
-      initializer: Some(Literal(Boolean(BooleanLiteral(
-        value: true,
-        range: Range(
-          start: 189,
-          end: 193,
+      initializer: [
+        Identifier(Identifier(
+          name: "name",
+          range: Range(
+            start: 163,
+            end: 167,
+          ),
+        )),
+      ],
+      range: Range(
+        start: 143,
+        end: 152,
+      ),
+    )),
+    Expression(Assign(AssignExpression(
+      left: [
+        Identifier(Identifier(
+          name: "name",
+          range: Range(
+            start: 169,
+            end: 173,
+          ),
+        )),
+      ],
+      right: [
+        Literal(Number(NumberLiteral(
+          value: "10",
+          range: Range(
+            start: 176,
+            end: 178,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 169,
+        end: 173,
+      ),
+    ))),
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("is_student"),
+            range: Range(
+              start: 185,
+              end: 195,
+            ),
+          ),
+          ty: Some(Boolean),
         ),
-      )))),
-    )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("what_is_that"),
-          range: Range(
-            start: 201,
-            end: 213,
-          ),
-        ), Some(Unknown)),
       ],
-      local: true,
-      initializer: None,
-    )),
-    Assign(AssignStatement(
-      values: [
-        (Token(
-          kind: Identifier("what_is_that"),
+      initializer: [
+        Literal(Boolean(BooleanLiteral(
+          value: true,
           range: Range(
-            start: 225,
-            end: 237,
+            start: 207,
+            end: 211,
           ),
-        ), None),
+        ))),
       ],
-      value: Literal(Number(NumberLiteral(
-        value: "10",
-        range: Range(
-          start: 240,
-          end: 242,
+      range: Range(
+        start: 179,
+        end: 195,
+      ),
+    )),
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("what_is_that"),
+            range: Range(
+              start: 219,
+              end: 231,
+            ),
+          ),
+          ty: Some(Unknown),
         ),
-      ))),
-    )),
-    Assign(AssignStatement(
-      values: [
-        (Token(
-          kind: Identifier("what_is_that"),
-          range: Range(
-            start: 245,
-            end: 257,
-          ),
-        ), None),
       ],
-      value: Literal(Boolean(BooleanLiteral(
-        value: true,
-        range: Range(
-          start: 260,
-          end: 264,
-        ),
-      ))),
+      initializer: [],
+      range: Range(
+        start: 213,
+        end: 231,
+      ),
     )),
+    Expression(Assign(AssignExpression(
+      left: [
+        Identifier(Identifier(
+          name: "what_is_that",
+          range: Range(
+            start: 243,
+            end: 255,
+          ),
+        )),
+      ],
+      right: [
+        Literal(Number(NumberLiteral(
+          value: "10",
+          range: Range(
+            start: 258,
+            end: 260,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 243,
+        end: 255,
+      ),
+    ))),
+    Expression(Assign(AssignExpression(
+      left: [
+        Identifier(Identifier(
+          name: "what_is_that",
+          range: Range(
+            start: 263,
+            end: 275,
+          ),
+        )),
+      ],
+      right: [
+        Literal(Boolean(BooleanLiteral(
+          value: true,
+          range: Range(
+            start: 278,
+            end: 282,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 263,
+        end: 275,
+      ),
+    ))),
+    Expression(Assign(AssignExpression(
+      left: [
+        Index(IndexExpression(
+          base: Identifier(Identifier(
+            name: "a",
+            range: Range(
+              start: 286,
+              end: 287,
+            ),
+          )),
+          index: Literal(Number(NumberLiteral(
+            value: "1",
+            range: Range(
+              start: 288,
+              end: 289,
+            ),
+          ))),
+          bracket_range: Range(
+            start: 287,
+            end: 290,
+          ),
+        )),
+      ],
+      right: [
+        Index(IndexExpression(
+          base: Identifier(Identifier(
+            name: "b",
+            range: Range(
+              start: 293,
+              end: 294,
+            ),
+          )),
+          index: Literal(Number(NumberLiteral(
+            value: "2",
+            range: Range(
+              start: 295,
+              end: 296,
+            ),
+          ))),
+          bracket_range: Range(
+            start: 294,
+            end: 297,
+          ),
+        )),
+      ],
+      range: Range(
+        start: 286,
+        end: 289,
+      ),
+    ))),
   ],
 )

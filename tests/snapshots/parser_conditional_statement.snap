@@ -13,13 +13,16 @@ Program(
       ),
       local: false,
       arguments: [
-        (Token(
-          kind: Identifier("t"),
-          range: Range(
-            start: 146,
-            end: 147,
+        Variable(
+          name: Token(
+            kind: Identifier("t"),
+            range: Range(
+              start: 146,
+              end: 147,
+            ),
           ),
-        ), Some(Boolean)),
+          ty: Some(Boolean),
+        ),
       ],
       return_type: None,
       generics: [],
@@ -52,6 +55,7 @@ Program(
                 )),
               ],
             )),
+            else_if_branches: [],
             else_body: Some(Block(BlockStatement(
               statements: [
                 Return(ReturnStatement(
@@ -84,77 +88,93 @@ Program(
       ),
       range_return_type: None,
     )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("result"),
-          range: Range(
-            start: 228,
-            end: 234,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("result"),
+            range: Range(
+              start: 228,
+              end: 234,
+            ),
           ),
-        ), Some(Number)),
-      ],
-      local: true,
-      initializer: Some(Call(CallExpression(
-        name: Token(
-          kind: Identifier("test"),
-          range: Range(
-            start: 245,
-            end: 249,
-          ),
+          ty: Some(Number),
         ),
-        args: Grouped(GroupedExpression(
-          expressions: [
-            Literal(Boolean(BooleanLiteral(
-              value: true,
-              range: Range(
-                start: 250,
-                end: 254,
-              ),
-            ))),
-          ],
-          range: Range(
-            start: 249,
-            end: 255,
-          ),
+      ],
+      initializer: [
+        Call(CallExpression(
+          left: Identifier(Identifier(
+            name: "test",
+            range: Range(
+              start: 245,
+              end: 249,
+            ),
+          )),
+          args: Grouped(GroupedExpression(
+            expressions: [
+              Literal(Boolean(BooleanLiteral(
+                value: true,
+                range: Range(
+                  start: 250,
+                  end: 254,
+                ),
+              ))),
+            ],
+            range: Range(
+              start: 249,
+              end: 255,
+            ),
+          )),
         )),
-      ))),
+      ],
+      range: Range(
+        start: 222,
+        end: 234,
+      ),
     )),
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("n"),
-          range: Range(
-            start: 262,
-            end: 263,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("n"),
+            range: Range(
+              start: 262,
+              end: 263,
+            ),
           ),
-        ), Some(String)),
-      ],
-      local: true,
-      initializer: Some(Call(CallExpression(
-        name: Token(
-          kind: Identifier("test"),
-          range: Range(
-            start: 274,
-            end: 278,
-          ),
+          ty: Some(String),
         ),
-        args: Grouped(GroupedExpression(
-          expressions: [
-            Literal(Boolean(BooleanLiteral(
-              value: false,
-              range: Range(
-                start: 279,
-                end: 284,
-              ),
-            ))),
-          ],
-          range: Range(
-            start: 278,
-            end: 285,
-          ),
+      ],
+      initializer: [
+        Call(CallExpression(
+          left: Identifier(Identifier(
+            name: "test",
+            range: Range(
+              start: 274,
+              end: 278,
+            ),
+          )),
+          args: Grouped(GroupedExpression(
+            expressions: [
+              Literal(Boolean(BooleanLiteral(
+                value: false,
+                range: Range(
+                  start: 279,
+                  end: 284,
+                ),
+              ))),
+            ],
+            range: Range(
+              start: 278,
+              end: 285,
+            ),
+          )),
         )),
-      ))),
+      ],
+      range: Range(
+        start: 256,
+        end: 263,
+      ),
     )),
   ],
 )

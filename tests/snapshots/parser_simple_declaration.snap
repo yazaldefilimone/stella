@@ -3,24 +3,32 @@ source: tests/snapshot_tests.rs
 ---
 Program(
   statements: [
-    VariableDeclaration(VariableDeclaration(
-      values: [
-        (Token(
-          kind: Identifier("name"),
-          range: Range(
-            start: 6,
-            end: 10,
+    Local(LocalStatement(
+      variables: [
+        Variable(
+          name: Token(
+            kind: Identifier("name"),
+            range: Range(
+              start: 6,
+              end: 10,
+            ),
           ),
-        ), Some(String)),
-      ],
-      local: true,
-      initializer: Some(Literal(String(StringLiteral(
-        value: "Stella",
-        range: Range(
-          start: 21,
-          end: 29,
+          ty: Some(String),
         ),
-      )))),
+      ],
+      initializer: [
+        Literal(String(StringLiteral(
+          value: "Stella",
+          range: Range(
+            start: 21,
+            end: 29,
+          ),
+        ))),
+      ],
+      range: Range(
+        start: 0,
+        end: 10,
+      ),
     )),
   ],
 )
