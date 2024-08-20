@@ -4,6 +4,9 @@ description = "Rust-based, speedy Lua type checker"
 authors = ["Yazalde Filimone <yazaldefilimon@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
+keywords = ["lua", "checker", "typechecker", "compiler"]
+categories = ["compilers", "text-processing", "development-tools"]
+repository = "https://github.com/yazaldefilimone/stella"
 
 
 [dependencies]
