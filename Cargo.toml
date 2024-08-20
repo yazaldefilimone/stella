@@ -19,11 +19,17 @@ glob = "0.3.1"
 insta = { version = "1.39.0", features = ["ron"] }
 
 [profile.release]
-opt-level = "z"   # Otimizar para o menor tamanho possível, use "3" para agressividade máxima
-debug = false     # Não incluir informações de depuração
 lto = "fat"       # Link Time Optimization, "fat" aplica otimizações mais agressivas
-panic = "abort"   # Abortar no caso de pânico, em vez de desempilhar
-codegen-units = 1 # Reduzir o número de unidades de geração de código para melhorar a otimização
+opt-level = 3
+codegen-units = 1
+strip = "symbols" # set to `false` for debug information
+debug = false     # set to `true` for debug information
+panic = "abort"   # Let it crash and force ourselves to write safe Rust.
+# Profile for `cargo coverage`
+[profile.coverage]
+inherits = "release"
+lto = "thin"            # Faster compile time with thin lto
+debug-assertions = true # Make sure `debug_assert!`s pass
 
 [[bench]]
 name = "stella_lexer_benchmark"
