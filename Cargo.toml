@@ -1,5 +1,5 @@
 [package]
-name = "stella"
+name = "stella_checker"
 description = "Rust-based, speedy Lua type checker"
 authors = ["Yazalde Filimone <yazaldefilimon@gmail.com>"]
 version = "0.1.0"
@@ -9,6 +9,10 @@ categories = ["compilers", "text-processing", "development-tools"]
 repository = "https://github.com/yazaldefilimone/stella"
 license = "Apache-2.0"
 
+
+[[bin]]
+name = "stella"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.5.9", features = ["derive"] }

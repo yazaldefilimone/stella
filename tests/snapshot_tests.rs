@@ -5,9 +5,9 @@ use insta::assert_ron_snapshot;
 use std::ffi::OsString;
 use std::fs;
 use std::path::Path;
-use stella::ast::tokens::{Token, TokenKind};
-use stella::lexer::Lexer;
-use stella::parser::parser::Parser;
+use stella_checker::ast::tokens::{Token, TokenKind};
+use stella_checker::lexer::Lexer;
+use stella_checker::parser::parser::Parser;
 
 fn read_test_files_with_pattern(pattern: &str) -> Vec<(String, String)> {
   let mut patterns = Vec::new();

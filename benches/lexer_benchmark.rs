@@ -15,7 +15,7 @@ pub fn lexer_benchmark(c: &mut Criterion) {
   for (file_name, source_code) in patterns.iter() {
     c.bench_function(format!("lexer_{}", file_name).as_str(), |b| {
       b.iter(|| {
-        black_box(stella::lexer::Lexer::new(source_code, file_name));
+        black_box(stella_checker::lexer::Lexer::new(source_code, file_name));
       });
     });
   }
