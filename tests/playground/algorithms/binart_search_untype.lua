@@ -1,9 +1,5 @@
-
-type Array<T> = {T}
-
-function binary_search(sorted_array: Array<number>, target_value: number): option<number>
+function binary_search(sorted_array, target_value)
   local low_index = 1
-
   local high_index = #sorted_array
 
   while low_index <= high_index do
@@ -19,9 +15,11 @@ function binary_search(sorted_array: Array<number>, target_value: number): optio
   return nil
 end
 
-
 age = 19
 
-local age = 20 -- shadowing warning
+local age = 20
+
+
+age = "Hello, Stella checker :)"
 
 local target_index = binary_search({1, 3, 5, 7, 9}, 5)

@@ -30,7 +30,6 @@ impl<'a> Checker<'a> {
 
     let range = left.range.clone();
     let left_hand_side = &(lexeme, None);
-    self.check_shadowing(lexeme, false, &range)?;
     self.declare_global_variable(&left_hand_side, right_type, range)?;
     Ok(())
   }
@@ -47,7 +46,6 @@ impl<'a> Checker<'a> {
 
     let range = left.get_range();
     let left_hand_side = &(lexeme, left.ty.clone());
-    self.check_shadowing(lexeme, false, &range)?;
     self.declare_global_variable(&left_hand_side, right_type, range)?;
     Ok(())
   }

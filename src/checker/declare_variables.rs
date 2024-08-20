@@ -14,7 +14,6 @@ impl<'a> Checker<'a> {
           let left_hand_side: LeftHandSide = &(token.0.lexeme(), token.1.clone());
           let range = token.0.range.clone();
           let assigned_type = group.types.get(index).cloned().unwrap_or(Type::Nil);
-          self.check_shadowing(token.0.lexeme(), local, &range)?;
           if local {
             self.declare_local_variable(&left_hand_side, assigned_type, range)?;
           } else {
@@ -28,7 +27,6 @@ impl<'a> Checker<'a> {
           let assigned_type = if index == 0 { self.check_type(ty.clone())? } else { Type::Nil };
           let range = token.0.range.clone();
           let left_hand_side: LeftHandSide = &(token.0.lexeme(), token.1.clone());
-          self.check_shadowing(token.0.lexeme(), local, &range)?;
           if local {
             self.declare_local_variable(&left_hand_side, assigned_type, range)?;
           } else {

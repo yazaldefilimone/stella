@@ -14,9 +14,11 @@ impl<'a> Checker<'a> {
     let base_range = member.base.get_range();
     match base_type {
       Type::Table(ref table_type) => self.check_identifier_member(table_type, &member.identifier),
+      Type::Unknown => Ok(Some(Type::Unknown)),
       _ => Err(self.create_diagnostic(TypeError::ExpectedTable(base_type.to_string(), Some(base_range)))),
     }
   }
+
   fn check_identifier_member(&mut self, table: &TableType, identifier: &ast::Identifier) -> CheckResult<Option<Type>> {
     let name = identifier.name.as_str();
     if let Some(member_type) = table.get_type(name) {

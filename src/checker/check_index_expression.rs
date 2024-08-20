@@ -23,6 +23,7 @@ impl<'a> Checker<'a> {
         let tty = self.check_index_access(table_type, acc, table_expr.index.get_range())?;
         Ok(Some(tty))
       }
+      Type::Unknown => Ok(Some(Type::Unknown)),
       _ => Err(self.create_diagnostic(TypeError::ExpectedTable(base_type.to_string(), Some(base_range)))),
     }
   }

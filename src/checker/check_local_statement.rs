@@ -11,7 +11,6 @@ impl<'a> Checker<'a> {
     let result = variables.iter().enumerate().map::<CheckResult<Option<Type>>, _>(|(position, variable)| {
       let lexeme = variable.name.lexeme();
       let range = variable.name.range.clone();
-      self.check_shadowing(lexeme, true, &range)?;
       let left_hand_side = &(lexeme, variable.ty.clone());
       let init_expression = initializer.get(position);
       let assign_type = match init_expression {

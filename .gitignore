@@ -20,3 +20,5 @@ Cargo.lock
 
 # ignore playground folder
 /tests/playground/*.lua
+
+draft.md
