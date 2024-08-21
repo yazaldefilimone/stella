@@ -16,14 +16,28 @@ impl<'a> Checker<'a> {
       self.diagnostics.add(self.create_diagnostic(diagnostic));
       return Ok(Some(Type::Unknown));
     }
+
     self.ctx.use_variable(&ident.name, Some(scope_pointer));
-    let tyy = self.ctx.get_variable(&ident.name, Some(scope_pointer)).unwrap();
-    Ok(Some(self.check_type(tyy.clone())?))
+
+    let tyy = self.ctx.get_variable(&ident.name, Some(scope_pointer));
+    match tyy {
+      Some(tyy) => Ok(Some(self.check_type(&tyy.to_owned())?)),
+      None => Ok(None),
+    }
+    // Ok(Some(self.check_type(tyy)?.clone()))
   }
-  pub fn check_type_identifier(&mut self, ident: &types::IdentifierType) -> Result<types::Type, Diagnostic> {
+
+  // pub fn check_type_alias(&mut self, ident: &types::AliasType) -> Result<types::Type, Diagnostic> {
+  //   let tty = self.ctx.get_type(ident.name.as_str()).cloned().ok_or_else(|| {
+  //     self.create_diagnostic(TypeError::UndeclaredType(ident.name.to_string(), Some(ident.range.clone())))
+  //   })?;
+  //   return Ok(self.check_type(tty)?);
+  // }
+
+  pub fn check_type_alias<'t>(&mut self, ident: &'t types::AliasType) -> Result<types::Type, Diagnostic> {
     let tty = self.ctx.get_type(ident.name.as_str()).cloned().ok_or_else(|| {
       self.create_diagnostic(TypeError::UndeclaredType(ident.name.to_string(), Some(ident.range.clone())))
     })?;
-    return Ok(self.check_type(tty)?);
+    return Ok(self.check_type(&tty)?);
   }
 }

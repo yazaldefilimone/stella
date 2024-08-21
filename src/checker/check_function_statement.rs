@@ -30,7 +30,7 @@ impl<'a> Checker<'a> {
       }
     }
 
-    let function_type = Type::new_function(params, return_type);
+    let function_type = Type::new_function(params, return_type.to_owned());
 
     self.ctx.redeclare_variable(function_name, function_type.clone(), Some(scope_pointer));
 
@@ -41,15 +41,15 @@ impl<'a> Checker<'a> {
 
   pub fn declare_function_params(&mut self, arguments: &Vec<ast::Variable>) -> CheckResult<Vec<Type>> {
     let params = arguments.iter().map::<CheckResult<Type>, _>(|arg| {
-      let arg_type = if let Some(ty) = &arg.ty { ty.clone() } else { Type::Unknown };
+      let arg_type = if let Some(ty) = &arg.ty { ty } else { &Type::Unknown };
       let lexeme = arg.name.lexeme();
 
-      let arg_type = self.check_type(arg_type.clone())?;
+      let arg_type = self.check_type(arg_type)?;
 
       self.ctx.declare_variable(lexeme, arg_type.clone(), None);
       self.ctx.declare_variable_range(lexeme, arg.name.range.clone(), None);
 
-      Ok(arg_type)
+      Ok(arg_type.to_owned())
     });
 
     let params = params.collect::<CheckResult<Vec<Type>>>()?;

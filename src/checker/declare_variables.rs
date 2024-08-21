@@ -24,7 +24,7 @@ impl<'a> Checker<'a> {
       _ => {
         // Handle single type where one type is assigned to multiple variables
         for (index, token) in names.iter().enumerate() {
-          let assigned_type = if index == 0 { self.check_type(ty.clone())? } else { Type::Nil };
+          let assigned_type = if index == 0 { self.check_type(&ty)? } else { Type::Nil };
           let range = token.0.range.clone();
           let left_hand_side: LeftHandSide = &(token.0.lexeme(), token.1.clone());
           if local {
@@ -53,7 +53,7 @@ impl<'a> Checker<'a> {
 
     // If a type is specified in the variable declaration, check if it's redundant
     if let Some(declared_type) = &current_ty {
-      let declared_type = self.check_type(declared_type.to_owned())?;
+      let declared_type = self.check_type(declared_type)?;
       if !assign_ty.check_match(&declared_type) {
         return Err(self.create_type_mismatch(assign_ty, declared_type, range));
       }
@@ -68,6 +68,12 @@ impl<'a> Checker<'a> {
 
         self.diagnostics.add(diagnostic.into());
       }
+
+      // declare the variable using declared type
+      self.ctx.declare_variable(name, declared_type, None);
+      // declare the variable range in current scope
+      self.ctx.declare_variable_range(name, range, None);
+      return Ok(());
     }
 
     // declare the variable as global
@@ -97,7 +103,7 @@ impl<'a> Checker<'a> {
 
     // If a type is specified in the variable declaration, check if it's redundant
     if let Some(declared_type) = &current_ty {
-      let declared_type = self.check_type(declared_type.to_owned())?;
+      let declared_type = self.check_type(declared_type)?;
       if !assign_ty.check_match(&declared_type) {
         return Err(self.create_type_mismatch(assign_ty, declared_type, range));
       }
@@ -110,6 +116,13 @@ impl<'a> Checker<'a> {
         let diagnostic = TypeWarning::RedundantType(name.to_string(), existing_type.to_string(), Some(range.clone()));
         self.diagnostics.add(diagnostic.into());
       }
+
+      // declare the variable using declared type
+      self.ctx.declare_variable(name, declared_type, None);
+      self.ctx.set_local_declaration(name);
+      // declare the variable range in current scope
+      self.ctx.declare_variable_range(name, range, None);
+      return Ok(());
     }
 
     // declare the variable as local

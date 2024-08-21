@@ -10,10 +10,6 @@ impl<'a> Checker<'a> {
       ast::Expression::Variable(variable) => self.assign_variable(variable, right),
       ast::Expression::Index(index) => self.assign_index(index, right),
       ast::Expression::Member(member) => self.assign_member(member, right),
-      // todo: implement more assign expressions
-      // left[expression] = expression
-      // left.expression = expression
-      // ...
       _ => todo!("Implement more assign expressions"),
     }
   }

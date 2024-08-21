@@ -62,7 +62,6 @@ impl<'a> Checker<'a> {
       }
       self.leave_scope();
     }
-    // println!("result {:#?}", result_types);
     if result_types.len() > 1 {
       return Ok(Some(Type::new_union(result_types)));
     }

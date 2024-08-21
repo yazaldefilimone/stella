@@ -45,9 +45,9 @@ impl<'a> Checker<'a> {
         match binary_expr.operator {
           BinaryOperator::Equal => {
             let left_type = self.check_expression(&*binary_expr.left)?.unwrap_or(Type::Nil);
-            let left_type = self.check_type(left_type)?;
+            let left_type = self.check_type(&left_type)?;
             let right_type = self.check_expression(&*binary_expr.right)?.unwrap_or(Type::Nil);
-            let right_type = self.check_type(right_type)?;
+            let right_type = self.check_type(&right_type)?;
             match left_type {
               Type::Union(union) => {
                 for left_type in union.types {

@@ -27,7 +27,6 @@ impl<'a> Checker<'a> {
       let inner_type = types.iter().filter(|t| !t.is_nil()).next().unwrap().clone();
       return Some(Type::new_option(inner_type));
     }
-
     return Some(Type::new_union(types));
   }
 }

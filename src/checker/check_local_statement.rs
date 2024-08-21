@@ -19,6 +19,7 @@ impl<'a> Checker<'a> {
       };
       // declare is not return type ...
       self.declare_local_variable(left_hand_side, assign_type, range)?;
+
       return Ok(None);
     });
     let _ = result.collect::<CheckResult<Vec<_>>>()?;

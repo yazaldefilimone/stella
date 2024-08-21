@@ -24,7 +24,16 @@ impl<'a> Checker<'a> {
     //   }
     // };
 
-    self.check_call_type(&call_type, &call_expr.args, call_expr.get_range())
+    let return_type = self.check_call_type(&call_type, &call_expr.args, call_expr.get_range())?;
+    if let Some(return_type) = return_type {
+      match return_type {
+        // todo: it's ok to return nil here? :(....
+        Type::Nil => Ok(None),
+        _ => Ok(Some(return_type)),
+      }
+    } else {
+      Ok(None)
+    }
   }
 
   pub fn check_call_type(&mut self, call: &Type, args: &ast::Expression, range: Range) -> CheckResult<Option<Type>> {
@@ -72,7 +81,7 @@ impl<'a> Checker<'a> {
   }
 
   fn check_single_argument(&mut self, arg: &ast::Expression, param_type: &Type) -> CheckResult<()> {
-    let param_type_checked = self.check_type(param_type.clone())?;
+    let param_type_checked = self.check_type(param_type)?;
     let arg_type = self.check_expression(arg)?.unwrap();
     if !arg_type.check_match(&param_type_checked) {
       return Err(self.create_diagnostic(TypeError::MismatchedTypes(
@@ -89,7 +98,7 @@ impl<'a> Checker<'a> {
     if let Type::Variadic(VariadicType { inner_type }) = param_type {
       let arg_type = self.check_expression(arg)?.unwrap();
 
-      let inner_type = self.check_type(*inner_type.to_owned())?;
+      let inner_type = self.check_type(&*inner_type)?;
       if !arg_type.check_match(&inner_type) {
         let diagnostic =
           TypeError::MismatchedTypes(inner_type.to_string(), arg_type.to_string(), Some(arg.get_range()));

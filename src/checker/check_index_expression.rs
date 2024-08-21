@@ -15,7 +15,7 @@ impl<'a> Checker<'a> {
   // todo: improve this... :(
   pub fn check_index_expression(&mut self, table_expr: &ast::IndexExpression) -> CheckResult<Option<Type>> {
     let base_type = self.check_expression(&table_expr.base)?.unwrap_or(Type::Nil);
-    let base_type = self.check_type(base_type)?;
+    let base_type = self.check_type(&base_type)?;
     let base_range = table_expr.base.get_range();
     match base_type {
       Type::Table(ref table_type) => {

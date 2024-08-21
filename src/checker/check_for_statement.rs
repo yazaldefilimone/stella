@@ -51,7 +51,7 @@ impl<'a> Checker<'a> {
         return Err(diagnostic);
       }
     }
-    // Ok(None)
+
     Ok(body_type)
   }
 }

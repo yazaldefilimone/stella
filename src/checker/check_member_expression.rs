@@ -10,7 +10,7 @@ impl<'a> Checker<'a> {
   // todo: improve this... :(
   pub fn check_member_expression(&mut self, member: &ast::MemberExpression) -> CheckResult<Option<Type>> {
     let base_type = self.check_expression(&member.base)?.unwrap();
-    let base_type = self.check_type(base_type)?;
+    let base_type = self.check_type(&base_type)?;
     let base_range = member.base.get_range();
     match base_type {
       Type::Table(ref table_type) => self.check_identifier_member(table_type, &member.identifier),
