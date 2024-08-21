@@ -48,7 +48,6 @@ impl Statement {
       Statement::Goto(goto) => goto.get_range(),
       Statement::Block(block) => block.get_range(),
       Statement::Empty(empty) => empty.get_range(),
-      // Statement::VariableDeclaration(variable) => variable.get_range(),
       Statement::TypeDeclaration(declaration) => declaration.get_range(),
       Statement::Expression(expression) => expression.get_range(),
       Statement::Continue(continue_) => continue_.get_range(),
@@ -58,54 +57,6 @@ impl Statement {
 
   pub fn new_function(function: FunctionStatement) -> Self {
     Statement::Function(function)
-  }
-
-  pub fn new_return(return_: ReturnStatement) -> Self {
-    Statement::Return(return_)
-  }
-
-  pub fn new_if(if_: IfStatement) -> Self {
-    Statement::If(if_)
-  }
-
-  pub fn new_while(while_: WhileStatement) -> Self {
-    Statement::While(while_)
-  }
-
-  pub fn new_repeat(repeat: RepeatStatement) -> Self {
-    Statement::Repeat(repeat)
-  }
-
-  pub fn new_for(for_: ForStatement) -> Self {
-    Statement::For(for_)
-  }
-
-  pub fn new_break(break_: BreakStatement) -> Self {
-    Statement::Break(break_)
-  }
-
-  pub fn new_goto(goto: GotoStatement) -> Self {
-    Statement::Goto(goto)
-  }
-
-  pub fn new_block(block: BlockStatement) -> Self {
-    Statement::Block(block)
-  }
-
-  pub fn new_empty(empty: EmptyStatement) -> Self {
-    Statement::Empty(empty)
-  }
-
-  pub fn new_type(type_: TypeDeclaration) -> Self {
-    Statement::TypeDeclaration(type_)
-  }
-
-  pub fn new_continue(continue_: ContinueStatement) -> Self {
-    Statement::Continue(continue_)
-  }
-
-  pub fn new_local(local: LocalStatement) -> Self {
-    Statement::Local(local)
   }
 }
 
@@ -205,6 +156,7 @@ impl ElseIfStatement {
   pub fn new(condition: Expression, body: Statement, range: Range) -> Self {
     ElseIfStatement { condition, then_branch: Box::new(body), range }
   }
+
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }

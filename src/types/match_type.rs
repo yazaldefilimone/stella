@@ -9,6 +9,9 @@ pub fn check_match_table(left: &TableType, right: &TableType) -> bool {
       left_map.len() == right_map.len()
         && left_map.iter().all(|(k, v)| right_map.get(k).map_or(false, |rv| v.check_match(rv)))
     }
+    (TableType { array: None, map: None }, TableType { array: None, map: None }) => true,
+    (TableType { array: None, map: None }, TableType { .. }) => true,
+    (TableType { .. }, TableType { array: None, map: None }) => true,
     _ => false,
   }
 }

@@ -13,6 +13,7 @@ pub enum Type {
   Number,
   String,
   Boolean,
+  Alias(AliasType),
   Table(TableType),
   Function(FunctionType),
   Generic(GenericType),
@@ -20,7 +21,6 @@ pub enum Type {
   Union(UnionType),
   Option(OptionType),
   Unknown,
-  Identifier(IdentifierType),
   Nil,
   Group(GroupType),
   Variadic(VariadicType),
@@ -40,7 +40,7 @@ impl Hash for Type {
       Type::GenericCall(generic_call) => generic_call.hash(state),
       Type::Union(union) => union.hash(state),
       Type::Option(option) => option.hash(state),
-      Type::Identifier(identifier) => identifier.hash(state),
+      Type::Alias(identifier) => identifier.hash(state),
       Type::Group(group) => group.hash(state),
       Type::Variadic(variadic) => variadic.hash(state),
     }
@@ -71,6 +71,18 @@ impl Hash for TableType {
   }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AliasType {
+  pub name: String,
+  pub range: Range,
+}
+
+impl Hash for AliasType {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    self.name.hash(state);
+  }
+}
+
 impl Type {
   pub fn new(name: &str, range: Range) -> Self {
     match name {
@@ -79,7 +91,7 @@ impl Type {
       "string" => Type::String,
       "nil" => Type::Nil,
       "unknown" => Type::Unknown,
-      _ => Type::Identifier(IdentifierType { name: name.to_string(), range }),
+      _ => Type::Alias(AliasType { name: name.to_string(), range }),
     }
   }
   pub fn is_nil(&self) -> bool {
@@ -184,8 +196,6 @@ impl Type {
   }
 
   pub fn suport_unary_operator(&self, operator: &UnaryOperator) -> bool {
-    // println!("left: {:#?} ->  right: {:#?}", self, other);
-
     if matches!(self, Type::Number) {
       return operator.support_number();
     }
@@ -286,7 +296,7 @@ fn supports_stdlib_operator(left: &Type, operator: &BinaryOperator) -> bool {
 fn supports_stdlib_unary_operator(left: &Type, operator: &UnaryOperator) -> bool {
   // tables
   if matches!(left, Type::Table(_)) {
-    return matches!(operator, UnaryOperator::Not | UnaryOperator::Hash | UnaryOperator::Negate);
+    return matches!(operator, UnaryOperator::Not | UnaryOperator::Hash);
   }
 
   if matches!(left, Type::Option(_)) {
@@ -331,13 +341,6 @@ fn get_operator_stdlib_result_type(left: &Type, operator: &BinaryOperator) -> Op
 impl TableType {
   pub fn get_type(&self, key: &str) -> Option<&Type> {
     self.map.as_ref()?.get(key)
-  }
-}
-
-pub fn replace_type(replaced: &Type, replaced_type: &Type) -> Type {
-  match replaced {
-    Type::Unknown => replaced_type.clone(),
-    _ => replaced.clone(),
   }
 }
 

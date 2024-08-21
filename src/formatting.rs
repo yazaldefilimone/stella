@@ -24,7 +24,7 @@ impl fmt::Display for Type {
       Type::Generic(generic) => write!(f, "{}", generic),
       Type::Union(union) => write!(f, "{}", union),
       Type::Option(option) => write!(f, "{}", option),
-      Type::Identifier(identifier) => write!(f, "{}", identifier),
+      Type::Alias(alias) => write!(f, "{}", alias.name),
       Type::Group(group) => write!(f, "{}", group),
       Type::GenericCall(generic_call) => write!(f, "{}", generic_call),
       Type::Variadic(variadic) => write!(f, "{}", variadic),

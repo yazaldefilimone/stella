@@ -126,7 +126,7 @@ impl<'a> Parser<'a> {
       None
     };
 
-    return ast::Variable::new(name, ty);
+    ast::Variable::new(name, ty)
   }
 
   fn parse_type_declaration(&mut self) -> ast::Statement {
@@ -541,7 +541,6 @@ impl<'a> Parser<'a> {
 
   fn parse_assign_expression(&mut self, left: Option<ast::Expression>) -> ast::Expression {
     let mut variables = vec![left.unwrap_or_else(|| self.parse_expression())];
-    // println!("{:?}", variables);
     let start_range = variables.first().unwrap().get_range();
 
     while self.match_token_and_consume(TokenKind::Comma).is_some() {
@@ -711,7 +710,7 @@ impl<'a> Parser<'a> {
       let type_or_key = self.parse_type(false);
       let peeked = self.lexer.peek_token();
       match (&type_or_key, &peeked.kind) {
-        (Type::Identifier(identifier), &TokenKind::Colon) => {
+        (Type::Alias(identifier), &TokenKind::Colon) => {
           self.consume_expect_token(TokenKind::Colon);
           let value_type = self.parse_type(false);
           map_elements.insert(identifier.name.to_string(), value_type);
