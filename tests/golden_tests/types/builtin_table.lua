@@ -1,6 +1,6 @@
 type Table = {
-  name = string,
-  age = number,
+  name: string,
+  age: number,
   fn: function(string): string,
 }
 

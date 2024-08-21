@@ -1,31 +1,3 @@
-<samp>
-
-Stella is a type checker for Lua that adds TypeScript-like type safety to your code. It helps catch errors early, ensures your code runs smoothly, and works with your existing Lua code without requiring any changes.
-
-### Installation
-
-#### Install Dependencies
-
-##### On Linux or Mac
-
-```sh
-# Install Rust if you haven't already.
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
-##### Install Stella
-
-```sh
-# Install Stella
-cargo install stellla_checker
-
-# Check if Stella is installed correctly
-stella --version
-```
-
-### Simple exemple!
-
-```lua
 type Fn<T, R> = function(param: T): R
 
 type Array<T> = {T}
@@ -63,16 +35,3 @@ local numbers_error = {1, 2, 3, 4, "hello"}
 -- ERROR >>> expected `table<number>`, found `table<string, number>`
 --  in `numbers_error`
 local incremented_numbers = process_list(numbers_error, increment)
-
-```
-
-```sh
-stella check process_list.lua
-
-# let me know if you have any questions or suggestions :) I hope you have a amazing day!
-
-```
-
-- [A Quick Guide](./guide.md)
-
-- [Stella Virtual Machine (maybe coming soon)](https://github.com/yazaldefilimone/stella-compiler)

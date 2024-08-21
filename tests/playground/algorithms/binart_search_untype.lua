@@ -15,11 +15,4 @@ function binary_search(sorted_array, target_value)
   return nil
 end
 
-age = 19
-
-local age = 20
-
-
-age = "Hello, Stella checker :)"
-
 local target_index = binary_search({1, 3, 5, 7, 9}, 5)
