@@ -1,4 +1,3 @@
-<samp>
 
 Stella is a type checker for Lua that adds TypeScript-like type safety to your code. It helps catch errors early, ensures your code runs smoothly, and works with your existing Lua code without requiring any changes.
 
