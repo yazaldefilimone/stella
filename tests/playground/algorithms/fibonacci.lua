@@ -6,3 +6,5 @@ function fibonacci(sequence_position: number): number
 end
 
 local fibonacci_result = fibonacci(10)
+
+print(fibonacci_result)

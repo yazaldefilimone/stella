@@ -41,6 +41,12 @@ To check it:
 stella check hello.lua
 ```
 
+or run it:
+
+```sh
+stella run hello.lua
+```
+
 Stella checks for any type errors before running your Lua code.
 
 ### Pure Lua
