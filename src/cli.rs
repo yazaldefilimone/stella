@@ -2,22 +2,25 @@ use clap::{Arg, Command};
 
 pub fn command_line() -> clap::ArgMatches {
   let matches = Command::new("Stella")
-    .about("Speedy, lightweight lua type checker.")
+    .about(env!("CARGO_PKG_DESCRIPTION"))
+    .version(env!("CARGO_PKG_VERSION"))
+    .author(env!("CARGO_PKG_AUTHORS"))
     .subcommand_required(true)
     .arg_required_else_help(true)
-    .author("Yazalde Filimone <yazaldefilimon@gmail.com>")
     .subcommand(
       Command::new("check")
-        .about("check a lua file.")
-        .arg(Arg::new("file").help("the lua file to check.").required(true)),
+        .about("check a stella(lua) file.")
+        .arg(Arg::new("file").help("the stella(lua) file to check.").required(true)),
     )
     .subcommand(
       Command::new("compile")
-        .about("transform a lua file to a native executable.")
-        .arg(Arg::new("file").help("the lua file to compile.").required(true)),
+        .about("compile a stella(lua) file to a native executable.")
+        .arg(Arg::new("file").help("the stella(lua) file to compile.").required(true)),
     )
     .subcommand(
-      Command::new("run").about("run stella code.").arg(Arg::new("file").help("the lua file to run.").required(true)),
+      Command::new("run")
+        .about("run stella(lua) code.")
+        .arg(Arg::new("file").help("the stella(lua) file to run.").required(true)),
     )
     .get_matches();
 
