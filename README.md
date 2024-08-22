@@ -78,14 +78,16 @@ local target_index = binary_search({1, 3, 5, 7, 9}, 5)
 print(target_index)
 ```
 
+check it:
+
 ```sh
-stella check binart_search_untype.lua
+stella check binary_search.lua
 ```
 
-or run it:
+run it:
 
 ```sh
-stella run binart_search_untype.lua
+stella run binary_search.lua
 ```
 
 ### Complex Examples
