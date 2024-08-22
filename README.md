@@ -22,7 +22,74 @@ cargo install stellla_checker
 stella --version
 ```
 
-### Simple exemple!
+#### Fibonacci
+
+```lua
+function fibonacci(sequence_position: number): number
+  if sequence_position <= 1 then
+    return sequence_position
+  end
+  return fibonacci(sequence_position - 1) + fibonacci(sequence_position - 2)
+end
+
+local fibonacci_result = fibonacci(10)
+
+print(fibonacci_result)
+
+```
+
+```sh
+stella check fibonacci.lua
+```
+
+or run it:
+
+```sh
+stella run fibonacci.lua
+#  output:
+# done. 0 errors, 0 warnings
+# emitting lua code...
+# 55
+```
+
+#### Binary Search
+
+```lua
+type Array<T> = {T}
+
+function binary_search(sorted_array: Array<number>, target_value: number): option<number>
+  local low_index = 1
+  local high_index = #sorted_array
+
+  while low_index <= high_index do
+    local mid_index = math.floor((low_index + high_index) / 2)
+    if sorted_array[mid_index] == target_value then
+      return mid_index
+    elseif sorted_array[mid_index] < target_value then
+      low_index = mid_index + 1
+    else
+      high_index = mid_index - 1
+    end
+  end
+  return nil
+end
+local target_index = binary_search({1, 3, 5, 7, 9}, 5)
+print(target_index)
+```
+
+check it:
+
+```sh
+stella check binary_search.lua
+```
+
+run it:
+
+```sh
+stella run binary_search.lua
+```
+
+### Complex Examples
 
 ```lua
 type Fn<T, R> = function(param: T): R
@@ -69,7 +136,6 @@ local incremented_numbers = process_list(numbers_error, increment)
 stella check process_list.lua
 
 # let me know if you have any questions or suggestions :) I hope you have a amazing day!
-
 ```
 
 - [A Quick Guide](./guide.md)
