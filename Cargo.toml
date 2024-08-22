@@ -2,7 +2,7 @@
 name = "stella_checker"
 description = "Rust-based, speedy Lua type checker"
 authors = ["Yazalde Filimone <yazaldefilimon@gmail.com>"]
-version = "0.1.1"
+version = "0.2.1"
 edition = "2021"
 keywords = ["lua", "checker", "typechecker", "compiler"]
 categories = ["compilers", "text-processing", "development-tools"]
@@ -17,6 +17,7 @@ path = "src/main.rs"
 [dependencies]
 clap = { version = "4.5.9", features = ["derive"] }
 code_highlighter = "0.1.1"
+rlua = "0.20.1"
 serde = { version = "1.0.204", features = ["derive"] }
 
 [dev-dependencies]

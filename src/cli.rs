@@ -16,6 +16,9 @@ pub fn command_line() -> clap::ArgMatches {
         .about("transform a lua file to a native executable.")
         .arg(Arg::new("file").help("the lua file to compile.").required(true)),
     )
+    .subcommand(
+      Command::new("run").about("run stella code.").arg(Arg::new("file").help("the lua file to run.").required(true)),
+    )
     .get_matches();
 
   return matches;
