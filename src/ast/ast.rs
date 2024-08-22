@@ -15,6 +15,14 @@ impl Program {
   pub fn new() -> Program {
     Program { statements: Vec::new() }
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    for statement in &self.statements {
+      *raw = statement.emit(raw);
+    }
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -58,6 +66,25 @@ impl Statement {
   pub fn new_function(function: FunctionStatement) -> Self {
     Statement::Function(function)
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    match self {
+      Statement::Function(function) => function.emit(raw),
+      Statement::Return(return_) => return_.emit(raw),
+      Statement::If(if_) => if_.emit(raw),
+      Statement::While(while_) => while_.emit(raw),
+      Statement::Repeat(repeat) => repeat.emit(raw),
+      Statement::For(for_) => for_.emit(raw),
+      Statement::Break(break_) => break_.emit(raw),
+      Statement::Goto(goto) => goto.emit(raw),
+      Statement::Block(block) => block.emit(raw),
+      Statement::Empty(empty) => empty.emit(raw),
+      Statement::TypeDeclaration(declaration) => declaration.emit(raw),
+      Statement::Continue(continue_) => continue_.emit(raw),
+      Statement::Local(local) => local.emit(raw),
+      Statement::Expression(expression) => expression.emit(raw),
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -74,6 +101,24 @@ impl AssignExpression {
 
   pub fn get_range(&self) -> Range {
     return self.range.clone();
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    for (index, variable) in self.left.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = variable.emit(raw);
+    }
+    raw.push_str(" = ");
+    for (index, initializer) in self.right.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = initializer.emit(raw);
+    }
+    raw.push_str("\n");
+    return raw.to_string();
   }
 }
 
@@ -106,6 +151,27 @@ impl FunctionStatement {
   pub fn get_range(&self) -> Range {
     return self.range.clone();
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    if self.local {
+      raw.push_str("local ");
+    }
+
+    raw.push_str(&format!("function {}", self.name.lexeme()));
+    raw.push_str("(");
+    for (index, argument) in self.arguments.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = argument.emit(raw);
+    }
+    raw.push_str(")");
+    raw.push_str("\n");
+    *raw = self.body.emit(raw);
+    raw.push_str("\nend");
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -121,6 +187,18 @@ impl ReturnStatement {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("return ");
+    for (index, value) in self.values.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = value.emit(raw);
+    }
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -134,6 +212,11 @@ impl ContinueStatement {
   }
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("continue\n");
+    return raw.to_string();
   }
 }
 
@@ -160,6 +243,15 @@ impl ElseIfStatement {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("elseif ");
+    *raw = self.condition.emit(raw);
+    raw.push_str(" then\n");
+    *raw = self.then_branch.emit(raw);
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 impl IfStatement {
@@ -182,6 +274,22 @@ impl IfStatement {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("if ");
+    *raw = self.condition.emit(raw);
+    raw.push_str(" then\n");
+    *raw = self.then_body.emit(raw);
+    for else_if_branch in &self.else_if_branches {
+      *raw = else_if_branch.emit(raw);
+    }
+    if let Some(else_body) = &self.else_body {
+      *raw = else_body.emit(raw);
+    }
+    raw.push_str("end");
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -197,6 +305,16 @@ impl WhileStatement {
   }
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("while ");
+    *raw = self.condition.emit(raw);
+    raw.push_str(" do\n");
+    *raw = self.body.emit(raw);
+    raw.push_str("end");
+    raw.push_str("\n");
+    return raw.to_string();
   }
 }
 
@@ -214,6 +332,15 @@ impl RepeatStatement {
 
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("repeat\n");
+    *raw = self.body.emit(raw);
+    raw.push_str("until ");
+    *raw = self.condition.emit(raw);
+    raw.push_str("\n");
+    return raw.to_string();
   }
 }
 
@@ -240,6 +367,23 @@ impl ForStatement {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("for ");
+    *raw = self.init.emit(raw);
+    raw.push_str(" = ");
+    *raw = self.limit.emit(raw);
+    if let Some(step) = &self.step {
+      raw.push_str(", ");
+      *raw = step.emit(raw);
+    }
+    raw.push_str(" do\n");
+    *raw = self.body.emit(raw);
+    raw.push_str("end");
+    raw.push_str("\n");
+
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -253,6 +397,11 @@ impl BreakStatement {
   }
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("break\n");
+    return raw.to_string();
   }
 }
 
@@ -269,6 +418,15 @@ impl GotoStatement {
 
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("goto ");
+    if let Some(label) = &self.label {
+      raw.push_str(&format!("{}\n", label));
+    }
+    raw.push_str("\n");
+    return raw.to_string();
   }
 }
 
@@ -289,6 +447,13 @@ impl BlockStatement {
     let last_statement = self.statements.last().unwrap();
     create_middle_range(&first_statement.get_range(), &last_statement.get_range())
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    for statement in &self.statements {
+      *raw = statement.emit(raw);
+    }
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -297,6 +462,11 @@ pub struct EmptyStatement {}
 impl EmptyStatement {
   pub fn get_range(&self) -> Range {
     Range::new()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("\n");
+    return raw.to_string();
   }
 }
 
@@ -322,6 +492,11 @@ impl TypeDeclaration {
     // todo: check if it's correct
     create_middle_range(&self.range, &self.name.range)
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    // don't emit type's
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -339,6 +514,11 @@ impl TypeFunction {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    // don't emit type's
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -353,6 +533,12 @@ impl Variable {
   }
   pub fn get_range(&self) -> Range {
     return self.name.range.clone();
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str(&format!("{}", self.name.lexeme()));
+    // don't emit type's
+    return raw.to_string();
   }
 }
 
@@ -370,6 +556,25 @@ impl LocalStatement {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("local ");
+    for (index, variable) in self.variables.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = variable.emit(raw);
+    }
+    raw.push_str(" = ");
+    for (index, initializer) in self.initializer.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = initializer.emit(raw);
+    }
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -385,6 +590,24 @@ impl AssignExpresion {
   }
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    for (index, variable) in self.variables.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = variable.emit(raw);
+    }
+    raw.push_str(" = ");
+    for (index, initializer) in self.initializer.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = initializer.emit(raw);
+    }
+    raw.push_str("\n");
+    return raw.to_string();
   }
 }
 
@@ -493,6 +716,24 @@ impl Expression {
   pub fn is_literal(&self) -> bool {
     matches!(self, Expression::Literal(_))
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    match self {
+      Expression::Literal(literal) => literal.emit(raw),
+      Expression::Identifier(identifier) => identifier.emit(raw),
+      Expression::Call(call) => call.emit(raw),
+      Expression::Unary(unary) => unary.emit(raw),
+      Expression::Grouped(grouped) => grouped.emit(raw),
+      Expression::Binary(binary) => binary.emit(raw),
+      Expression::Require(require) => require.emit(raw),
+      Expression::Function(function) => function.emit(raw),
+      Expression::Table(table) => table.emit(raw),
+      Expression::Member(member) => member.emit(raw),
+      Expression::Index(index) => index.emit(raw),
+      Expression::Assign(assign) => assign.emit(raw),
+      Expression::Variable(variable) => variable.emit(raw),
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -511,6 +752,13 @@ impl RequireExpression {
     let left_range = self.range.clone();
     create_middle_range(&left_range, &right_range)
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("require ");
+    raw.push_str(&format!("\"{}\"", self.module_name.lexeme()));
+    raw.push_str("\n");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -527,6 +775,18 @@ impl GroupedExpression {
   pub fn get_range(&self) -> Range {
     self.range.clone()
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    // raw.push_str("(");
+    for (index, expression) in self.expressions.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = expression.emit(raw);
+    }
+    // raw.push_str(")");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -538,6 +798,11 @@ pub struct Identifier {
 impl Identifier {
   pub fn new(name: String, range: Range) -> Self {
     Identifier { name, range }
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str(&format!("{}", self.name));
+    return raw.to_string();
   }
 }
 
@@ -556,6 +821,14 @@ impl CallExpression {
     let left_range = self.left.get_range();
     let right_range = self.args.get_range();
     create_middle_range(&left_range, &right_range)
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    *raw = self.left.emit(raw);
+    raw.push_str("(");
+    *raw = self.args.emit(raw);
+    raw.push_str(")");
+    return raw.to_string();
   }
 }
 
@@ -580,6 +853,13 @@ impl UnaryExpression {
   pub fn get_operator_range(&self) -> Range {
     self.range.clone()
   }
+
+  // !aaa
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str(&format!("{}", self.operator.to_str()));
+    *raw = self.operand.emit(raw);
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -596,6 +876,13 @@ impl MemberExpression {
     let left_range = self.base.get_range();
     let right_range = self.identifier.range.clone();
     create_middle_range(&left_range, &right_range)
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    *raw = self.base.emit(raw);
+    raw.push_str(".");
+    *raw = self.identifier.emit(raw);
+    return raw.to_string();
   }
 }
 
@@ -615,6 +902,14 @@ impl IndexExpression {
     let right_range = self.index.get_range();
     create_middle_range(&left_range, &right_range)
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    *raw = self.base.emit(raw);
+    raw.push_str("[");
+    *raw = self.index.emit(raw);
+    raw.push_str("]");
+    return raw.to_string();
+  }
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TableExpression {
@@ -629,6 +924,21 @@ impl TableExpression {
 
   pub fn get_range(&self) -> Range {
     self.range.clone()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("{");
+    for (index, value) in self.values.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = value.0.emit(raw);
+      if let Some(value) = &value.1 {
+        raw.push_str(" = ");
+        *raw = value.emit(raw);
+      }
+    }
+    return raw.to_string();
   }
 }
 
@@ -656,6 +966,20 @@ impl FunctionExpression {
     let left_range = self.range.clone();
     return left_range;
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("function ");
+    for (index, argument) in self.arguments.iter().enumerate() {
+      if index > 0 {
+        raw.push_str(", ");
+      }
+      *raw = argument.emit(raw);
+    }
+    raw.push_str("\n");
+    *raw = self.body.emit(raw);
+    raw.push_str("\nend");
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -674,6 +998,13 @@ impl BinaryExpression {
     let left_range = self.left.get_range();
     let right_range = self.right.get_range();
     create_middle_range(&left_range, &right_range)
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    *raw = self.left.emit(raw);
+    *raw = self.operator.emit(raw);
+    *raw = self.right.emit(raw);
+    return raw.to_string();
   }
 }
 
@@ -710,6 +1041,15 @@ impl LiteralExpression {
       LiteralExpression::Nil(nil) => nil.range.clone(),
     }
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    match self {
+      LiteralExpression::Number(number) => number.emit(raw),
+      LiteralExpression::String(string) => string.emit(raw),
+      LiteralExpression::Boolean(boolean) => boolean.emit(raw),
+      LiteralExpression::Nil(nil) => nil.emit(raw),
+    }
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -721,6 +1061,11 @@ pub struct NumberLiteral {
 impl NumberLiteral {
   pub fn new(value: String, range: Range) -> Self {
     NumberLiteral { value, range }
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str(&format!("{}", self.value));
+    return raw.to_string();
   }
 }
 
@@ -734,6 +1079,11 @@ impl StringLiteral {
   pub fn new(value: String, range: Range) -> Self {
     StringLiteral { value, range }
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str(&format!("\"{}\"", self.value));
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -746,6 +1096,11 @@ impl BooleanLiteral {
   pub fn new(value: bool, range: Range) -> Self {
     BooleanLiteral { value, range }
   }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str(&format!("{}", self.value));
+    return raw.to_string();
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -756,6 +1111,11 @@ pub struct NilLiteral {
 impl NilLiteral {
   pub fn new(range: Range) -> Self {
     NilLiteral { range }
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    raw.push_str("nil");
+    return raw.to_string();
   }
 }
 
@@ -788,6 +1148,15 @@ impl UnaryOperator {
   }
   pub fn support_nil(&self) -> bool {
     matches!(self, UnaryOperator::Not)
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    match self {
+      UnaryOperator::Negate => raw.push_str("-"),
+      UnaryOperator::Not => raw.push_str("not "),
+      UnaryOperator::Hash => raw.push_str("#"),
+    }
+    return raw.to_string();
   }
 }
 
@@ -840,6 +1209,27 @@ impl BinaryOperator {
   /// Determines if the current operator has equal precedence to another operator.
   pub fn has_equal_precedence_to(&self, other: &BinaryOperator) -> bool {
     self.precedence() == other.precedence()
+  }
+
+  pub fn emit(&self, raw: &mut String) -> String {
+    match self {
+      BinaryOperator::Add => raw.push_str("+"),
+      BinaryOperator::Subtract => raw.push_str("-"),
+      BinaryOperator::Multiply => raw.push_str("*"),
+      BinaryOperator::Divide => raw.push_str("/"),
+      BinaryOperator::Modulus => raw.push_str("%"),
+      BinaryOperator::And => raw.push_str("and"),
+      BinaryOperator::Or => raw.push_str("or"),
+      BinaryOperator::Equal => raw.push_str("=="),
+      BinaryOperator::NotEqual => raw.push_str("~="),
+      BinaryOperator::LessThan => raw.push_str("<"),
+      BinaryOperator::GreaterThan => raw.push_str(">"),
+      BinaryOperator::LessThanOrEqual => raw.push_str("<="),
+      BinaryOperator::GreaterThanOrEqual => raw.push_str(">="),
+      BinaryOperator::DoubleDot => raw.push_str(".."),
+      BinaryOperator::DoubleSlash => raw.push_str("//"),
+    }
+    return raw.to_string();
   }
 }
 

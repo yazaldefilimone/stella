@@ -244,8 +244,8 @@ impl Type {
       // math operators
       Add | Subtract | Multiply | Divide | Modulus | DoubleSlash => match (self, other) {
         (Type::Number, Type::Number)
-        | (Type::Unknown, Type::Number)
         | (Type::Number, Type::Unknown)
+        | (Type::Unknown, Type::Number)
         | (Type::Unknown, Type::Unknown) => Type::Number,
         _ => unreachable!("left: {:#?} {} right: {:#?}", self, operator, other),
       },
@@ -253,20 +253,19 @@ impl Type {
       // println!("comparison operators");
       Equal | NotEqual | LessThan | GreaterThan | LessThanOrEqual | GreaterThanOrEqual => match (self, other) {
         (Type::Number, Type::Number)
-        | (Type::Unknown, Type::Number)
-        | (Type::Number, Type::Unknown)
         | (Type::String, Type::String)
-        | (Type::Unknown, Type::String)
-        | (Type::String, Type::Unknown)
         | (Type::Boolean, Type::Boolean)
-        | (Type::Unknown, Type::Boolean)
-        | (Type::Boolean, Type::Unknown)
-        | (Type::Unknown, Type::Unknown) => Type::Boolean,
+        | (Type::Nil, _)
+        | (_, Type::Nil)
+        | (_, Type::Unknown)
+        | (Type::Unknown, _) => Type::Boolean,
         _ => unreachable!("left: {:#?} {} right: {:#?}", self, operator, other),
       },
       //  logical operators
       And | Or => match (self, other) {
         (Type::Boolean, Type::Boolean)
+        | (_, Type::Nil)
+        | (Type::Nil, _)
         | (Type::Unknown, Type::Boolean)
         | (Type::Boolean, Type::Unknown)
         | (Type::Unknown, Type::Unknown) => Type::Boolean,
