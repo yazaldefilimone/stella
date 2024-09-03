@@ -76,7 +76,8 @@ fn run_compile(path_name: &str) -> Result<(), std::io::Error> {
   }
 
   let output = create_output_directory(path_name);
-  let raw = emit::emit(&program, &path_name);
+  let raw = program.emit();
+  println!("raw: {}", raw);
   let path = Path::new(&output);
   if let Some(parent) = path.parent() {
     fs::create_dir_all(parent)?;
@@ -97,10 +98,13 @@ fn run(path_name: &str) {
     checker.diagnostics.emit_all(&raw, path_name);
     return;
   }
-  let raw = emit::emit(&program, &path_name);
+
+  let mut raw = program.emit();
+  raw = raw.trim().to_string();
+
+  println!("raw: {}", raw);
   let lua = Lua::new();
   let result = lua.load(raw).exec();
-
   match result {
     Ok(_) => {}
     Err(err) => {

@@ -15,3 +15,5 @@ function bubble_sort(array: Array<number>): Array<number>
 end
 
 local sorted_array = bubble_sort({5, 3, 8, 4, 2})
+
+print("sorted_array: ", sorted_array)

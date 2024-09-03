@@ -24,4 +24,5 @@ age = 19
 
 local age = 20 -- shadowing warning
 
-local target_index = binary_search({1, 3, 5, 7, 9}, 5)
+local target_index = binary_search({1, "10", 5, 7, 9}, 5)
+print("target_index: ", target_index)

@@ -16,3 +16,5 @@ function binary_search(sorted_array, target_value)
 end
 
 local target_index = binary_search({1, 3, 5, 7, 9}, 5)
+
+print("target_index: ", target_index)

@@ -1,3 +1,5 @@
+
+
 function fibonacci(sequence_position: number): number
   if sequence_position <= 1 then
     return sequence_position

@@ -27,11 +27,11 @@ local incremented_numbers = process_list(numbers, increment) -- ok :)
 
 -- Apply the 'double' function to each number in the list
 local doubled_numbers = process_list(numbers, double) -- ok :)
+print(doubled_numbers)
 
+-- --- error
+-- local numbers_error = {1, 2, 3, 4, "hello"}
 
---- error
-local numbers_error = {1, 2, 3, 4, "hello"}
-
--- ERROR >>> expected `table<number>`, found `table<string, number>`
---  in `numbers_error`
-local incremented_numbers = process_list(numbers_error, increment)
+-- -- ERROR >>> expected `table<number>`, found `table<string, number>`
+-- --  in `numbers_error`
+-- local incremented_numbers = process_list(numbers_error, increment)
