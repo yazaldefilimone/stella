@@ -2,7 +2,7 @@
 name = "stella_checker"
 description = "Rust-based, speedy Lua type checker"
 authors = ["Yazalde Filimone <yazaldefilimon@gmail.com>"]
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 keywords = ["lua", "checker", "typechecker", "compiler"]
 categories = ["compilers", "text-processing", "development-tools"]
